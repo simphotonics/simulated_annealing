@@ -39,7 +39,7 @@ is a small value approaching zero. -->
 
 ## Algorithm Tuning
 It can be shown that by selecting a sufficiently high initial
-temperature the algorithm converges to the global minimum in
+temperature  the algorithm converges to the global minimum in
 the asymptotic limit [\[1\]][1].
 
 Practical implementations of the SA algorith aim to generate
@@ -62,21 +62,22 @@ moves at high temperatures wasting computational time and delaying convergence.
 
 
 ### Selecting an annealing schedule.
-The package includes functions for generating linear, geometric, normal, and exponential
+The package includes functions for generating *linear*, *geometric*, *normal*, and *exponential*
 decreasing temperature sequences.
 It is recommended to start with a higher number of
 outer iterations (number of entries in the sequence of temperatures) and log
 quantities like the current system energy, temperature, and the intermediate solutions.
 
 Any user supplied temperature sequence may be used as annealing schedule. However,
-the initial sequence member T<sub>0</sub> must be the highest temperature since it is used
-to estimate the constant k<sub>B</sub>. For continuous problems, the
-final value T<sub>n</sub> is related to the required *solution precision*.
+the *initial* sequence member T<sub>0</sub> must be the *highest* temperature since it is used
+to estimate the constant k<sub>B</sub>.
 
-It is useful to contract the search neighbourhood during each (outer) SA iteration.
+For continuous problems, the
+final value T<sub>n</sub> is related to the required *solution precision*.
+The size of the search neighbourhood: dx is typically reduced during each (outer) SA iteration.
 Towards the end of the annealing cycle T -> T<sub>n</sub>,
-the search neighbourhood approaches the *precision* and &Delta;E -> 0.
-At this stage of the annealing cycle one must limit uphill moves and choose T<sub>n</sub>
+the dx approaches the *solution precision* and &Delta;E = E(x<sub>min</sub> + dx) - E(x<sub>min</sub>) -> 0.
+At this stage of the annealing cycle it is advisable to limit uphill moves and choose T<sub>n</sub>
 sufficiently small such that
 P(&Delta;E, T<sub>n</sub>) = e<sup>-&Delta;E/(k<sub>B</sub>&middot;T<sub>n</sub>)</sup> -> 0.
 
@@ -88,10 +89,10 @@ is determined by a function with `typedef` `MarkovChainLength`, see method `anne
 To use this package include [`simulated_annealing`][simulated_annealing] as a `dependency` in your `pubspec.yaml` file.
 
 The following steps are required to set up the SA algorithm.
-1. Specify the search space &omega;.
-2. Define an annealing schedule and a neighbourhood function.
-3. Define the system energy function E(x<sub>0</sub>, x<sub>1</sub>, ..., x<sub>n</sub>).
-4. Extend the class [`Simulator`][SimulatorClass] implementing the methods `prepareLog()` and  `recordLog()`.
+1. Extend the class [`Simulator`][SimulatorClass] implementing the methods `prepareLog()` and  `recordLog()`.
+2. Specify the search space &omega;.
+3. Define an annealing schedule and a neighbourhood function.
+4. Define the system energy function E(x<sub>0</sub>, x<sub>1</sub>, ..., x<sub>n</sub>).
 
 <details><summary> Click to show source code.</summary>
 
@@ -139,7 +140,7 @@ class Sim extends Simulator {
 }
 
 void main() async {
-  // Defining a spherical space.
+  // Defining a spherical search space.
   final radius = 2;
   final x = FixedInterval(-radius, radius);
   final y = ParametricInterval(
@@ -172,7 +173,8 @@ void main() async {
 
   // ignore: unused_element
   int markov(num temperature) {
-    return min(1 + 1~/(100*temperature),25);
+     return 1;
+    //return min(1 + 1~/(100*temperature),25);
   }
 
   // Construct a simulator instance.
@@ -183,8 +185,7 @@ void main() async {
     ),
     schedule,
     gamma: 0.8,
-    //dE0: 0.46,
-    xMin0: [-1, -1, -0.5],
+    xMin0: xLocalMin,
   );
 
   print(simulator);
@@ -194,7 +195,7 @@ void main() async {
     sample[i].add(simulator.system.e[i]);
   }
 
-  final xSol = simulator.anneal((t) => 1);
+  final xSol = simulator.anneal(markov);
   await File('../sample_data/log.dat').writeAsString(simulator.rec.export());
   await File('../sample_data/energy_sample.dat')
       .writeAsString(sample.export(label: 'x y z energy'));
