@@ -75,7 +75,7 @@ to estimate the constant k<sub>B</sub>.
 For continuous problems, the
 final value T<sub>n</sub> is related to the required *solution precision*.
 The size of the search neighbourhood: dx is typically reduced during each (outer) SA iteration.
-Towards the end of the annealing cycle T -> T<sub>n</sub>,
+Towards the end of the annealing cycle T&nbsp;->&nbsp;T<sub>n</sub>,
 the dx approaches the *solution precision* and &Delta;E = E(x<sub>min</sub> + dx) - E(x<sub>min</sub>) -> 0.
 At this stage of the annealing cycle it is advisable to limit uphill moves and choose T<sub>n</sub>
 sufficiently small such that
