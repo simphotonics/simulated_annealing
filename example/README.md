@@ -1,15 +1,13 @@
-# Simulated Annealing For Dart - Examples
 
 ##  Defining a Search Space
 
 The class [`SearchSpace`][SearchSpace] is used to define a region from which points are
-randomly sampled. The search space is defined in terms of intervals along each dimension.
+randomly sampled. A search space is defined in terms of intervals along each dimension.
 
 The example below demonstrates how to define a
-spherical search space using cartesian coordinates.
-The interval `x` is an object of type `FixedInterval` that is the left and right boundary
-are constant numbers. The intervals `y` and `z` are objects of type `ParametricInterval`
-and their boundaries are specified in terms of a function that depends on other
+**spherical** search space using cartesian coordinates.
+The interval `x` is an object of type [`FixedInterval`][FixedInterval] that is the left and right boundary are constant numbers. The intervals `y` and `z` are objects of type [`ParametricInterval`][ParametricInterval]
+and their boundaries are specified in terms of a numerical function that depends on other
 intervals.
 
 <details><summary> Click to show source code.</summary>
@@ -71,7 +69,7 @@ void main() async {
 
 
 The figure below shows 2000 random points sampled from the spherical search space.
-The point were generated using the method `next` provided by the class `SearchSpace`.
+The point were generated using the method `next` provided by the class [`SearchSpace`][SearchSpace].
 
 The (red) test point T<sub>test</sub> has coordinates (1.2, 1.0, 1.6).
 The green dots represent points sampled for a neighbourhood T<sub>test</sub> &pm; m around T<sub>test</sub>, where m&nbsp;=&nbsp;(0.4, 0.4, 0.4) are the perturbation magnitudes along each dimension.
@@ -86,3 +84,9 @@ T<sub>test</sub> is returned unperturbed.
 Please file feature requests and bugs at the [issue tracker].
 
 [issue tracker]: https://github.com/simphotonics/simulated_annealing/issues
+
+[SearchSpace]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/SearchSpaceClass.html
+
+[FixedInterval]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/FixedIntervalClass.html
+
+[ParametricInterval]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/ParametricIntervalClass.html
