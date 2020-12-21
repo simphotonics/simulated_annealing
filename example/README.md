@@ -65,7 +65,7 @@ void main() async {
 ```
 </details>
 
-![Spherical Search Space](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/spherical_space.svg?sanitize=true)
+![Spherical Search Space](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/spherical_space.svg?sanitize=true&s=250)
 
 
 The figure below shows 2000 random points sampled from the spherical search space.
