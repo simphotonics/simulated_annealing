@@ -2,7 +2,7 @@
 
 The class [`AnnealingSchedule`][AnnealingSchedule] provides a
 decreasing sequence of temperatures (T<sub>0</sub>,&nbsp;...T<sub>n</sub>) and a decreasing sequence
-of perturbation magnitudes (**dx**<sub>0</sub>,&nbsp;... **dx**<sub>n</sub>) also known as neighbourhood function.
+of perturbation magnitudes (**dx**<sub>0</sub>,&nbsp;... **dx**<sub>n</sub>) also known as neighbourhood function. Note: Bold characters indicate vector valued quantities.
 
 The package includes functions for generating
 *linear*, *geometric*, *normal*, and *exponential*
@@ -18,14 +18,14 @@ void main() async {
   final dxMax = [2.0, 2.0, 2.0];
 
   // The perturbation magnitude at the end of the annealing process.
-  final precision = [1e-6, 1e-6, 1e-6];
+  final dxMin = [1e-6, 1e-6, 1e-6];
 
   // Defining an annealing schedule.
   // The initial temperature is 100, the final temperature is 1e-8.
   final schedule = AnnealingSchedule(
     exponentialSequence(100, 1e-8, n: 750),
-    spaceSize,
-    precision,
+    dxMax,
+    dxMin,
   );
 ```
 </details>
