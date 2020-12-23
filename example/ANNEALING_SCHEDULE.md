@@ -57,7 +57,7 @@ with 750 elements, start value T<sub>0</sub> = 100 and end value T<sub>n</sub> =
 [`AnnealingSchedule`][AnnealingSchedule] provides the method `dx(num temperature)`.
 The values of dx (green curve) are calculated by interpolated between **dxMax**&nbsp;=&nbsp;\[2.0,&nbsp;2.0,&nbsp;2.0\] and **dxMin**&nbsp;=&nbsp;\[1e-6,&nbsp;1e-6,&nbsp;1e-6\] using the function: **dx**(T)&nbsp;=&nbsp;**a**\*&nbsp;T&nbsp;+&nbsp;**b**, where **a**&nbsp;=&nbsp;(**dxMax**&nbsp;-&nbsp;**dxMin**)/(T<sub>0</sub>&nbsp;-&nbsp;T<sub>n</sub>) and **b**&nbsp;=&nbsp;**dxMax**&nbsp;-&nbsp;**a**\*t<sub>0</sub>.
 
-![Temperatures 3D](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/temperatures.svg?sanitize=true)
+![Temperature 3D](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/temperature.svg?sanitize=true)
 
 The figure above show the temperature during the SA process. At high temperatures (red dots) **dxMax**&nbsp;=&nbsp;\[2.0,&nbsp;2.0,&nbsp;2.0\] and the solutions are selected from the entire search space.
 As the temperature decreases (blue dots) the solution converges towards the global minimum.
