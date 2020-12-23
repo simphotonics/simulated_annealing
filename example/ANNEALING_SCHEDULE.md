@@ -40,13 +40,13 @@ sufficiently small such that
 P(&Delta;E, T<sub>n</sub>) = e<sup>-&Delta;E/(k<sub>B</sub>&middot;T<sub>n</sub>)</sup> -> 0,
 that is during the final iterations of the annealing process uphill moves are unlikely.
 
-The neighbourhood function dx specifies a region of the search space around
-the current solution. From this region a random point is selected as the
+The neighbourhood function **dx** specifies a region of the search space around
+the current solution **x**. From this region a random point is selected as the
 next potential solution.
 
 SA is typically used to solve discrete optimization problems.
 SA can be adapted to minimize continuous (multi-variate) functions by reducing the size of the
-search neighbourhood, dx, during each (outer) SA iteration until the required solution precision
+search neighbourhood, **dx**, during each (outer) SA iteration until the required solution precision
 is reached.
 
 ![Annealing Schedule](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/annealing_schedule.svg?sanitize=true)
@@ -55,7 +55,12 @@ The annealing schedule shown above consists of a monotonically decreasing expone
 with 750 elements, start value T<sub>0</sub> = 100 and end value T<sub>n</sub> = 1e-8.
 
 [`AnnealingSchedule`][AnnealingSchedule] provides the method `dx(num temperature)`.
-The values of dx (green curve) are calculated by interpolated between dxMax&nbsp;=&nbsp;(2.0,&nbsp;2.0,&nbsp;2.0) and dxMin&nbsp;=&nbsp;(1e-6,&nbsp;1e-6,&nbsp;1e-6) using the function: dx(T)&nbsp;=&nbsp;a\*&nbsp;T&nbsp;+&nbsp;b, where a&nbsp;=&nbsp;(dxMax&nbsp;-&nbsp;dxMin)/(T<sub>0</sub>&nbsp;-&nbsp;T<sub>n</sub>) and b&nbsp;=&nbsp;dxMax&nbsp;-&nbsp;a\*t<sub>0</sub>.
+The values of dx (green curve) are calculated by interpolated between **dxMax**&nbsp;=&nbsp;\[2.0,&nbsp;2.0,&nbsp;2.0\] and **dxMin**&nbsp;=&nbsp;\[1e-6,&nbsp;1e-6,&nbsp;1e-6\] using the function: **dx**(T)&nbsp;=&nbsp;**a**\*&nbsp;T&nbsp;+&nbsp;**b**, where **a**&nbsp;=&nbsp;(**dxMax**&nbsp;-&nbsp;**dxMin**)/(T<sub>0</sub>&nbsp;-&nbsp;T<sub>n</sub>) and **b**&nbsp;=&nbsp;**dxMax**&nbsp;-&nbsp;**a**\*t<sub>0</sub>.
+
+![Temperatures 3D](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/temperatures.svg?sanitize=true)
+
+The figure above show the temperature during the SA process. At high temperatures (red dots) **dxMax**&nbsp;=&nbsp;\[2.0,&nbsp;2.0,&nbsp;2.0\] and the solutions are selected from the entire search space.
+As the temperature decreases (blue dots) the solution converges towards the global minimum.
 
 ## Features and bugs
 Please file feature requests and bugs at the [issue tracker].
