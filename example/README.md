@@ -19,4 +19,4 @@ Please file feature requests and bugs at the [issue tracker].
 
 [annealing schedule]: https://github.com/simphotonics/simulated_annealing/blob/main/example/ANNEALING_SCHEDULE.md
 
-[simulator]: https://github.com/simphotonics/simulated_annealing/blob/main/example/SIMULATED_ANNEALING_EXAMPLE.md
+[simulator]: https://github.com/simphotonics/simulated_annealing/blob/main/example/SIMULATOR.md
