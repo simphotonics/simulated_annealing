@@ -2,7 +2,7 @@
 
 The class [`AnnealingSchedule`][AnnealingSchedule] provides a
 decreasing sequence of temperatures (T<sub>0</sub>,&nbsp;...T<sub>n</sub>) and a decreasing sequence
-of perturbation magnitudes (dx<sub>0</sub>,&nbsp;...dx<sub>n</sub>) also known as neighbourhood function.
+of perturbation magnitudes (**dx**<sub>0</sub>,&nbsp;... **dx**<sub>n</sub>) also known as neighbourhood function.
 
 The package includes functions for generating
 *linear*, *geometric*, *normal*, and *exponential*
