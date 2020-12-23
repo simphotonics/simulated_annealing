@@ -9,7 +9,7 @@ the **ground state** of the system.
 
 The algorithm name was coined by Kirkpatrick et al. [\[1\]][kirkpatrick1983] and was
 derived from the process of annealing a metal alloy or glass.
-The first step of annealing consists of heating a
+The first step of the annealing process consists of heating a
 solid material above a critical temperature. This allows its atoms to gain
 sufficient kinetic energy to be able to rearrange themselves.
 Then the temperature is decreased sufficiently slowly
@@ -32,7 +32,7 @@ k<sub>B</sub> relates the system temperature
 with the probability of accepting a solution where &Delta;E > 0.
 
 Many authors set k<sub>B</sub> = 1 and scale the temperature to control the
-solution acceptance probability. I find it more practical to define an
+solution acceptance probability. I find it more practical to define a
 temperature scale say T<sub>0</sub> = 100, T<sub>n</sub> = 1e-6, where n is the number of
 outer iterations and calculate the system dependent
 constant k<sub>B</sub> (see section [Algorithm Tuning](https://github.com/simphotonics/simulated_annealing#algorithm-tuning)).
