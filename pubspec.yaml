@@ -1,0 +1,17 @@
+name: simulated_annealing
+description: A simulated annealing framework for Dart.
+
+version: 0.0.1
+
+homepage: https://github.com/simphotonics/simulated_annealing
+
+environment:
+  sdk: '>=2.10.0 <3.0.0'
+
+dependencies:
+  exception_templates: ^0.1.1-nullsafety
+  lazy_memo: ^0.0.3-nullsafety
+
+dev_dependencies:
+  minimal_test: ^0.1.2-nullsafety
+  pedantic: ^1.9.2
