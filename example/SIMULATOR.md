@@ -15,8 +15,8 @@ The figure above shows a projection of E onto the x-y plane. The global minimum 
 is situated at **x**<sub>glob</sub> = \[0.5, 0.7, 0.8\]. The function has a local minimum
 at **x**<sub>loc</sub>&nbsp;= \[-1, -1, -0.5\].
 
-After defining a [search space], an [annealing schedule], and an annealing system, we create
-an instance of `Simulator`. The annealing process is started by calling the method `anneal`.
+After defining a [search space], an [annealing schedule], and an annealing system (see source code below), we create
+an instance of [`Simulator`][SimulatorClass]. The annealing process is started by calling the method `anneal`.
 
 <details><summary> Click to show source code.</summary>
 
@@ -162,3 +162,5 @@ Please file feature requests and bugs at the [issue tracker].
 [search space]: https://github.com/simphotonics/simulated_annealing/blob/main/example/SEARCH_SPACE.md
 
 [annealing schedule]: https://github.com/simphotonics/simulated_annealing/blob/main/example/ANNEALING_SCHEDULE.md
+
+[SimulatorClass]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/SimulatorClass.html
