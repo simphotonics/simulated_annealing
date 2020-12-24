@@ -6,7 +6,7 @@ The examples presented here demonstrate how to define a:
 - [annealing schedule],
 - annealing system and logging [simulator].
 
-The simulator is used to find the global minimum of a continuous
+The [simulator] is used to find the global minimum of a continuous
 3D function defined for a spherical region with radius 2.0 centred
 around the origin.
 

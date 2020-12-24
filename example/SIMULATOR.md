@@ -15,7 +15,7 @@ The figure above shows a projection of E onto the x-y plane. The global minimum 
 is situated at **x**<sub>glob</sub> = \[0.5, 0.7, 0.8\]. The function has a local minimum
 at **x**<sub>loc</sub>&nbsp;= \[-1, -1, -0.5\].
 
-After defining a search space, an annealing schedule, and an annealing system, we create
+After defining a [search space], an [annealing schedule], and an annealing system, we create
 an instance of `Simulator`. The annealing process is started by calling the method `anneal`.
 
 <details><summary> Click to show source code.</summary>
@@ -125,7 +125,7 @@ void main() async {
   await File('../data/energy_sample.dat')
       .writeAsString(sample.export(label: 'x y z energy'));
 
-  print(xSol);
+  print('Solution: $xSol');
 }
 
 ```
@@ -147,7 +147,8 @@ system energy evaluated at each point selected during the annealing
 process. The energy is represented as a colour and varies between a maximum at 4.0 (red) and a minimum value of 0.0 (blue). The initial point can be identified as a green point situated at
 **x**<sub>loc</sub> = \[-1.0, -1.0, -0.5\].
 
-As the energy decreases the solution approaches **x**<sub>glob</sub> = \[0.5, 0.7, 0.8\] asymptotically (blue dots). A typical solution is **x**<sub>min</sub> = \[0.5000000457219432, 0.6999999722831786, 0.800000105007227\].
+As the energy decreases the solution approaches **x**<sub>glob</sub> = \[0.5, 0.7, 0.8\] asymptotically (blue dots). A typical solution is **x**<sub>min</sub> = \[0.5000000457219432, 0.6999999722831786, 0.800000105007227\]. The solution precision is determined minimum value of the perturbation magnitude
+**dxMin** (see [annealing schedule]).
 
 
 
@@ -158,6 +159,6 @@ Please file feature requests and bugs at the [issue tracker].
 
 [SearchSpace]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/SearchSpaceClass.html
 
-[FixedInterval]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/FixedIntervalClass.html
+[search space]: https://github.com/simphotonics/simulated_annealing/blob/main/example/SEARCH_SPACE.md
 
-[ParametricInterval]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/ParametricIntervalClass.html
+[annealing schedule]: https://github.com/simphotonics/simulated_annealing/blob/main/example/ANNEALING_SCHEDULE.md
