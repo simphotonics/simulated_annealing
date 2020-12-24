@@ -102,5 +102,5 @@ void main() async {
   await File('../data/energy_sample.dat')
       .writeAsString(sample.export(label: 'x y z energy'));
 
-  print(xSol);
+  print('Solution: $xSol');
 }
