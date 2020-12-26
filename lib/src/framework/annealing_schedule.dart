@@ -133,9 +133,10 @@ class AnnealingSchedule {
   /// Minimum size of the search neighbourhood.
   UnmodifiableListView<num> dxMin;
 
-  /// Constant
+  /// Returns the factor a used in dx = a * temperature + b.
   late UnmodifiableListView<num> a;
 
+  /// Returns the factor b used in dx = a * temperature + b.
   late UnmodifiableListView<num> b;
 
   /// Returns the neighbourhood vector for a given temperature.
