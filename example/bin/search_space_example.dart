@@ -29,7 +29,7 @@ void main() async {
   final perturbation = List<List<num>>.generate(
       500, (_) => space.perturb(testPoint, magnitudes));
 
-  await File('../data/spheric_sample_space.dat').writeAsString(
+  await File('../data/spherical_search_space.dat').writeAsString(
     sample.export(),
   );
   await File('../data/perturbation.dat').writeAsString(
