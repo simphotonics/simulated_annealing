@@ -33,9 +33,9 @@ with the probability of accepting a solution where &Delta;E > 0.
 As such, the temperature is a parameter that controls the probability of up-hill moves.
 
 Many authors set k<sub>B</sub> = 1 and scale the temperature to control the
-solution acceptance probability. I find it more practical to define a
-temperature scale say T<sub>0</sub> = 100, T<sub>n</sub> = 1e-6, where n is the number of
-outer iterations and calculate the system dependent
+solution acceptance probability. I find it more practical to use an independent
+temperature scale with the highest value T<sub>0</sub> and the lowest value T<sub>n</sub>,
+(where n is the number of outer SA iterations) and calculate the system dependent
 constant k<sub>B</sub> (see section [Algorithm Tuning](https://github.com/simphotonics/simulated_annealing#algorithm-tuning)).
 
 ## Usage
@@ -188,7 +188,7 @@ energy function sample mentioned above.
 &Delta;E<sub>0</sub> is the **most critical SA parameter**. If &Delta;E<sub>0</sub> is too large the algorithm will
 oscillate wildy between random points and will most likely not converge towards an acceptable solution.
 On the other hand, if &Delta;E<sub>0</sub> is too small up-hill moves are unlikely and the solution
-most likely converges towards a local minimum or a plateau-shaped region.
+most likely converges towards a local minimum or a point situated in a plateau-shaped region.
 
 
 
@@ -215,9 +215,11 @@ increasing the number of inner iterations (Markov chain length).
 
 ## Examples
 
-Further examples on how  can be found in the folder [example].
-
-
+Further examples on how to define and use a:
+- [search space],
+- [annealing schedule],
+- annealing system and logging [simulator],
+can be found in the folder [example].
 
 
 ## Features and bugs
