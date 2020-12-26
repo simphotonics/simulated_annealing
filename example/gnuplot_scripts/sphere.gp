@@ -1,5 +1,6 @@
-reset
+# Visualizes the spherical search plotting the points in ../data/spherical_search_space.dat
 
+reset
 
 set key font ", 14"  inside bottom left enhanced
 
@@ -47,7 +48,7 @@ set rrange [ * : * ] noreverse writeback
 
 # unset parametric
 
-splot '../data/spherical_sample_space.dat' lt 1 ps 0.5 pt 4 t "Points In Search Space", \
+splot '../data/spherical_search_space.dat' lt 1 ps 0.5 pt 4 t "Points In Search Space", \
 '../data/perturbation.dat' ps 0.75 pt 7 lt 2 t "Points In Neighbourhood Around Test Point", \
 '../data/center_point.dat' ps 2 pt 7 lt 1 lc "red" t "Test Point", \
 "-" w p ps 3 pt 9 lt 9 lc "blue" t "Centre Point"
