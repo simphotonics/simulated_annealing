@@ -134,10 +134,9 @@ void main() async {
 
 ![Convergence Graph](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/convergence.svg?sanitize=true)
 
-The figure above shows the system energy, temperature, and acceptance probability during the
-annealing process.
+The figure above shows the system energy, min. system energy, temperature, and acceptance probability during the SA process.
 The annealing schedule (blue curve) consists of a monotonically decreasing exponential sequence
-with 750 elements, start value T<sub>0</sub> = 100 and end value T<sub>n</sub> = 1e-8. At high temperatures the algorithm explores the entire search space for the x-coordinate, (-2, 2), and new solutions are accepted with high probability (red dots along the line y = 1). As the temperature decreases fewer solutions are accepted and the x-coordinate converges towards 0.5.
+with 750 elements, start value T<sub>0</sub> = 100 and end value T<sub>n</sub> = 1e-8. At high temperatures the algorithm explores the entire search space for the x-coordinate (values ranging between -2 and 2), and new solutions are accepted with high probability (red dots along the line y = 1). As the temperature decreases fewer solutions are accepted and the x-coordinate converges towards 0.5.
 
 ![System Energy](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/energy.svg?sanitize=true)
 
