@@ -1,4 +1,8 @@
-set key inside box right top font ", 14"
+reset
+
+set term qt size 1000, 600
+
+set key inside box right bottom font ", 14"
 
 set title "Simulated Annealing - Convergence" font ",18"
 
