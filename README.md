@@ -204,9 +204,10 @@ outer iterations (number of entries in the sequence of temperatures) and log
 quantities like the current system energy, temperature, and the intermediate solutions.
 
 The figure below shows a typical SA log where the x-coordinate of the solution (green dots)
-converges after 750 iteration. The graph is discussed in more detail [here].
+converges after 750 iteration. A projection of the energy function onto the x-y plane
+is shown in the inset. The graph is discussed in more detail [here].
 
-![Convergence Graph](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/convergence.svg?sanitize=true)
+![Convergence Graph](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/convergenceWithInset.svg?sanitize=true)
 
 The number of inner iterations (performed while the temperature is kept constant)
 is determined by a function with typedef `MarkovChainLength`, see method [`anneal`][anneal].
