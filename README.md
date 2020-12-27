@@ -26,13 +26,13 @@ where &Delta;E = E - E<sub>min</sub>.
  Accepting up-hill moves provides a method of escaping from local energy minima.
  The probability of accepting a solution with &Delta;E > 0 decreases with decreasing temperature.
 
-In Physics, the [Boltzmann constant][Boltzmann] k<sub>B</sub> relates the system
+The [Boltzmann constant][Boltzmann] k<sub>B</sub> relates the system
 temperature with the kinetic energy of particles in a gas. In the context of SA,
 k<sub>B</sub> relates the system temperature
 with the probability of accepting a solution where &Delta;E > 0.
 As such, the temperature is a parameter that controls the probability of up-hill moves.
 
-Many authors set k<sub>B</sub> = 1 and scale the temperature to control the
+Most authors set k<sub>B</sub> = 1 and scale the temperature to control the
 solution acceptance probability. I find it more practical to use an independent
 temperature scale with the highest value T<sub>0</sub> and the lowest value T<sub>n</sub>,
 (where n is the number of outer SA iterations) and calculate the system dependent
@@ -162,13 +162,15 @@ void main() async {
 
 ## Algorithm Tuning
 It can be shown that by selecting a sufficiently high initial
-temperature (or factor k<sub>B</sub>&middot;T)
-the algorithm converges to the global minimum in
-the asymptotic limit [\[2\]][nikolaev2010].
+factor k<sub>B</sub>&middot;T
+the algorithm converges to the global minimum if the annealing schedule
+decreases on a logarithmic scale (slow cooling) and
+the number of inner iterations (Markov chain length)
+is sufficiently high [\[2\]][nikolaev2010].
 
 Practical implementations of the SA algorithm aim to generate
 an acceptable solution with *minimal* computational effort.
-In such circumstances, algorithm convergence is not
+For such fast cooling schedules, algorithm convergence to the global minimum is not
 strictly guaranteed. In that sense, SA is a heuristic approach and some
 degree of trial and error is required to determine which annealing schedule
 works best for a given problem.
@@ -177,19 +179,20 @@ works best for a given problem.
 An estimate for the average scale of the variation of the energy function &Delta;E<sub>0</sub>
 can be obtained by sampling the energy function E
 at random points in the search space &omega;
-and calculating the sample standard deviation &sigma;<sub>E</sub> [\[3\]][ledesma2008]. The constant k<sub>B</sub> is set such that the probability of accepting a solution P(&Delta;E<sub>0</sub> = &sigma;<sub>E</sub>, T<sub>0</sub>) = &gamma; where T<sub>0</sub> is the initial temperature.
+and calculating the sample standard deviation &sigma;<sub>E</sub> [\[3\]][ledesma2008].
+The constant k<sub>B</sub> is set such that the probability of accepting a
+solution P(&Delta;E<sub>0</sub> = &sigma;<sub>E</sub>, T<sub>0</sub>) = &gamma; where T<sub>0</sub> is the initial temperature.
 
-Note: When using the standard deviation as a measure of average variation of E it is possible
+Note: When using the standard deviation as a measure of the average variation of E it is possible
 to *underestimate* &Delta;E<sub>0</sub> if the function E is plateau-shaped with isolated extrema.
 For this reason, the constructor of [`Simulator`][Simulator] accepts the
-optional argument &Delta;E<sub>0</sub> with default value &Delta;E<sub>0</sub> = 0.5&middot;(&sigma;<sub>E</sub> + 0.2&middot;|E<sub>max</sub> - E<sub>min</sub>|), where E<sub>max</sub> and E<sub>min</sub> are the maximum and minimum values found in the
-energy function sample mentioned above.
+optional argument &Delta;E<sub>0</sub> with default value &Delta;E<sub>0</sub> = 0.5&middot;(&sigma;<sub>E</sub> + 0.2&middot;|E<sub>max</sub> - E<sub>min</sub>|), where E<sub>max</sub> and E<sub>min</sub> are the maximum and minimum values found while
+sampling the energy function as mentioned above.
 
 &Delta;E<sub>0</sub> is the **most critical SA parameter**. If &Delta;E<sub>0</sub> is too large the algorithm will
 oscillate wildy between random points and will most likely not converge towards an acceptable solution.
 On the other hand, if &Delta;E<sub>0</sub> is too small up-hill moves are unlikely and the solution
 most likely converges towards a local minimum or a point situated in a plateau-shaped region.
-
 
 
 Since gamma represents a probability, 0 < &gamma; < 1,  however useful values for &gamma;
@@ -204,8 +207,9 @@ outer iterations (number of entries in the sequence of temperatures) and log
 quantities like the current system energy, temperature, and the intermediate solutions.
 
 The figure below shows a typical SA log where the x-coordinate of the solution (green dots)
-converges after 750 iteration. A projection of the energy function onto the x-y plane
-is shown in the inset. The graph is discussed in more detail [here].
+converges asymptotically to 0.5 after 750 iteration. A projection of the energy function onto the x-y plane
+is shown in the inset. Note that the global minimum of the energy function occurs at x = 0.5.
+The graph is discussed in more detail [here].
 
 ![Convergence Graph](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/convergenceWithInset.svg?sanitize=true)
 
