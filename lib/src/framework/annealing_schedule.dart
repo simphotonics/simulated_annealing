@@ -5,7 +5,7 @@ import '../extensions/list_utils.dart';
 
 /// Linear temperature sequence with entries:
 ///
-/// `[tStart, tStart - dt, ..., tStart - n * dt]` where `dt = (tEnd - tStart)/(n - 1)`
+/// `tStart, tStart - dt, ..., tStart - n * dt` where `dt = (tEnd - tStart)/(n - 1)`
 List<num> linearSequence(num tStart, num tEnd, {int n = 3000}) {
   final dt = (tEnd - tStart) / (n - 1);
   return List<num>.generate(n, (i) => tStart + dt * i);
@@ -102,15 +102,15 @@ class AnnealingSchedule {
     List<num> temperatures,
     List<num> dxMax,
     List<num> dxMin,
-  )   : _temperatures = List<num>.generate(
-            temperatures.length, (i) => temperatures[i].abs()),
+  )   : _temperatures =
+            List<num>.generate(temperatures.length, (i) => temperatures[i]),
         dxMax = UnmodifiableListView(dxMax),
-        dxMin = UnmodifiableListView(dxMin) {
-    a = UnmodifiableListView(
-      (dxMax - dxMin).divide(tStart - tEnd),
-    );
-    b = UnmodifiableListView(dxMax - a.times(tStart));
-  }
+        dxMin = UnmodifiableListView(dxMin),
+        _a = UnmodifiableListView(
+            (dxMax - dxMin).divide(temperatures.first - temperatures.last)),
+        _b = UnmodifiableListView(dxMax -
+            (dxMax - dxMin).times(
+                temperatures.first / (temperatures.first - temperatures.last)));
 
   /// Sequence of temperatures defining the annealing schedule.
   /// * The initial temperature `tStart` must be the largest temperature
@@ -128,19 +128,19 @@ class AnnealingSchedule {
   List<num> get temperatures => List<num>.of(_temperatures);
 
   /// Sample space size. Parameter used by the neighbourhood function.
-  UnmodifiableListView<num> dxMax;
+  final UnmodifiableListView<num> dxMax;
 
   /// Minimum size of the search neighbourhood.
-  UnmodifiableListView<num> dxMin;
+  final UnmodifiableListView<num> dxMin;
 
-  /// Returns the factor a used in dx = a * temperature + b.
-  late UnmodifiableListView<num> a;
+  /// Returns the factor a used in dx = _a * temperature + _b.
+  final List<num> _a;
 
-  /// Returns the factor b used in dx = a * temperature + b.
-  late UnmodifiableListView<num> b;
+  /// Returns the factor b used in dx = _a * temperature + _b.
+  final List<num> _b;
 
   /// Returns the neighbourhood vector for a given temperature.
   /// * `dx(tStart) = spaceSize`
   /// * `dx(tEnd) = precision`
-  List<num> dx(num temperature) => a.times(temperature).plus(b);
+  List<num> dx(num temperature) => _a.times(temperature).plus(_b);
 }
