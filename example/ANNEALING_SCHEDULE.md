@@ -59,7 +59,7 @@ The values of dx (green curve) are calculated by interpolated between **dxMax**&
 
 ![Temperature 3D](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/temperature.svg?sanitize=true)
 
-The figure above show the temperature during the SA process. At high temperatures (red dots) **dxMax**&nbsp;=&nbsp;\[2.0,&nbsp;2.0,&nbsp;2.0\] and the solutions are selected from the entire search space.
+The figure above shows the temperature during the SA process. At high temperatures (red dots) **dxMax**&nbsp;=&nbsp;\[2.0,&nbsp;2.0,&nbsp;2.0\] and the solutions are selected from the entire search space.
 As the temperature decreases (blue dots) the solution converges towards the global minimum.
 
 ## Features and bugs
