@@ -8,6 +8,7 @@ import '../extensions/random_sample.dart';
 /// Function defining an interval start/end point.
 typedef ParametricPoint = num Function();
 
+/// Abstract class representing a numerical interval.
 abstract class Interval {
   Interval();
 
@@ -25,6 +26,7 @@ abstract class Interval {
   num get _size;
 
   /// Cached random number in interval (startPoint(), endPoint()).
+  /// @nodoc
   late num _cache;
 
   /// Logical flag indicating if `_cache` is up to date.
@@ -37,33 +39,20 @@ abstract class Interval {
     _isUpToDate = false;
   }
 
-  /// Copy constructor
-  // factory Interval.from(Interval interval) {
-  //   if (interval is FixedInterval) {
-  //     return FixedInterval(interval.start, interval.end);
-  //   } else if (interval is ParametricInterval) {
-  //     return ParametricInterval(interval.pStart, interval.pEnd);
-  //   } else {
-  //     throw ErrorOf<Interval>(
-  //       message: 'Cannot construct a copy of $interval',
-  //     );
-  //   }
-  // }
-
   /// The random number generator.
   static final random = Random();
 }
 
-/// A numeric interval defined by
+/// A fixed numerical interval defined by
 /// the start point `start` and the end point `end`.
 class FixedInterval extends Interval {
-  /// Construct a fixed interval (`start`, `end`).
+  /// Constructs a fixed interval (`start`, `end`).
   FixedInterval(this.start, this.end);
 
-  /// Start point of the numeric interval.
+  /// Start point of the numerical interval.
   final num start;
 
-  /// End point of the numeric interval.
+  /// End point of the numerical interval.
   final num end;
 
   /// Returns the next random number that is larger than `start`
@@ -119,16 +108,16 @@ class FixedInterval extends Interval {
   num get _size => (end - start).abs();
 }
 
-/// A numeric interval defined by
+/// A numerical interval defined by
 /// the parametric start point function `pStart` and the end point `pEnd`.
 class ParametricInterval extends Interval {
   /// Constructs a parametric interval.
   ParametricInterval(this.pStart, this.pEnd);
 
-  /// Start point of the numeric interval.
+  /// Start point of the numerical interval.
   final ParametricPoint pStart;
 
-  /// End point of the numeric interval.
+  /// End point of the numerical interval.
   final ParametricPoint pEnd;
 
   /// Returns the next random number that is larger
@@ -180,7 +169,7 @@ class ParametricInterval extends Interval {
     }
   }
 
-  /// Returns true if x is safisfying
+  /// Returns true if `x` is safisfying
   /// `(x >= pStart() && x<= pEnd()))`.
   @override
   bool contains(num x) => (x >= pStart() && x <= pEnd());
@@ -207,7 +196,7 @@ class ParametricInterval extends Interval {
 /// A search region with boundaries defined by
 /// `intervals`.
 class SearchSpace {
-  /// Construct an object of type `SearchSpace`.
+  /// Constructs an object of type `SearchSpace`.
   SearchSpace(List<Interval> intervals)
       : _intervals = List<Interval>.of(intervals);
 
@@ -295,8 +284,8 @@ class SearchSpace {
   /// Returns the sample space size along each dimension.
   ///
   /// Note:
-  /// Parameteric interval sizes are sampled
-  /// 20 times and the maximum values are returned.
+  /// Parametric interval sizes are sampled
+  /// 50 times and the maximum values are returned.
   List<num> get size {
     final sizes = List<List<num>>.generate(50, (_) {
       clearCache();
