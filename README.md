@@ -45,20 +45,21 @@ The following steps are required to set up the SA algorithm.
 1. Extend the class [`Simulator`][SimulatorClass] implementing the methods `prepareLog()` and  `recordLog()`.
 2. Specify the [search space][search space] &omega;.
 3. Define an [annealing schedule][annealing schedule] and a neighbourhood function.
-4. Define the system energy function E(x<sub>0</sub>, x<sub>1</sub>, ..., x<sub>n</sub>).
+4. Define the system [energy][energy].
 5. Start the [simulated annealing][simulator] process.
 
 <details><summary> Click to show source code.</summary>
 
 ```Dart
+
 import 'dart:io';
 import 'dart:math';
 
 import 'package:simulated_annealing/simulated_annealing.dart';
 
-class Sim extends Simulator {
-  Sim(
-    AnnealingSystem system,
+class LoggingSimulator extends Simulator {
+  LoggingSimulator(
+    Energy system,
     AnnealingSchedule schedule, {
     num gamma = 0.8,
     num? dE0,
@@ -77,6 +78,7 @@ class Sim extends Simulator {
   void prepareLog() {
     rec.prepareVector('x', 3);
     rec.prepareScalar('Energy');
+    rec.prepareScalar('Energy Min');
     rec.prepareScalar('P(dE)');
     rec.prepareScalar('Temperature');
     rec.prepareVector('dx', 3);
@@ -87,6 +89,7 @@ class Sim extends Simulator {
     rec.addVector('x', x);
     rec.addVector('dx', dx);
     rec.addScalar('Energy', eCurrent);
+    rec.addScalar('Energy Min', eMin);
     rec.addScalar('P(dE)',
         (eCurrent - eMin) < 0 ? 1 : exp(-(eCurrent - eMin) / (kB * t)));
     rec.addScalar('Temperature', t);
@@ -94,7 +97,7 @@ class Sim extends Simulator {
 }
 
 void main() async {
-  // Defining a spherical search space.
+  // Defining a spherical space.
   final radius = 2;
   final x = FixedInterval(-radius, radius);
   final y = ParametricInterval(
@@ -119,7 +122,7 @@ void main() async {
   // and a global minimum at xGlobalMin.
   final xGlobalMin = [0.5, 0.7, 0.8];
   final xLocalMin = [-1.0, -1.0, -0.5];
-  num energy(List<num> x) {
+  num energyFunction(List<num> x) {
     return 4.0 -
         4.0 * exp(-4 * xGlobalMin.distance(x)) -
         2.0 * exp(-6 * xLocalMin.distance(x));
@@ -127,34 +130,33 @@ void main() async {
 
   // ignore: unused_element
   int markov(num temperature) {
-     return 1;
-    //return min(1 + 1~/(100*temperature),25);
+    return min(1 + 1 ~/ (100 * temperature), 25);
   }
 
+  final energy = Energy(energyFunction, space);
+
   // Construct a simulator instance.
-  final simulator = Sim(
-    AnnealingSystem(
-      energy,
-      space,
-    ),
+  final simulator = LoggingSimulator(
+    energy,
     schedule,
     gamma: 0.8,
-    xMin0: xLocalMin,
+    dE0: energy.stdDev + 0.1,
+    xMin0: [-1, -1, -0.5],
   );
 
   print(simulator);
 
-  final sample = simulator.system.x;
+  final sample = simulator.system.samplePoints;
   for (var i = 0; i < simulator.system.sampleSize; i++) {
-    sample[i].add(simulator.system.e[i]);
+    sample[i].add(simulator.system.sample[i]);
   }
 
-  final xSol = simulator.anneal(markov);
+  final xSol = simulator.anneal((t) => 1);
   await File('../data/log.dat').writeAsString(simulator.rec.export());
   await File('../data/energy_sample.dat')
       .writeAsString(sample.export(label: 'x y z energy'));
 
-  print(xSol);
+  print('Solution: $xSol');
 }
 
 ```
@@ -257,4 +259,6 @@ Please file feature requests and bugs at the [issue tracker][tracker].
 
 [simulator]: https://github.com/simphotonics/simulated_annealing/blob/main/example/SIMULATOR.md
 
-[anneal]:
+[anneal]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/Simulator/anneal.html
+
+[energy]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/EnergyClass.html
