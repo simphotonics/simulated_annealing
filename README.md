@@ -225,7 +225,7 @@ increasing the number of inner iterations (Markov chain length).
 Further examples on how to define and use a:
 - [search space],
 - [annealing schedule],
-- annealing system and logging [simulator],
+- system energy and logging [simulator],
 can be found in the folder [example].
 
 

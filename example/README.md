@@ -4,7 +4,7 @@
 The examples presented here demonstrate how to define a:
 - [search space],
 - [annealing schedule],
-- annealing system and logging [simulator].
+- system energy and logging [simulator].
 
 The [simulator] is used to find the global minimum of a continuous
 3D function defined for a spherical region with radius 2.0 centred
