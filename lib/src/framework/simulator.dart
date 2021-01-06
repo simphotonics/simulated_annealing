@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'annealing_schedule.dart';
-import 'annealing_system.dart';
+import 'energy.dart';
 import 'search_space.dart';
 
 typedef MarkovChainLength = int Function(num temperature);
@@ -11,9 +11,12 @@ abstract class Simulator {
   /// * system: Annealing system (energy function and search region).
   /// * schedule: Annealing schedule.
   /// * precision: Minimum neighbourhood step size.
-  /// * gamma: Probability of solution acceptance if `dE == dE0`.
-  /// * dE0: Defaults to `system.eStdDev`. Can be used for testing
-  ///   purposes. Scale of
+  /// * gamma: Probability of solution acceptance if `dE == dE0`
+  ///   and the system is at the highest (initial) temperature.
+  /// * dE0: Defaults to `system.dE0`. Can be used for testing
+  ///   purposes. It is an estimate of the typical variation of
+  ///   the system energy function.
+  ///
   /// * xMin0: Defaults to `system.xMin0`. Can be used to specify the
   ///   starting point of the simulated annealing process.
   Simulator(
@@ -24,9 +27,9 @@ abstract class Simulator {
     List<num>? xMin0,
   }) {
     this.dE0 = (dE0 == null) ? system.dE0 : dE0;
-    _xMin = (xMin0 == null) ? system.xMin0 : xMin0;
+    _xMin = (xMin0 == null) ? system.xMin : xMin0;
     _xMinGlobal = _xMin;
-    _eMin = system.energy(_xMin);
+    _eMin = system.energyFunction(_xMin);
     _eMinGlobal = _eMin;
     kB = -this.dE0 / (schedule.tStart * math.log(gamma));
     _e = _eMin;
@@ -43,7 +46,7 @@ abstract class Simulator {
   late final num kB;
 
   /// Annealing system consisting of an energy function and a search region.
-  final AnnealingSystem system;
+  final Energy system;
 
   /// A typical energy difference encountered when evaluating `system.energy`
   /// at random points.
@@ -55,6 +58,7 @@ abstract class Simulator {
   late final dE0;
 
   /// Current energy minimizing solution.
+  /// @nodoc
   late List<num> _xMin;
 
   /// Current energy minimizing solution. If the argument `xMin0` is not
@@ -71,33 +75,39 @@ abstract class Simulator {
   num get eMin => _eMin;
 
   /// Current energy minimum.
+  /// @nodoc
   late num _eMin;
 
   /// Global energy minimum.
+  /// @nodoc
   late num _eMinGlobal;
 
   /// Global energy minimum.
   num get eMinGlobal => _eMinGlobal;
 
   /// Current temperature;
+  /// @nodoc
   late num _t;
 
   /// Current temperature.
   num get t => _t;
 
   /// Current energy.
+  /// @nodoc
   late num _e;
 
   /// Current energy.
   num get eCurrent => _e;
 
   /// Current perturbation magnitude.
+  /// @nodoc
   late List<num> _dx;
 
   /// Current perturbation magnitude.
   List<num> get dx => _dx;
 
   /// Current position.
+  /// @nodoc
   late List<num> _x;
 
   /// Current position
@@ -134,7 +144,7 @@ abstract class Simulator {
         _x = system.perturb(_xMin, _dx);
 
         /// Calculate energy
-        _e = system.energy(_x);
+        _e = system.energyFunction(_x);
         dE = _e - _eMin;
 
         if (dE < 0) {

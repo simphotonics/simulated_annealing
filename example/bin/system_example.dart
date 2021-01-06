@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:simulated_annealing/simulated_annealing.dart';
-import 'package:simulated_annealing/src/framework/annealing_system.dart';
 
 void main(List<String> args) {
   // Defining a spherical space.
@@ -28,7 +27,7 @@ void main(List<String> args) {
         2.0 * exp(-6 * xLocalMin.distance(x));
   }
 
-  final system = AnnealingSystem(energy, space);
+  final system = Energy(energy, space);
 
   print(system);
 }

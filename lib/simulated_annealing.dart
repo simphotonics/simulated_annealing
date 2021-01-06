@@ -2,7 +2,7 @@
 library simulated_annealing;
 
 export 'src/framework/annealing_schedule.dart';
-export 'src/framework/annealing_system.dart';
+export 'src/framework/energy.dart';
 export 'src/framework/data_recorder.dart';
 export 'src/framework/search_space.dart';
 export 'src/framework/simulator.dart';
