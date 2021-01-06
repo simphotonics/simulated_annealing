@@ -5,7 +5,7 @@ import 'package:simulated_annealing/simulated_annealing.dart';
 
 class LoggingSimulator extends Simulator {
   LoggingSimulator(
-    AnnealingSystem system,
+    Energy system,
     AnnealingSchedule schedule, {
     num gamma = 0.8,
     num? dE0,
@@ -68,7 +68,7 @@ void main() async {
   // and a global minimum at xGlobalMin.
   final xGlobalMin = [0.5, 0.7, 0.8];
   final xLocalMin = [-1.0, -1.0, -0.5];
-  num energy(List<num> x) {
+  num energyFunction(List<num> x) {
     return 4.0 -
         4.0 * exp(-4 * xGlobalMin.distance(x)) -
         2.0 * exp(-6 * xLocalMin.distance(x));
@@ -79,22 +79,22 @@ void main() async {
     return min(1 + 1 ~/ (100 * temperature), 25);
   }
 
-  final system = AnnealingSystem(energy, space);
+  final energy = Energy(energyFunction, space);
 
   // Construct a simulator instance.
   final simulator = LoggingSimulator(
-    system,
+    energy,
     schedule,
     gamma: 0.8,
-    dE0: system.eStdDev + 0.1,
+    dE0: energy.stdDev + 0.1,
     xMin0: [-1, -1, -0.5],
   );
 
   print(simulator);
 
-  final sample = simulator.system.x;
+  final sample = simulator.system.samplePoints;
   for (var i = 0; i < simulator.system.sampleSize; i++) {
-    sample[i].add(simulator.system.e[i]);
+    sample[i].add(simulator.system.sample[i]);
   }
 
   final xSol = simulator.anneal((t) => 1);
