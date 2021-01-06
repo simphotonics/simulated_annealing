@@ -44,12 +44,14 @@ class Energy {
   final SearchSpace _searchSpace;
 
   /// Random points sampled from the search region.
+  /// @nodoc
   late final List<List<num>> _samplePoints;
 
   /// Random points sampled from the search region.
   List<List<num>> get samplePoints => List<List<num>>.of(_samplePoints);
 
   /// Energy evaluated for each point in `samplePoints`.
+  /// @nodoc
   late final List<num> _e;
 
   /// Energy evaluated for each point in `x`.
