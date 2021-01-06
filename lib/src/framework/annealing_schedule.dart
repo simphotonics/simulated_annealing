@@ -131,6 +131,8 @@ class AnnealingSchedule {
   final UnmodifiableListView<num> dxMax;
 
   /// Minimum size of the search neighbourhood.
+  ///
+  /// For continuous problems this parameter determines the solution precision.
   final UnmodifiableListView<num> dxMin;
 
   /// Returns the factor a used in dx = _a * temperature + _b.
@@ -140,7 +142,7 @@ class AnnealingSchedule {
   final List<num> _b;
 
   /// Returns the neighbourhood vector for a given temperature.
-  /// * `dx(tStart) = spaceSize`
-  /// * `dx(tEnd) = precision`
+  /// * `dx(tStart) == dxMax`
+  /// * `dx(tEnd) == dxMin`
   List<num> dx(num temperature) => _a.times(temperature).plus(_b);
 }
