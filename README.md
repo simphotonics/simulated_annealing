@@ -216,7 +216,7 @@ The graph is discussed in more detail [here].
 ![Convergence Graph](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/convergenceWithInset.svg?sanitize=true)
 
 The number of inner iterations (performed while the temperature is kept constant)
-is determined by a function with typedef `MarkovChainLength`, see method [`anneal`][anneal].
+is determined by a function with typedef [`MarkovChainLength`][MarkovChainLength], see method [`anneal`][anneal].
 For fast cooling schedules convergence to an acceptable solution can be improved by
 increasing the number of inner iterations (Markov chain length).
 
@@ -262,3 +262,5 @@ Please file feature requests and bugs at the [issue tracker][tracker].
 [anneal]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/Simulator/anneal.html
 
 [energy]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/EnergyClass.html
+
+[MarkovChainLength]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/MarkovChainLength.html
