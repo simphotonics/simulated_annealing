@@ -1,4 +1,5 @@
 ##  Annealing Schedule - Example
+[![Build Status](https://travis-ci.com/simphotonics/simulated_annealing.svg?branch=main)](https://travis-ci.com/simphotonics/simulated_annealing)
 
 The class [`AnnealingSchedule`][AnnealingSchedule] provides a
 decreasing sequence of temperatures (T<sub>0</sub>,&nbsp;...T<sub>n</sub>) and a decreasing sequence

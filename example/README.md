@@ -1,5 +1,6 @@
 
 ## Simulated Annealing For Dart - Example
+[![Build Status](https://travis-ci.com/simphotonics/simulated_annealing.svg?branch=main)](https://travis-ci.com/simphotonics/simulated_annealing)
 
 The examples presented here demonstrate how to define a:
 - [search space],

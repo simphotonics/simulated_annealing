@@ -1,4 +1,5 @@
 ##  Simulated Annealing - Example
+[![Build Status](https://travis-ci.com/simphotonics/simulated_annealing.svg?branch=main)](https://travis-ci.com/simphotonics/simulated_annealing)
 
 Simulated annealing (SA) is typically used to solve discrete optimisation problems. But the algorithm can be adapted to minimize continuous functions. The example below demonstrates how
 to find the global minimum of the function:

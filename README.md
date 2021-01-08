@@ -1,4 +1,5 @@
 # Simulated Annealing For Dart
+[![Build Status](https://travis-ci.com/simphotonics/simulated_annealing.svg?branch=main)](https://travis-ci.com/simphotonics/simulated_annealing)
 
 ## Introduction
 [Simulated annealing][SA-Wiki] (SA) is an algorithm aimed at finding the *global* minimum of

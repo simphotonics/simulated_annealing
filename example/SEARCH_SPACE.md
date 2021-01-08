@@ -1,4 +1,5 @@
 ##  Search Space - Example
+[![Build Status](https://travis-ci.com/simphotonics/simulated_annealing.svg?branch=main)](https://travis-ci.com/simphotonics/simulated_annealing)
 
 The class [`SearchSpace`][SearchSpace] is used to define a region from which points are
 randomly sampled. A search space is defined in terms of intervals along each dimension.
