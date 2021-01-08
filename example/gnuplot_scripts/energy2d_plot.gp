@@ -1,5 +1,7 @@
 reset
 
+set term qt size 1000, 1000
+
 load 'energy2d.gp'
 
 set key font ", 12"
@@ -41,4 +43,7 @@ set cntrparam levels incr 0, 0.5, 3
 
 
 set hidden
+
+set term qt size 1000, 1000 font "Sans,14"
+
 splot energy2d(x,y) lw 1.5 t 'Energy'

@@ -49,4 +49,4 @@ set palette defined (0 "blue", 5 "#4444FF99", 10 "#9999FF99", 15 "turquoise",  3
 
 
 splot '../data/log.dat' using 1:2:3:($7) ps 2 pt 7 pal t "System Temperature", \
-'../data/spherical_sample_space.dat' using 1:2:3 ps 0.45 lc "#44444455" pt 7 t "Search Region",
+'../data/spherical_search_space.dat' using 1:2:3 ps 0.45 lc "#44444455" pt 7 t "Search Region",

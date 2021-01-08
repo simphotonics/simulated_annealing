@@ -47,5 +47,5 @@ set cbrange [0: 4]
 # Gnuplot script plotting a 3D graph of the system energy.
 set palette defined (0 "blue", 1 "turquoise", 2 "green", 3 "yellow",  4 "red" )
 
-splot '../data/spherical_sample_space.dat' using 1:2:3 ps 0.25 lt 1 pt 7 t "Search Region", \
+splot '../data/spherical_search_space.dat' using 1:2:3 ps 0.25 lt 1 pt 7 t "Search Region", \
  '../data/log.dat' using 1:2:3:4 ps 1 pt 7 pal t "System energy"
