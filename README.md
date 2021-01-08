@@ -38,7 +38,7 @@ Most authors set k<sub>B</sub> = 1 and scale the temperature to control the
 solution acceptance probability. I find it more practical to use an independent
 temperature scale with the highest value T<sub>0</sub> and the lowest value T<sub>n</sub>,
 (where n is the number of outer SA iterations) and calculate the system dependent
-constant k<sub>B</sub> (see section [Algorithm Tuning](https://github.com/simphotonics/simulated_annealing#algorithm-tuning)).
+constant k<sub>B</sub> (see section [Algorithm Tuning](#algorithm-tuning)).
 
 ## Usage
 To use this package include [`simulated_annealing`][simulated_annealing] as a `dependency` in your `pubspec.yaml` file.
