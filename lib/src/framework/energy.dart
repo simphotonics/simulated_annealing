@@ -18,8 +18,10 @@ class Energy {
     this.sampleSize = 1000,
   }) : _searchSpace = SearchSpace.from(searchSpace) {
     /// Initializing late variables.
-    _samplePoints = List<List<num>>.generate(sampleSize, (_) => _searchSpace.next());
-    _e = List<num>.generate(sampleSize, (i) => energyFunction(_samplePoints[i]));
+    _samplePoints =
+        List<List<num>>.generate(sampleSize, (_) => _searchSpace.next());
+    _e =
+        List<num>.generate(sampleSize, (i) => energyFunction(_samplePoints[i]));
     mean = _e.reduce((sum, current) => sum += current) / sampleSize;
     stdDev = sqrt(
       _e.reduce((sum, current) => sum += pow(current - mean, 2)) /

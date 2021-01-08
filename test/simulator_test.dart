@@ -95,9 +95,8 @@ void main() {
           simulator.gamma);
     });
     test('Convergence', () {
-      final result = simulator.anneal((num temperature) => 1);
+      final result = simulator.anneal((num temperature) => 5);
       expect(result, xGlobalMin, precision: 1e-4);
-
     });
   });
 }

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:simulated_annealing/simulated_annealing.dart';
 

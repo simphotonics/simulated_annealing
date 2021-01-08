@@ -2,7 +2,6 @@ import '../extensions/list_utils.dart';
 
 /// Records numerical data in scalar and vector format.
 class DataRecorder {
-  
   /// Map storing numerical data.
   final _store = <String, List<num>>{};
 

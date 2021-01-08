@@ -69,7 +69,5 @@ void main(List<String> args) {
     });
   });
   // Testing class: Space
-  group('', () {
-
-  });
+  group('', () {});
 }

@@ -9,5 +9,3 @@ extension RandomInRange on Random {
   double nextDoubleInRange(num xMin, num xMax) =>
       xMin + nextDouble() * (xMax - xMin);
 }
-
-

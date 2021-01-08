@@ -26,5 +26,3 @@ extension EuclideanMetric on List<num> {
     return sqrt(result);
   }
 }
-
-
