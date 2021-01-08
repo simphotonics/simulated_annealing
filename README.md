@@ -44,7 +44,8 @@ constant k<sub>B</sub> (see section [Algorithm Tuning](#algorithm-tuning)).
 To use this package include [`simulated_annealing`][simulated_annealing] as a `dependency` in your `pubspec.yaml` file.
 
 The following steps are required to set up the SA algorithm.
-1. Extend the class [`Simulator`][SimulatorClass] implementing the methods `prepareLog()` and  `recordLog()`.
+1. Extend the class [`Simulator`][SimulatorClass] implementing the methods `prepareLog()`
+and  `recordLog()`.
 2. Specify the [search space][search space] &omega;.
 3. Define an [annealing schedule][annealing schedule] and a neighbourhood function.
 4. Define the system [energy][energy].
@@ -215,7 +216,7 @@ converges asymptotically to 0.5 after 750 iteration. A projection of the energy 
 is shown in the inset. Note that the global minimum of the energy function occurs at x = 0.5.
 The graph is discussed in more detail [here].
 
-![Convergence Graph](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/convergenceWithInset.svg?sanitize=true)
+![Convergence Graph](example/plots/convergenceWithInset.svg)
 
 The number of inner iterations (performed while the temperature is kept constant)
 is determined by a function with typedef [`MarkovChainLength`][MarkovChainLength], see method [`anneal`][anneal].
