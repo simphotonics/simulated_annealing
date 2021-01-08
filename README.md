@@ -3,7 +3,8 @@
 
 ## Introduction
 [Simulated annealing][SA-Wiki] (SA) is an algorithm aimed at finding the *global* minimum of
-of a function E(x<sub>0</sub>, x<sub>1</sub>, ..., x<sub>n</sub>) for a given region &omega;.
+of a function E(x<sub>0</sub>,&nbsp;x<sub>1</sub>,&nbsp;...,&nbsp;x<sub>n</sub>)
+for a given region &omega;.
 The function to be minimized can be interpreted as the
 **system energy**. In that case, the global minimum represents
 the **ground state** of the system.
@@ -234,9 +235,9 @@ can be found in the folder [example].
 
 Please file feature requests and bugs at the [issue tracker][tracker].
 
-[tracker]: http://github.com/simphotonics/simulated_annealing/issues
+[tracker]: https://github.com/simphotonics/simulated_annealing/issues
 
-[example]: https://github.com/simphotonics/simulated_annealing/tree/master/example
+[example]: example
 
 [Boltzmann]: https://en.wikipedia.org/wiki/Boltzmann_constant
 
@@ -246,7 +247,7 @@ Please file feature requests and bugs at the [issue tracker][tracker].
 
 [ledesma2008]: https://cdn.intechopen.com/pdfs/4631/InTech-Practical_considerations_for_simulated_annealing_implementation.pdf
 
-[here]: https://github.com/simphotonics/simulated_annealing/blob/main/example/SIMULATOR.md
+[here]: example/SIMULATOR.md
 
 [simulated_annealing]: https://pub.dev/packages/simulated_annealing
 
@@ -254,11 +255,11 @@ Please file feature requests and bugs at the [issue tracker][tracker].
 
 [SA-Wiki]: https://en.wikipedia.org/wiki/Simulated_annealing
 
-[search space]: https://github.com/simphotonics/simulated_annealing/blob/main/example/SEARCH_SPACE.md
+[search space]: example/SEARCH_SPACE.md
 
-[annealing schedule]: https://github.com/simphotonics/simulated_annealing/blob/main/example/ANNEALING_SCHEDULE.md
+[annealing schedule]: example/ANNEALING_SCHEDULE.md
 
-[simulator]: https://github.com/simphotonics/simulated_annealing/blob/main/example/SIMULATOR.md
+[simulator]: example/SIMULATOR.md
 
 [anneal]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/Simulator/anneal.html
 
