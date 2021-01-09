@@ -85,7 +85,6 @@ final simulator = LoggingSimulator(
   energy,
   schedule,
   gamma: 0.8,
-  dE0: energy.stdDev + 0.1,
 );
 
 void main() {
