@@ -17,7 +17,7 @@ dart:
 
 before_install:
   - |
-    git diff --name-only -- . | grep -qvE '(\.md$)' || {
+    git diff --name-only master...${TRAVIS_COMMIT} | grep -qvE '(\.md$)' || {
       echo "Only *.md file were updated. Stopping build process."
       exit
     }
