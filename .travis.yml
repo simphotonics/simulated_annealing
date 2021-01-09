@@ -15,5 +15,12 @@ dart:
 # # Warnings are fatal, but we only analyze the lib/ directory.
 # - dartanalyzer: --fatal-warnings lib
 
+before_install:
+  - |
+    git diff --name-only -- . | grep -qvE '(\.md$)' || {
+      echo "Only *.md file were updated. Stopping build process."
+      exit
+    }
+
 script:
   - tool/travis.sh
