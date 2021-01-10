@@ -66,7 +66,7 @@ void main() async {
 ```
 </details>
 
-![Spherical Search Space](example/plots/spherical_space.svg)
+![Spherical Search Space](plots/spherical_space.svg)
 
 
 The figure below shows 2000 random points sampled from the spherical search space.
