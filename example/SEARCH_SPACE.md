@@ -6,7 +6,8 @@ randomly sampled. A search space is defined in terms of intervals along each dim
 
 The example below demonstrates how to define a
 **spherical** search space using cartesian coordinates.
-The interval `x` is an object of type [`FixedInterval`][FixedInterval] that is the left and right boundary are constant numbers. The intervals `y` and `z` are objects of type [`ParametricInterval`][ParametricInterval]
+The interval `x` is an object of type [`FixedInterval`][FixedInterval] that is
+the left and right boundary are constant numbers. The intervals `y` and `z` are objects of type [`ParametricInterval`][ParametricInterval]
 and their boundaries are specified in terms of a numerical function that depends on other
 intervals.
 
@@ -65,7 +66,7 @@ void main() async {
 ```
 </details>
 
-![Spherical Search Space](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/spherical_space.svg?sanitize=true)
+![Spherical Search Space](example/plots/spherical_space.svg)
 
 
 The figure below shows 2000 random points sampled from the spherical search space.
@@ -85,8 +86,8 @@ Please file feature requests and bugs at the [issue tracker].
 
 [issue tracker]: https://github.com/simphotonics/simulated_annealing/issues
 
-[SearchSpace]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/SearchSpaceClass.html
+[SearchSpace]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/SearchSpace-class.html
 
-[FixedInterval]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/FixedIntervalClass.html
+[FixedInterval]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/FixedInterval-class.html
 
-[ParametricInterval]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/ParametricIntervalClass.html
+[ParametricInterval]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/ParametricInterval-class.html

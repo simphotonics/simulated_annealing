@@ -159,13 +159,13 @@ Please file feature requests and bugs at the [issue tracker].
 
 [issue tracker]: https://github.com/simphotonics/simulated_annealing/issues
 
-[SearchSpace]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/SearchSpaceClass.html
+[SearchSpace]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/SearchSpace-class.html
 
-[search space]: https://github.com/simphotonics/simulated_annealing/blob/main/example/SEARCH_SPACE.md
+[search space]: SEARCH_SPACE.md
 
-[annealing schedule]: https://github.com/simphotonics/simulated_annealing/blob/main/example/ANNEALING_SCHEDULE.md
+[annealing schedule]: ANNEALING_SCHEDULE.md
 
-[SimulatorClass]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/SimulatorClass.html
+[SimulatorClass]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/Simulator-class.html
 
 [anneal]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/Simulator/anneal.html
 

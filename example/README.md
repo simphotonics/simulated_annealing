@@ -16,8 +16,8 @@ Please file feature requests and bugs at the [issue tracker].
 
 [issue tracker]: https://github.com/simphotonics/simulated_annealing/issues
 
-[search space]: https://github.com/simphotonics/simulated_annealing/blob/main/example/SEARCH_SPACE.md
+[search space]: SEARCH_SPACE.md
 
-[annealing schedule]: https://github.com/simphotonics/simulated_annealing/blob/main/example/ANNEALING_SCHEDULE.md
+[annealing schedule]: ANNEALING_SCHEDULE.md
 
-[simulator]: https://github.com/simphotonics/simulated_annealing/blob/main/example/SIMULATOR.md
+[simulator]: SIMULATOR.md
