@@ -254,7 +254,7 @@ Please file feature requests and bugs at the [issue tracker][tracker].
 
 [simulated_annealing]: https://pub.dev/packages/simulated_annealing
 
-[SimulatorClass]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/SimulatorClass.html
+[SimulatorClass]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/Simulator-class.html
 
 [SA-Wiki]: https://en.wikipedia.org/wiki/Simulated_annealing
 
@@ -266,6 +266,6 @@ Please file feature requests and bugs at the [issue tracker][tracker].
 
 [anneal]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/Simulator/anneal.html
 
-[energy]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/EnergyClass.html
+[energy]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/Energy-class.html
 
 [MarkovChainLength]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/MarkovChainLength.html
