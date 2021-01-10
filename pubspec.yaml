@@ -2,7 +2,7 @@ name: simulated_annealing
 
 description: A simulated annealing framework for Dart.
 
-version: 0.0.1-nullsafety
+version: 0.0.3-nullsafety
 
 homepage: https://github.com/simphotonics/simulated_annealing
 
