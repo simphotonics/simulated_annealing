@@ -17,8 +17,9 @@ dart:
 
 before_install:
   - |
-    git diff --name-only FETCH_HEAD...$TRAVIS_BRANCH | grep -qvE '(\.md$)' || {
+    git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '(\.md$)' || {
       echo "Only *.md file were updated. Stopping build process."
+      echo $TRAVIS_COMMIT_RANGE
       exit
     }
 
