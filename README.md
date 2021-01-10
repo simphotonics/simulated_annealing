@@ -190,7 +190,7 @@ solution P(&Delta;E<sub>0</sub> = &sigma;<sub>E</sub>, T<sub>0</sub>) = &gamma; 
 
 Note: When using the standard deviation as a measure of the average variation of E it is possible
 to *underestimate* &Delta;E<sub>0</sub> if the function E is plateau-shaped with isolated extrema.
-For this reason, the constructor of [`Simulator`][Simulator] accepts the
+For this reason, the constructor of [`Simulator`][SimulatorClass] accepts the
 optional argument &Delta;E<sub>0</sub> with default value &Delta;E<sub>0</sub> = 0.5&middot;(&sigma;<sub>E</sub> + 0.2&middot;|E<sub>max</sub> - E<sub>min</sub>|), where E<sub>max</sub> and E<sub>min</sub> are the maximum and minimum values found while
 sampling the energy function as mentioned above.
 
