@@ -211,6 +211,7 @@ It is recommended to start with a higher number of
 outer iterations (number of entries in the sequence of temperatures) and log
 quantities like the current system energy, temperature, and the intermediate solutions.
 
+
 The figure below shows a typical SA log where the x-coordinate of the solution (green dots)
 converges asymptotically to 0.5 after 750 iteration. A projection of the energy function onto the x-y plane
 is shown in the inset. Note that the global minimum of the energy function occurs at x = 0.5.
@@ -219,9 +220,10 @@ The graph is discussed in more detail [here].
 ![Convergence Graph](example/plots/convergenceWithInset.svg)
 
 The number of inner iterations (performed while the temperature is kept constant)
-is determined by a function with typedef [`MarkovChainLength`][MarkovChainLength], see method [`anneal`][anneal].
+is also referred to as Markov chain length and is determined by a function with typedef [`MarkovChainLength`][MarkovChainLength], see method [`anneal`][anneal].
+
 For fast cooling schedules convergence to an acceptable solution can be improved by
-increasing the number of inner iterations (Markov chain length).
+increasing the number of inner iterations.
 
 ## Examples
 
