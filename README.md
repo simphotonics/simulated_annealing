@@ -4,7 +4,7 @@
 ## Introduction
 [Simulated annealing][SA-Wiki] (SA) is an algorithm aimed at finding the *global* minimum of
 of a function E(x<sub>0</sub>,&nbsp;x<sub>1</sub>,&nbsp;...,&nbsp;x<sub>n</sub>)
-for a given region &omega;.
+for a given region &omega;x<sub>0</sub>,&nbsp;x<sub>1</sub>,&nbsp;...,&nbsp;x<sub>n</sub>.
 The function to be minimized can be interpreted as the
 **system energy**. In that case, the global minimum represents
 the **ground state** of the system.
@@ -191,7 +191,8 @@ solution P(&Delta;E<sub>0</sub> = &sigma;<sub>E</sub>, T<sub>0</sub>) = &gamma; 
 Note: When using the standard deviation as a measure of the average variation of E it is possible
 to *underestimate* &Delta;E<sub>0</sub> if the function E is plateau-shaped with isolated extrema.
 For this reason, the constructor of [`Simulator`][SimulatorClass] accepts the
-optional argument &Delta;E<sub>0</sub> with default value &Delta;E<sub>0</sub> = 0.5&middot;(&sigma;<sub>E</sub> + 0.2&middot;|E<sub>max</sub> - E<sub>min</sub>|), where E<sub>max</sub> and E<sub>min</sub> are the maximum and minimum values found while
+optional argument &Delta;E<sub>0</sub> with default value
+&Delta;E<sub>0</sub> = 0.5&middot;(&sigma;<sub>E</sub> + 0.2&middot;|E<sub>max</sub> - E<sub>min</sub>|), where E<sub>max</sub> and E<sub>min</sub> are the maximum and minimum values found while
 sampling the energy function as mentioned above.
 
 &Delta;E<sub>0</sub> is the **most critical SA parameter**. If &Delta;E<sub>0</sub> is too large the algorithm will
@@ -217,7 +218,7 @@ converges asymptotically to 0.5 after 750 iteration. A projection of the energy 
 is shown in the inset. Note that the global minimum of the energy function occurs at x = 0.5.
 The graph is discussed in more detail [here].
 
-![Convergence Graph](example/plots/convergenceWithInset.svg)
+![Convergence Graph](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/convergenceWithInset.svg)
 
 The number of inner iterations (performed while the temperature is kept constant)
 is also referred to as Markov chain length and is determined by a function with typedef [`MarkovChainLength`][MarkovChainLength], see method [`anneal`][anneal].

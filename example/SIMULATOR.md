@@ -16,7 +16,9 @@ The figure above shows a projection of E onto the x-y plane. The global minimum 
 is situated at **x**<sub>glob</sub> = \[0.5, 0.7, 0.8\]. The function has a local minimum
 at **x**<sub>loc</sub>&nbsp;= \[-1, -1, -0.5\].
 
-After defining a [search space], an [annealing schedule], and the system `Energy` (see source code below), we extend the class [`Simulator`][SimulatorClass] and create an instance of `LoggingSimulator`. The annealing process is started by calling the method [`anneal`][anneal].
+After defining a [search space], an [annealing schedule], and the system `Energy` (see source code below),
+we extend the class [`Simulator`][SimulatorClass] and
+create an instance of `LoggingSimulator`. The annealing process is started by calling the method [`anneal`][anneal].
 
 <details><summary> Click to show source code.</summary>
 
@@ -132,7 +134,7 @@ void main() async {
 </details>
 
 
-![Convergence Graph](plots/convergence.svg)
+![Convergence Graph](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/convergence.svg)
 
 The figure above shows the system energy, min. system energy, temperature, and acceptance probability during the SA process.
 
@@ -141,7 +143,7 @@ The graphs were generated using [gnuplot] and the scripts are available in the f
 The annealing schedule (blue curve) consists of a monotonically decreasing exponential sequence
 with 750 elements, start value T<sub>0</sub> = 100 and end value T<sub>n</sub> = 1e-8. At high temperatures the algorithm explores the entire search space for the x-coordinate (values ranging between -2 and 2), and new solutions are accepted with high probability (red dots along the line y = 1). As the temperature decreases fewer solutions are accepted and the x-coordinate converges towards 0.5.
 
-![System Energy](plots/energy.svg)
+![System Energy](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/energy.svg)
 
 In order to demonstrate the ability of the algorithm to escape from a local minimum, we have
 initialized **x**<sub>min</sub> as **x**<sub>loc</sub>. The figure above shows the
