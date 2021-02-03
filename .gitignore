@@ -24,6 +24,7 @@ doc/api/
 
 # Simulation log files that can be recreated.
 example/data
+example/backup
 
 # Figures that can be recreated.
 example/plots/*.pdf
