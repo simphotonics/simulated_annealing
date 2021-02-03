@@ -1,6 +1,15 @@
+## 0.1.0-nullsafety
+
+- Computationally costly methods of `Simulator` and `EnergyField`  are now asynchronous.
+- Class `DataRecorder` is now generic.
+- Removed class `AnnealingSchedule`.
+- Added `dxMax` and `dxMin` to the required list of parameters when constructing
+  an object of type `SearchSpace`.
+- Amended examples.
+
 ## 0.0.3-nullsafety
 
-- Converted links to images to absolute links. 
+- Converted links to images to absolute links.
 
 
 ## 0.0.2-nullsafety
