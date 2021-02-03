@@ -4,7 +4,7 @@
 ## Introduction
 [Simulated annealing][SA-Wiki] (SA) is an algorithm aimed at finding the *global* minimum of
 of a function E(x<sub>0</sub>,&nbsp;x<sub>1</sub>,&nbsp;...,&nbsp;x<sub>n</sub>)
-for a given region &omega;x<sub>0</sub>,&nbsp;x<sub>1</sub>,&nbsp;...,&nbsp;x<sub>n</sub>.
+for a given region &omega;(x<sub>0</sub>,&nbsp;x<sub>1</sub>,&nbsp;...,&nbsp;x<sub>n</sub>).
 The function to be minimized can be interpreted as the
 **system energy**. In that case, the global minimum represents
 the **ground state** of the system.
@@ -17,38 +17,41 @@ sufficient kinetic energy to be able to rearrange themselves.
 Then the temperature is decreased sufficiently slowly
 in order to minimize atomic lattice defects as the material solidifies.
 
-*Simulated* annealing works by randomly selecting points in the search space &omega;,
+*Simulated* annealing works by randomly selecting a new point in the neighbourhood of the
+current solution,
 evaluating the energy function, and deciding if the new solution is accepted or rejected.
 If for a newly selected point the energy E is lower that the previous minimum energy
-E<sub>min</sub>, the new solution is accepted: P(&Delta;E < 0, T) = 1,
+E<sub>min</sub>, the new solution is accepted: P(&Delta;E&nbsp;<&nbsp;0,&nbsp;T)&nbsp;=&nbsp;1,
 where &Delta;E = E - E<sub>min</sub>.
 
- Crucially, if the energy is larger than E<sub>min</sub>, the algorithm still accepts the
+ Crucially, if &Delta;E > 0, the algorithm still accepts the
  new solution with probability: P(&Delta;E > 0, T) = e<sup>-&Delta;E/(k<sub>B</sub>&middot;T)</sup>.
  Accepting up-hill moves provides a method of escaping from local energy minima.
- The probability of accepting a solution with &Delta;E > 0 decreases with decreasing temperature.
 
 The [Boltzmann constant][Boltzmann] k<sub>B</sub> relates the system
 temperature with the kinetic energy of particles in a gas. In the context of SA,
 k<sub>B</sub> relates the system temperature
 with the probability of accepting a solution where &Delta;E > 0.
+The expression used to calculate P(&Delta;E > 0, T) ensures
+that the acceptance probability decreases with decreasing temperature.
 As such, the temperature is a parameter that controls the probability of up-hill moves.
 
 Most authors set k<sub>B</sub> = 1 and scale the temperature to control the
 solution acceptance probability. I find it more practical to use an independent
-temperature scale with the highest value T<sub>0</sub> and the lowest value T<sub>n</sub>,
-(where n is the number of outer SA iterations) and calculate the system dependent
+temperature scale with the lowest value T<sub>end</sub>
+and calculate the system dependent
 constant k<sub>B</sub> (see section [Algorithm Tuning](#algorithm-tuning)).
 
 ## Usage
-To use this package include [`simulated_annealing`][simulated_annealing] as a `dependency` in your `pubspec.yaml` file.
+To use this package include [`simulated_annealing`][simulated_annealing]
+as a `dependency` in your `pubspec.yaml` file.
 
 The following steps are required to set up the SA algorithm.
-1. Extend the class [`Simulator`][SimulatorClass] implementing the methods `prepareLog()`
-and  `recordLog()`.
-2. Specify the [search space][search space] &omega;.
-3. Define an [annealing schedule][annealing schedule] and a neighbourhood function.
-4. Define the system [energy][energy].
+1. Specify the [search space][search space] &omega;.
+2. Define an [annealing schedule][annealing schedule].
+3. Define the system [energy field][energy_field].
+4. Extend the class [`Simulator`][SimulatorClass] implementing the methods `prepareLog()`
+and  `recordLog()` or create an instance of [`LoggingSimulator`][LoggingSimulator].
 5. Start the [simulated annealing][simulator] process.
 
 <details><summary> Click to show source code.</summary>
@@ -58,109 +61,51 @@ and  `recordLog()`.
 import 'dart:io';
 import 'dart:math';
 
+import 'package:list_operators/list_operators.dart';
 import 'package:simulated_annealing/simulated_annealing.dart';
 
-class LoggingSimulator extends Simulator {
-  LoggingSimulator(
-    Energy system,
-    AnnealingSchedule schedule, {
-    num gamma = 0.8,
-    num? dE0,
-    List<num>? xMin0,
-  }) : super(
-          system,
-          schedule,
-          gamma: gamma,
-          dE0: dE0,
-          xMin0: xMin0,
-        );
+void main() async {
 
-  final rec = DataRecorder();
+  // Defining a spherical space.
+final radius = 2;
+final x = FixedInterval(-radius, radius);
+final y = ParametricInterval(
+  () => -sqrt(pow(radius, 2) - pow(x.next(), 2)),
+  () => sqrt(pow(radius, 2) - pow(x.next(), 2)),
+);
+final z = ParametricInterval(
+  () => -sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
+  () => sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
+);
+final dxMin = <num>[1e-6, 1e-6, 1e-6];
+final space = SearchSpace([x, y, z], dxMin: [1e-6, 1e-6, 1e-6]);
 
-  @override
-  void prepareLog() {
-    rec.prepareVector('x', 3);
-    rec.prepareScalar('Energy');
-    rec.prepareScalar('Energy Min');
-    rec.prepareScalar('P(dE)');
-    rec.prepareScalar('Temperature');
-    rec.prepareVector('dx', 3);
-  }
-
-  @override
-  void recordLog() {
-    rec.addVector('x', x);
-    rec.addVector('dx', dx);
-    rec.addScalar('Energy', eCurrent);
-    rec.addScalar('Energy Min', eMin);
-    rec.addScalar('P(dE)',
-        (eCurrent - eMin) < 0 ? 1 : exp(-(eCurrent - eMin) / (kB * t)));
-    rec.addScalar('Temperature', t);
-  }
+// Defining an energy function.
+final xGlobalMin = [0.5, 0.7, 0.8];
+final xLocalMin = [-1.0, -1.0, -0.5];
+num energy(List<num> x) {
+  return 4.0 -
+      4.0 * exp(-4 * xGlobalMin.distance(x)) -
+      2.0 * exp(-6 * xLocalMin.distance(x));
 }
 
-void main() async {
-  // Defining a spherical space.
-  final radius = 2;
-  final x = FixedInterval(-radius, radius);
-  final y = ParametricInterval(
-    () => -sqrt(pow(radius, 2) - pow(x.next(), 2)),
-    () => sqrt(pow(radius, 2) - pow(x.next(), 2)),
-  );
-  final z = ParametricInterval(
-    () => -sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
-    () => sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
-  );
-  final space = SearchSpace([x, y, z]);
+// Constructing an instance of `EnergyField`.
+final energyField = EnergyField(
+  energy,
+  space,
+);
+  // Constructing an instance of `LoggingSimulator`.
+  final simulator = LoggingSimulator(energyField, exponentialSequence,
+      iterations: 750, gammaStart: 0.7, gammaEnd: 0.05);
 
-  // Defining an annealing schedule.
-  final schedule = AnnealingSchedule(
-    exponentialSequence(100, 1e-8, n: 750),
-    space.size,
-    [1e-6, 1e-6, 1e-6],
-  );
+  print(await simulator.info);
 
-  // Defining an energy function.
-  // The energy function has a local minimum at xLocalMin
-  // and a global minimum at xGlobalMin.
-  final xGlobalMin = [0.5, 0.7, 0.8];
-  final xLocalMin = [-1.0, -1.0, -0.5];
-  num energyFunction(List<num> x) {
-    return 4.0 -
-        4.0 * exp(-4 * xGlobalMin.distance(x)) -
-        2.0 * exp(-6 * xLocalMin.distance(x));
-  }
-
-  // ignore: unused_element
-  int markov(num temperature) {
-    return min(1 + 1 ~/ (100 * temperature), 25);
-  }
-
-  final energy = Energy(energyFunction, space);
-
-  // Construct a simulator instance.
-  final simulator = LoggingSimulator(
-    energy,
-    schedule,
-    gamma: 0.8,
-    dE0: energy.stdDev + 0.1,
-    xMin0: [-1, -1, -0.5],
-  );
-
-  print(simulator);
-
-  final sample = simulator.system.samplePoints;
-  for (var i = 0; i < simulator.system.sampleSize; i++) {
-    sample[i].add(simulator.system.sample[i]);
-  }
-
-  final xSol = simulator.anneal((t) => 1);
+  final xSol = await simulator.anneal((_) => 1, isRecursive: true);
   await File('../data/log.dat').writeAsString(simulator.rec.export());
-  await File('../data/energy_sample.dat')
-      .writeAsString(sample.export(label: 'x y z energy'));
 
   print('Solution: $xSol');
 }
+
 
 ```
 </details>
@@ -181,29 +126,37 @@ degree of trial and error is required to determine which annealing schedule
 works best for a given problem.
 
 ### Estimating the value of k<sub>B</sub>
-An estimate for the average scale of the variation of the energy function &Delta;E<sub>0</sub>
+An estimate for the average scale of the variation of the energy function &Delta;E
 can be obtained by sampling the energy function E
 at random points in the search space &omega;
 and calculating the sample standard deviation &sigma;<sub>E</sub> [\[3\]][ledesma2008].
+
+For continuous problems, the size of the search region around the current solution is gradually contracted
+to &omega;<sub>end</sub> in order to generate a solution with the required precision.
+
 The constant k<sub>B</sub> is set such that the probability of accepting a
-solution P(&Delta;E<sub>0</sub> = &sigma;<sub>E</sub>, T<sub>0</sub>) = &gamma; where T<sub>0</sub> is the initial temperature.
+solution P(&Delta;E<sub>end</sub> = &sigma;<sub>E</sub>(&omega;<sub>end</sub>), T<sub>end</sub>) = &gamma;<sub>end</sub> where T<sub>end</sub> is the final annealing temperature.
+
+The initial temperature is then set such that the initial acceptance probability is &gamma;<sub>start</sub>.
 
 Note: When using the standard deviation as a measure of the average variation of E it is possible
-to *underestimate* &Delta;E<sub>0</sub> if the function E is plateau-shaped with isolated extrema.
+to *underestimate* &Delta;E<sub>start</sub> if the function E is plateau-shaped with isolated extrema.
 For this reason, the constructor of [`Simulator`][SimulatorClass] accepts the
-optional argument &Delta;E<sub>0</sub> with default value
+optional argument `dEnergyStart` with default value
 &Delta;E<sub>0</sub> = 0.5&middot;(&sigma;<sub>E</sub> + 0.2&middot;|E<sub>max</sub> - E<sub>min</sub>|), where E<sub>max</sub> and E<sub>min</sub> are the maximum and minimum values found while
 sampling the energy function as mentioned above.
 
-&Delta;E<sub>0</sub> is the **most critical SA parameter**. If &Delta;E<sub>0</sub> is too large the algorithm will
-oscillate wildy between random points and will most likely not converge towards an acceptable solution.
-On the other hand, if &Delta;E<sub>0</sub> is too small up-hill moves are unlikely and the solution
+&Delta;E<sub>start</sub> is a **critical SA parameter**. If &Delta;E<sub>start</sub> is too large the algorithm will oscillate wildy between random points and will most likely not converge towards an acceptable solution.
+On the other hand, if &Delta;E<sub>start</sub> is too small up-hill moves are unlikely and the solution
 most likely converges towards a local minimum or a point situated in a plateau-shaped region.
 
 
-Since gamma represents a probability, 0 < &gamma; < 1,  however useful values for &gamma;
-are in the range of (0.7, 0.9). If &gamma; is too low, up-hill moves are unlikely (potentially) preventing the SA algorithm from
-escaping a local miniumum. If &gamma; is set close to 1.0 the algorithm will accept too many up-hill moves at high temperatures wasting computational time and delaying convergence.
+Since gamma represents a probability, 0 < &gamma; < 1,  however useful values for &gamma;<sub>start</sub>
+are in the range of (0.7, 0.9). If &gamma;<sub>start</sub> is too low, up-hill moves are unlikely (potentially) preventing the SA algorithm from
+escaping a local miniumum. If &gamma;<sub>start</sub> is set close to 1.0 the algorithm will accept too many up-hill moves at high temperatures wasting computational time and delaying convergence.
+
+Towards the end of the annealing process one assumes that the solution has converged towards the global
+minimum and up-hill moves should be restricted. For this reason &gamma;<sub>end</sub> has default value 0.05.
 
 
 ### Selecting an annealing schedule.
@@ -228,11 +181,11 @@ increasing the number of inner iterations.
 
 ## Examples
 
-Further examples on how to define and use a:
+Further information can be found in the folder [example]. The following topics are covered:
 - [search space],
 - [annealing schedule],
-- system energy and logging [simulator],
-can be found in the folder [example].
+- system energy and logging [simulator].
+
 
 
 ## Features and bugs
