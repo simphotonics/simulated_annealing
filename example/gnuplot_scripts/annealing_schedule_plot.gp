@@ -17,5 +17,5 @@ set yrange [ * : * ] noreverse writeback
 set y2range [ * : * ] noreverse writeback
 
 
-plot '../data/temperatures.dat' using ($1)  w l lw 3 lc "#00cc4433" t 'Temperature', \
-     '../data/dx.dat' using ($1)  w l lw 3 t "Neighbourhood function dx", \
+plot '../data/log.dat' using ($7)  w l lw 3 lc "#00cc4433" t 'Temperature', \
+     '../data/log.dat' using ($8)  w l lw 3 t "Perturbation magnitude dx", \
