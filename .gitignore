@@ -21,3 +21,10 @@ doc/api/
 *.js.map
 *.code-workspace
 .vscode
+
+# Simulation log files that can be recreated.
+example/data
+
+# Figures that can be recreated.
+example/plots/*.pdf
+example/plots/*.svg
