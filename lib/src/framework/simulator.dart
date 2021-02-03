@@ -1,191 +1,358 @@
+import 'dart:io';
 import 'dart:math' as math;
+import 'dart:math';
+
+import 'package:lazy_memo/lazy_memo.dart';
+import 'package:list_operators/list_operators.dart';
+
 import 'annealing_schedule.dart';
-import 'energy.dart';
+import 'energy_field.dart';
+
 import 'search_space.dart';
 
+/// Function returning an integer representing a Markov
+/// chain length (the number of simulated annealing iterations
+/// performed at constant temperature).
 typedef MarkovChainLength = int Function(num temperature);
+
+/// Function returning a sequence of pertubation
+/// magnitude vectors.
+typedef PertubationSequence = List<List<num>> Function(
+  List<num> temperatures,
+  List<num> deltaPositionMax,
+  List<num> deltaPositionMin,
+);
+
+/// Returns a sequence of pertubation magnitude vectors
+/// by interpolating between
+/// `deltaPositionMax` and `deltaPositionMin`.
+/// * `temperatures`: A sequence of temperatures.
+/// * `dxMax`: The initial perturbation magnitude vector.
+/// * `dxMin`: The final perturbation magnitude vector.
+List<List<num>> perturbationSequence(
+  List<num> temperatures,
+  List<num> deltaPositionMax,
+  List<num> deltaPositionMin,
+) {
+  final a = (deltaPositionMax - deltaPositionMin) /
+      (temperatures.first - temperatures.last);
+  final b = deltaPositionMax -
+      (deltaPositionMax - deltaPositionMin) *
+          (temperatures.first / (temperatures.first - temperatures.last));
+  return List<List<num>>.generate(
+      temperatures.length, (i) => (a * temperatures[i]).plus(b));
+}
+
+/// Returns an integer between `chainLengthStart` and `chainLengthEnd`.
+/// * `markovChainlength(tStart) = mStart`,
+/// * `markovChainlength(tEnd) = mEnd`.
+///
+/// Note: The following must hold: `tStart <= temperature <= tEnd`.
+int markovChainLength(
+  num temperature, {
+  required num tStart,
+  required num tEnd,
+  int chainLengthStart = 5,
+  int chainLengthEnd = 20,
+}) {
+  return (chainLengthStart - chainLengthEnd) * temperature ~/ (tStart - tEnd) +
+      chainLengthStart -
+      (chainLengthStart - chainLengthEnd) * tStart ~/ (tStart - tEnd);
+}
 
 /// Annealing simulator
 abstract class Simulator {
   /// Simulator constructor.
-  /// * system: Annealing system (energy function and search region).
-  /// * schedule: Annealing schedule.
-  /// * precision: Minimum neighbourhood step size.
-  /// * gamma: Probability of solution acceptance if `dE == dE0`
-  ///   and the system is at the highest (initial) temperature.
-  /// * dE0: Defaults to `system.dE0`. Can be used for testing
-  ///   purposes. It is an estimate of the typical variation of
-  ///   the system energy function.
+  /// * field: An object of type `EnergyField` encapsulating the
+  ///   energy function (cost function)  and search space.
+  /// * temperatureSequence: A function with typedef `TemperatureSequence`. It
+  ///   specifies the simulated annealing temperature schedule.
   ///
-  /// * xMin0: Defaults to `system.xMin0`. Can be used to specify the
+  /// ----
+  ///
+  /// Optional parameters:
+  /// * tEnd: The system temperature at the end of the annealing process.
+  /// * gammaStart: Probability of solution acceptance if `dE == dEnergyStart`
+  ///   and the temperature is the initial temperature of the annealing process.
+  /// * gammaEnd: Probability of solution acceptance if `dE == dEnergyEnd`
+  ///   and the temperature is the final temperatures of the annealing process.
+  /// * iterations: Number of iterations when cooling
+  ///   the system from the initial annealing
+  ///   temperature to the final temperature `tEnd`.
+  /// * xStart: Defaults to `field.minPosition`. Can be used to specify the
   ///   starting point of the simulated annealing process.
+  /// * dEnergyStart: Defaults to `field.dEnergyStart`. Can be used for testing
+  ///   purposes. It is an estimate of the typical variation of
+  ///   the energy function when perturbing the current position randomly with
+  ///   magnitude `dxMax`.
+  /// * dEnergyEnd: Defaults to `field.dEnergyEnd`. Can be used for testing
+  ///   purposes. It is an estimate of the typical variation of
+  ///   the system energy function when perturbing the current position
+  ///   randomly with magnitude `dxMin`.
   Simulator(
-    this.system,
-    this.schedule, {
-    this.gamma = 0.8,
-    num? dE0,
-    List<num>? xMin0,
-  }) {
-    this.dE0 = (dE0 == null) ? system.dE0 : dE0;
-    _xMin = (xMin0 == null) ? system.xMin : xMin0;
-    _xMinGlobal = _xMin;
-    _eMin = system.energyFunction(_xMin);
-    _eMinGlobal = _eMin;
-    kB = -this.dE0 / (schedule.tStart * math.log(gamma));
-    _e = _eMin;
-    _t = schedule.tStart;
-    _dx = schedule.dx(_t);
-    _x = _xMin;
+    EnergyField field,
+    TemperatureSequence temperatureSequence,
+    PertubationSequence perturbationSequence, {
+    this.tEnd = 1e-4,
+    this.gammaStart = 0.8,
+    this.gammaEnd = 0.1,
+    this.iterations = 750,
+    List<num>? startPosition,
+    num? dEnergyStart,
+    num? dEnergyEnd,
+  }) : _field = EnergyField.from(field) {
+    // Initializing late variables:
+    _dEnergyStart = Lazy<Future<num>>(
+      () => (dEnergyStart == null)
+          ? _field.dEnergyStart
+          : Future<num>.value(dEnergyStart),
+    );
+    _dEnergyEnd = Lazy<Future<num>>(
+      () => (dEnergyEnd == null)
+          ? _field.dEnergyEnd
+          : Future<num>.value(dEnergyEnd),
+    );
+    _kB = Lazy<Future<num>>(
+      () =>
+          this.dEnergyEnd.then((value) => -value / (tEnd * math.log(gammaEnd))),
+    );
+    _tStart = Lazy<Future<num>>(
+      () => Future.wait([this.dEnergyStart, kB])
+          .then((value) => -value[0] / (value[1] * math.log(gammaStart))),
+    );
+    _temperatures = Lazy<Future<List<num>>>(
+      () => tStart.then<List<num>>((_tStart) =>
+          temperatureSequence(_tStart, tEnd, iterations: iterations)),
+    );
+    _perturbationMagnitudes = Lazy<Future<List<List<num>>>>(
+      () => temperatures
+          .then<List<List<num>>>((temperatures) => perturbationSequence(
+                temperatures,
+                _field.deltaPositionMax,
+                _field.deltaPositionMin,
+              )),
+    );
+
+    /// Set initial position:
+    if (startPosition != null) {
+      _field.perturb(startPosition, _field.deltaPositionMin * 0.0);
+    }
+    _currentMinEnergy = _field.value;
+    _currentMinPosition = _field.position;
+    _acceptanceProbability = 1.0;
   }
 
-  /// Probability of solution acceptance if `dE == dE0`.
-  final num gamma;
+  /// Energy field.
+  final EnergyField _field;
 
-  /// System Boltzmann constant, initialized such that:
-  /// * `exp(-dE0/(kB * t0)) == gamma`
-  late final num kB;
+  /// Acceptance probability at temperature `tStart` and
+  /// `dE = dEnergyStart`.
+  final num gammaStart;
 
-  /// Annealing system consisting of an energy function and a search region.
-  final Energy system;
+  /// Acceptance probability at temperature `tEnd` and
+  /// `dE = dEnergyEnd`.
+  final num gammaEnd;
 
-  /// A typical energy difference encountered when evaluating `system.energy`
-  /// at random points.
-  ///
-  /// If no value is specified in the constructor it is initialized as
-  /// `system.eStdDev`, the standard deviation of a sample
-  /// obtained by evaluating `system.energy` at random
-  /// points in the search space.
-  late final dE0;
+  /// System Boltzmann constant.
+  late final Lazy<Future<num>> _kB;
 
-  /// Current energy minimizing solution.
-  /// @nodoc
-  late List<num> _xMin;
+  /// System Boltzmann constant. Relates the temperature to
+  /// the acceptance probability if `dE = E - E_min > 0`.
+  /// * `P(dE > 0, T) = exp(-dE / (kB * T))`: Uphill moves are accepted with
+  /// probability `P(dE > 0, T)`.
+  /// * Note: `P(dE < 0, T) = 1.0`: Downhill moves are always accepted.
+  Future<num> get kB async => await _kB();
 
-  /// Current energy minimizing solution. If the argument `xMin0` is not
-  /// specified in the constructor it is initialized as `system.xMin`.
-  List<num> get xMin => _xMin;
+  /// Number of outer simulated annealing iterations. Iterations at
+  /// decreasing temperature.
+  int iterations;
 
-  /// Global energy minimizing solution.
-  late List<num> _xMinGlobal;
+  /// Annealing temperatures.
+  late final Lazy<Future<List<num>>> _temperatures;
 
-  /// Global energy minimizing solution.
-  List<num> get xMinGlobal => _xMinGlobal;
+  /// Annealing temperatures.
+  Future<List<num>> get temperatures => _temperatures();
+
+  /// Perturbation magnitudes.
+  late final Lazy<Future<List<List<num>>>> _perturbationMagnitudes;
+
+  Future<List<List<num>>> get perturbationMagnitudes =>
+      _perturbationMagnitudes();
+
+  /// Initial annealing temperature.
+  late final Lazy<Future<num>> _tStart;
+
+  /// Initial annealing temperature.
+  Future<num> get tStart => _tStart();
+
+  /// Final annealing temperature.
+  final num tEnd;
+
+  /// Estimated energy difference when perturbing the current position
+  /// randomly with magnitude `deltaPositionMax`.
+  late final Lazy<Future<num>> _dEnergyStart;
+
+  /// Estimated energy difference when perturbing the current position
+  /// randomly with magnitude `deltaPositionMax`.
+  Future<num> get dEnergyStart => _dEnergyStart();
+
+  /// Estimated energy difference when perturbing the current position
+  /// randomly with magnitude `deltaPositionMin`.
+  late final Lazy<Future<num>> _dEnergyEnd;
+
+  /// Estimated energy difference when perturbing the current position
+  /// randomly with magnitude `deltaPositionMin`.
+  Future<num> get dEnergyEnd => _dEnergyEnd();
+
+  /// Current field position.
+  List<num> get currentPosition => _field.position;
+
+  /// Energy at current field position.
+  num get currentEnergy => _field.value;
+
+  /// Current energy minimizing field position.
+  late List<num> _currentMinPosition;
+
+  /// Current energy minimizing solution. If the argument `startPosition` is not
+  /// specified in the constructor it is initialized as `field.minPosition`.
+  List<num> get currentMinPosition => _currentMinPosition;
 
   /// Current energy minimum.
-  num get eMin => _eMin;
+  late num _currentMinEnergy;
 
   /// Current energy minimum.
-  /// @nodoc
-  late num _eMin;
+  num get currentMinEnergy => _currentMinEnergy;
+
+  /// Global energy minimizing solution.
+  List<num> get globalMinPosition => _field.minPosition;
 
   /// Global energy minimum.
-  /// @nodoc
-  late num _eMinGlobal;
-
-  /// Global energy minimum.
-  num get eMinGlobal => _eMinGlobal;
+  num get globalMinEnergy => _field.minValue;
 
   /// Current temperature;
-  /// @nodoc
   late num _t;
 
   /// Current temperature.
   num get t => _t;
 
-  /// Current energy.
-  /// @nodoc
-  late num _e;
-
-  /// Current energy.
-  num get eCurrent => _e;
-
   /// Current perturbation magnitude.
-  /// @nodoc
   late List<num> _dx;
 
   /// Current perturbation magnitude.
   List<num> get dx => _dx;
 
-  /// Current position.
-  /// @nodoc
-  late List<num> _x;
+  /// Acceptance probability of current solution.
+  late num _acceptanceProbability;
 
-  /// Current position
-  List<num> get x => _x;
+  /// Acceptance probability of current solution.
+  num get acceptanceProbability => _acceptanceProbability;
 
-  /// Annealing schedule defined by a sequence of temperatures.
-  final AnnealingSchedule schedule;
+  /// Recursion counter.
+  int _recursionCounter = 0;
 
-  /// Method called once from within `anneal` before any iterations.
+  /// Method called once from within `anneal` before any
+  /// simulated annealing iterations.
   ///
   /// Can be used to setup a log.
   void prepareLog();
 
   /// Method called during each (inner) iteration.
   ///
-  /// Can be used to add entries to the log.
+  /// Can be used to add entries to a log.
   void recordLog();
 
-  List<num> anneal(MarkovChainLength markov) {
-    //innerIterations = innerIterations.abs();
+  /// Starts the simulated annealing process and
+  /// returns the best solution found.
+  /// * isRecursive: Flag used to call the method recursively if the algorithm
+  /// converges towards a local minimum. (The algorithm
+  /// keeps track of the lowest energy values previously visited.)
+  /// * ratio: Factor reducing the length of the initial
+  /// temperature sequence during recursive calls. The parameter is used
+  /// to model repeated annealing cycles with decreasing initial temperature.
+  /// * Note: `0.0 < ratio < 1.0`.
+  Future<List<num>> anneal(
+    MarkovChainLength markov, {
+    bool isRecursive = false,
+    num ratio = 0.5,
+  }) async {
+    final kB = await this.kB;
+
+    /// Initialize parameters:
+    final temperatures = await this.temperatures;
+    final perturbationMagnitudes = await this.perturbationMagnitudes;
     num dE = 0;
 
-    prepareLog();
-    recordLog();
+    if (_recursionCounter == 0) {
+      _t = temperatures.first;
+      _dx = perturbationMagnitudes.first;
+      prepareLog();
+      recordLog();
+    }
 
-    final temperatures = schedule.temperatures;
+    // During the first iteration ratio = 1.0 and i = 0.
+    ratio = pow(ratio.abs(), _recursionCounter);
+    var i = (temperatures.length * (1.0 - ratio)).toInt();
 
-    for (var i = 0; i < temperatures.length; i++) {
+    ++_recursionCounter;
+
+    // Outer iteration loop.
+    for (i; i < temperatures.length; i++) {
       _t = temperatures[i];
+      _dx = perturbationMagnitudes[i];
 
+      // Inner iteration loop.
       for (var j = 0; j < markov(_t); j++) {
-        /// Calculate perturbation magnitudes
-        _dx = schedule.dx(_t);
-        _x = system.perturb(_xMin, _dx);
-
-        /// Calculate energy
-        _e = system.energyFunction(_x);
-        dE = _e - _eMin;
+        // Choose next random point and calculate energy difference.
+        dE = _field.perturb(_currentMinPosition, _dx) - _currentMinEnergy;
 
         if (dE < 0) {
-          _eMin = _e;
-          _xMin = _x;
-          if (_eMinGlobal > _eMin) {
-            _eMinGlobal = _eMin;
-            _xMinGlobal = _xMin;
-          }
-          //log.addScalar('Prob', 1);
-        } else if (math.exp(-dE / (kB * _t)) > Interval.random.nextDouble()) {
-          _eMin = _e;
-          //log.addScalar('Prob', math.exp(-dE / (kB * t)));
-          _xMin = _x;
+          _currentMinEnergy = _field.value;
+          _currentMinPosition = _field.position;
+          _acceptanceProbability = 1.0;
         } else {
-          //log.addScalar('Prob', 0);
+          _acceptanceProbability = math.exp(-dE / (kB * _t));
+          if (_acceptanceProbability > Interval.random.nextDouble()) {
+            _currentMinEnergy = _field.value;
+            _currentMinPosition = _field.position;
+          }
         }
         recordLog();
       }
     }
-    if (_eMinGlobal < _eMin) {
-      print('Warning: E($_xMinGlobal) = $_eMinGlobal < E($_xMin) = $_eMin!');
+    if (globalMinEnergy < _currentMinEnergy) {
+      print('Warning: E($globalMinPosition) = $globalMinEnergy '
+          '< E($_currentMinPosition) = $_currentMinEnergy!');
+      if (isRecursive) {
+        stdin.readLineSync();
+        _currentMinPosition = globalMinPosition;
+        _currentMinEnergy = globalMinEnergy;
+
+        _currentMinPosition = await anneal(
+          markov,
+          isRecursive: isRecursive,
+          ratio: ratio,
+        );
+      }
     }
-    return _xMin;
+    return _currentMinPosition;
   }
 
   @override
-  String toString() {
+  String toString() => runtimeType.toString();
+
+  /// Returns a `String` containing object info.
+  ///
+  /// Note: The method calls asynchronous methods.
+  Future<String> get info async {
     final b = StringBuffer();
     b.writeln('Simulator: ');
-    b.writeln('  gamma: $gamma');
-    b.writeln('  P(dE0): ${math.exp(-dE0 / (kB * schedule.tStart))}');
-    b.writeln('  kB: $kB');
-    b.writeln('  t0: ${schedule.tStart}');
-    b.writeln('  t${schedule.temperatures.length}: '
-        '${schedule.temperatures.last}');
-    b.writeln('  search region size: ${system.size}');
-    b.writeln('  dx: ${schedule.dx(schedule.tStart)}');
-    b.writeln('  precision: ${schedule.dx(schedule.tEnd)}');
-    b.writeln('');
-    b.writeln('  $system');
+    b.writeln('  iteration: $iterations');
+    b.writeln('  dEnergyStart: ${await dEnergyStart}');
+    b.writeln('  dEnergyEnd: ${await dEnergyEnd}');
+    b.writeln('  kB: ${await _kB}');
+    b.writeln('  xMin: ${_field.minPosition}');
+    b.writeln('  tStart: ${await tStart}');
+    b.writeln('  tEnd: ${await tEnd}');
     return b.toString();
   }
 }
