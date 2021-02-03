@@ -9,7 +9,7 @@ E(**x**) = 4.0 - 4.0&middot;e<sup>-4&middot;|**x** - **x**<sub>glob</sub>|</sup>
 defined for a spherical search space centred around the origin.
 Hereby, |**x** - **y**| = &#8730; ( &sum;<sub> i</sub><sup>3</sup> (x<sub>i</sub> - y<sub>i</sub>)<sup>2</sup> ) is the distance between the vectors **x** and **y**.
 
-![Energy Function](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/energy2d.svg?sanitize=true)
+![Energy Function](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/energy2d.jpg)
 
 
 The figure above shows a projection of E onto the x-y plane. The global minimum of E(**x**)
@@ -82,7 +82,7 @@ void main() async {
 </details>
 
 
-![Convergence Graph](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/convergence.svg)
+![Convergence Graph](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/convergence.jpg)
 
 The figure above shows the system energy, min. system energy, temperature, and acceptance probability during the SA process.
 
@@ -91,7 +91,7 @@ The graphs were generated using [gnuplot] and the scripts are available in the f
 The annealing schedule (blue curve) consists of a monotonically decreasing exponential sequence
 with 750 elements, start value T<sub>0</sub> = 100 and end value T<sub>n</sub> = 1e-8. At high temperatures the algorithm explores the entire search space for the x-coordinate (values ranging between -2 and 2), and new solutions are accepted with high probability (red dots along the line y = 1). As the temperature decreases fewer solutions are accepted and the x-coordinate converges towards 0.5.
 
-![System Energy](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/energy.svg)
+![System Energy](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/energy.jpg)
 
 In order to demonstrate the ability of the algorithm to escape from a local minimum, we have
 initialized **x**<sub>min</sub> as **x**<sub>loc</sub>. The figure above shows the
