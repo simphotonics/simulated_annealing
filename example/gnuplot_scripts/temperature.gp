@@ -1,3 +1,5 @@
+reset
+
 set key left bottom nobox font ", 12"
 
 set title "Simulated Annealing - System Temperature" font ",18"
@@ -38,15 +40,16 @@ set y2range [ * : * ] noreverse writeback
 
 set zlabel "Z" font ", 20"
 set zrange [ * : * ] noreverse writeback
-set cbrange [ 0 : 100 ] noreverse writeback
+set cbrange [ 0 : 2000 ] noreverse writeback
 set rrange [ * : * ] noreverse writeback
 
 
 
 # Gnuplot script plotting a 3D graph of the system energy.
-set palette defined (0 "blue", 5 "#4444FF99", 10 "#9999FF99", 15 "turquoise",  30 "turquoise", 40 "green", 70 "yellow",  100 "red" )
+set palette defined (2 "blue", 10 "#4444FF99", 20 "#9999FF99", 100 "turquoise",  250 "green", 600 "yellow",  2000 "red" )
 
+set term qt size 1000, 1000 font "Sans,14"
 
 
 splot '../data/log.dat' using 1:2:3:($7) ps 2 pt 7 pal t "System Temperature", \
-'../data/spherical_search_space.dat' using 1:2:3 ps 0.45 lc "#44444455" pt 7 t "Search Region",
+'../data/spherical_search_space2D.dat' using 1:2:3 ps 0.45 lc "#44444455" pt 7 t "Search Region",
