@@ -1,9 +1,11 @@
+import 'dart:collection';
 import 'dart:math';
 
 import 'package:exception_templates/exception_templates.dart';
-import 'package:simulated_annealing/src/exceptions/incompatible_vectors.dart';
+import 'package:lazy_memo/lazy_memo.dart';
 
 import '../extensions/random_sample.dart';
+import '../exceptions/incompatible_vectors.dart';
 
 /// Function defining an interval start/end point.
 typedef ParametricPoint = num Function();
@@ -13,7 +15,12 @@ abstract class Interval {
   Interval();
 
   /// Returns the next random number in the interval.
-  num next({num? midPoint, num magnitude});
+  num next();
+
+  /// Returns the next random number in the intersection of the intervals
+  /// `(start, end)` and `(x - dx, x + dx)`.
+  /// Returns `x` if the intersection is the empty interval.
+  num perturb(num x, num dx);
 
   /// Returns true if `point` belongs to the interval.
   bool contains(num point);
@@ -25,14 +32,14 @@ abstract class Interval {
   /// Returns the size of the interval.
   num get _size;
 
-  /// Cached random number in interval (startPoint(), endPoint()).
+  /// Cached random number in interval.
   /// @nodoc
   late num _cache;
 
   /// Logical flag indicating if `_cache` is up to date.
   bool _isUpToDate = false;
 
-  /// Clears the internal cache. After calling this function
+  /// Clears the internal cache holding next. After calling this function
   /// the method `next` will return a new random number sampled from the
   /// interval `(start, end)`.
   void clearCache() {
@@ -55,44 +62,59 @@ class FixedInterval extends Interval {
   /// End point of the numerical interval.
   final num end;
 
-  /// Returns the next random number that is larger than `start`
-  /// inclusive, and smaller than `end`, exclusive.
-  ///
-  /// If `midPoint` is specified the method returns
-  /// the next random number sampled from the interval
-  /// obtained by intersecting:
-  /// `(start, end)` and
-  /// `(midPoint - magnitude, midPoint + magnitude)`.
-  ///
-  /// Note: If the intersection is empty, the input
-  /// `midPoint` is returned unperturbed.
+  /// Returns the next random number sampled from
+  /// the interval `(start, end)`.
+  /// * Returns a cached value if the cache is up-to-date.
+  /// * If the cache is stale an new random number is returned and cached.
   @override
-  num next({num? midPoint, num magnitude = 0}) {
-    if (_isUpToDate) return _cache;
-    if (midPoint == null) {
+  num next() {
+    if (_isUpToDate) {
+      return _cache;
+    } else {
       _isUpToDate = true;
       return _cache = Interval.random.nextDoubleInRange(start, end);
-    } else {
-      final startM = midPoint - magnitude.abs();
-      final endM = midPoint + magnitude.abs();
-      if (!overlaps(startM, endM)) {
-        return midPoint;
-      }
-      final _start = max(startM, start);
-      final _end = min(endM, end);
+    }
+  }
+
+  /// Returns the next random number sampled from the interval
+  /// obtained by intersecting:
+  /// `(start, end)` and `(x - dx, x + dx)`.
+  /// * If the intersection is empty, `x` is returned unperturbed.
+  /// * Returns a cached value if the cache is up-to-date.
+  /// * If the cache is stale an new random number is returned and cached.
+  @override
+  num perturb(num x, num dx) {
+    if (overlaps(x - dx, x + dx)) {
       _isUpToDate = true;
-      return _cache = Interval.random.nextDoubleInRange(_start, _end);
+      return _cache = Interval.random.nextDoubleInRange(
+        max(x - dx, start),
+        min(x + dx, end),
+      );
+    } else {
+      _isUpToDate = false;
+      return x;
     }
   }
 
   @override
-  String toString() =>
-      _isUpToDate ? '[$start, $_cache, $end]' : '[$start, $end]';
+  String toString() {
+    final b = StringBuffer();
+    b.writeln('FixedInterval:');
+    b.writeln('  start: $start');
+    b.writeln('  end: $end');
+    if (_isUpToDate) {
+      b.write('  cached next: $_cache');
+    } else {
+      b.write('  cached next: not set');
+    }
+
+    return b.toString();
+  }
 
   /// Returns true if x is safisfying
   /// `(x >= start && x<= end)`.
   @override
-  bool contains(num x) => (x >= start && x <= end);
+  bool contains(num x) => (x >= start && x <= end) || (x >= end && x <= start);
 
   /// Returns true if the interval defined by the points
   /// `left` and `right` overlaps `this`.
@@ -123,21 +145,10 @@ class ParametricInterval extends Interval {
   /// Returns the next random number that is larger
   /// than `pStart()` inclusive,
   /// and smaller than `pEnd()`, exclusive.
-  ///
-  ///
-  /// If `midPoint` is specified the method returns
-  /// the next random number sampled from the interval
-  /// obtained by intersecting:
-  /// `(pStart(), pEnd())` and
-  /// `(midPoint - magnitude, midPoint + magnitude)`.
-  ///
-  /// Note: If the intersection is empty, the input
-  /// `midPoint` is returned unperturbed.
-  ///
-  /// * Results are cached. To clear the cache call `clearCache()`.
-  /// * Result caching enables defining parameterized bpeoples courtoundaries where some
+  /// * Returns a cached value if the cache is up-to-date.
+  /// * To clear the cache call `clearCache()`.
+  /// * Result caching enables defining parameterized intervals where some
   ///   intervals depend on other intervals.
-  ///
   ///   ```
   ///   /// Defines a 2D circular sampling area centered at
   ///   /// (0, 0) with radius 2.75.
@@ -151,44 +162,67 @@ class ParametricInterval extends Interval {
   ///   final space = ParametricSpace([x,y]);
   ///   ```
   @override
-  num next({num? midPoint, num magnitude = 0}) {
-    if (_isUpToDate) return _cache;
-    if (midPoint == null) {
-      _isUpToDate = true;
-      return _cache = Interval.random.nextDoubleInRange(pStart(), pEnd());
+  num next() {
+    if (_isUpToDate) {
+      return _cache;
     } else {
       _isUpToDate = true;
-      final startM = midPoint - magnitude.abs();
-      final endM = midPoint + magnitude.abs();
-      if (!overlaps(startM, endM)) {
-        return _cache = midPoint;
-      }
-      final _start = max(startM, pStart());
-      final _end = min(endM, pEnd());
-      return _cache = Interval.random.nextDoubleInRange(_start, _end);
+      return _cache = Interval.random.nextDoubleInRange(pStart(), pEnd());
+    }
+  }
+
+  /// Returns the next random number sampled from the interval
+  /// obtained by intersecting:
+  /// `(start, end)` and `(x - dx, x + dx)`.
+  /// * If the intersection is empty, `x` is returned unperturbed.
+  /// * Returns a cached value if the cache is up-to-date.
+  /// * If the cache is stale an new random number is returned and cached.
+  @override
+  num perturb(num x, num dx) {
+    if (overlaps(x - dx, x + dx)) {
+      _isUpToDate = true;
+      return _cache = Interval.random.nextDoubleInRange(
+        max(x - dx, pStart()),
+        min(x + dx, pEnd()),
+      );
+    } else {
+      _isUpToDate = false;
+      return x;
     }
   }
 
   /// Returns true if `x` is safisfying
   /// `(x >= pStart() && x<= pEnd()))`.
   @override
-  bool contains(num x) => (x >= pStart() && x <= pEnd());
+  bool contains(num x) =>
+      (x >= pStart() && x <= pEnd() || x >= pEnd() && x <= pStart());
 
   /// Returns true if the interval defined by the points
   /// `left` and `right` overlaps with `this`.
   @override
   bool overlaps(num left, num right) {
-    if (left < pStart() && right < pStart()) return false;
+    if (right < pStart() && left < pStart()) return false;
     if (left > pEnd() && right > pEnd()) return false;
     return true;
   }
 
   @override
-  String toString() => _isUpToDate
-      ? '[${pStart()}, $_cache, ${pEnd()}]'
-      : '[${pStart()}, ${pEnd()}]';
+  String toString() {
+    final b = StringBuffer();
+    b.writeln('ParametricInterval (current boundaries):');
+    b.writeln('  start: ${pStart()}');
+    b.writeln('  end: ${pEnd()}');
+    if (_isUpToDate) {
+      b.write('  cached next: $_cache');
+    } else {
+      b.write('  cached next: not set');
+    }
+    return b.toString();
+  }
 
-  /// Returns the length of the interval.
+  /// Returns the current length of the interval.
+  ///
+  /// Note: For parametric intervals the length may not be constant.
   @override
   num get _size => (pEnd() - pStart()).abs();
 }
@@ -197,54 +231,69 @@ class ParametricInterval extends Interval {
 /// `intervals`.
 class SearchSpace {
   /// Constructs an object of type `SearchSpace`.
-  SearchSpace(List<Interval> intervals)
-      : _intervals = List<Interval>.of(intervals);
-
-  /// Copy constructor.
-  factory SearchSpace.from(SearchSpace region) {
-    return SearchSpace(region._intervals);
+  /// * `intervals`: A list of intervals defining the search space.
+  /// * `dxMin`: The smallest perturbation magnitudes used with
+  ///    the method `perturb`. For a discrete search space
+  ///    it corresponds to the solution precision.
+  /// * `dxMax`: The largest perturbation magnitudes used with
+  ///    the method `perturb`. This parameter is optional. It
+  ///    defaults to the search space `size`.
+  SearchSpace(
+    List<Interval> intervals, {
+    required List<num> dxMin,
+    List<num>? dxMax,
+  })  : _intervals = List<Interval>.of(intervals),
+        dxMin = UnmodifiableListView<num>(dxMin),
+        dimension = intervals.length {
+    _size = Lazy<List<num>>(() => estimateSize());
+    this.dxMax = (dxMax == null)
+        ? UnmodifiableListView(size)
+        : UnmodifiableListView(dxMax);
   }
 
-  /// Search region dimension.
+  /// Search space dimension.
   /// * Is equal to the length of the constructor parameter `intervals`.
-  /// * Corresponds to the number of variables being sampled.
-  int get dimension => _intervals.length;
+  int dimension;
 
   /// Intervals defining the boundary of the sampling space.
   /// * The list `_intervals` must not be empty.
   final List<Interval> _intervals;
 
+  // Maximum size of the search neighbourhood.
+  late final UnmodifiableListView<num> dxMax;
+
+  /// Minimum size of the search neighbourhood.
+  ///
+  /// For continuous problems this parameter determines the solution precision.
+  final UnmodifiableListView<num> dxMin;
+
   /// Returns a random vector of length `dimension`. Each vector coordinate
   /// is generated by drawing samples from the corresponding
   /// interval.
   List<num> next() {
-    final result = List<num>.generate(
+    _clearCache();
+    return List<num>.generate(
       dimension,
       (i) => _intervals[i].next(),
     );
-    // Clearing the function table of the memoized method perturb.
-    _intervals.forEach((interval) {
-      interval.clearCache();
-    });
-    return result;
   }
 
   /// Returns a random vector of length `dimension`
   /// sampled from the interval
   /// obtained by intersecting `this` with the generalized rectangle
-  /// centred at `midPoint` with edge lengths `(midPoint - dx, midPoint + dx)`.
+  /// centred at `x` with edge lengths `(x - dx, x + dx)`.
   ///
   /// Note: If the intersection is empty, the input
-  /// `midPoint` is returned unperturbed.
+  /// `x` is returned unperturbed.
   ///
   /// Throws an error of type `ErrorOfType<InCompatibleVector>` if the
-  /// length of the `midPoint` or `dx` does not match `this.dimension`.
-  List<num> perturb(List<num> midPoint, List<num> dx) {
-    if (midPoint.length != dimension) {
+  /// length of the `x` or `dx` does not match `this.dimension`.
+  List<num> perturb(List<num> x, List<num> dx) {
+    if (x.length != dimension) {
       throw ErrorOfType<IncompatibleVector>(
-          message: 'Could not generate perturbation around $midPoint.',
-          invalidState: 'Dimension mismatch: $dimension != ${midPoint.length}.',
-          expectedState: 'The vector midPoint must have length $dimension.');
+          message: 'Could not generate random point around $x.',
+          invalidState: 'Dimension mismatch: $dimension != ${x.length}.',
+          expectedState: 'The vector x must have length $dimension.');
     }
     if (dx.length != dimension) {
       throw ErrorOfType<IncompatibleVector>(
@@ -252,50 +301,87 @@ class SearchSpace {
           invalidState: 'Dimension mismatch: $dimension != ${dx.length}.',
           expectedState: 'The vector dx must have length $dimension.');
     }
+    _clearCache();
     // Generating the random sample.
-    num mid = 0;
     final result = <num>[];
+    num value = 0;
     for (var i = 0; i < dimension; ++i) {
-      mid = _intervals[i].next(
-        midPoint: midPoint[i],
-        magnitude: dx[i],
-      );
-      if (!_intervals[i].overlaps(
-        midPoint[i] - dx[i].abs(),
-        midPoint[i] + dx[i].abs(),
-      )) {
-        clearCache();
-        return midPoint;
+      value = _intervals[i].perturb(x[i], dx[i]);
+      if (!_intervals[i]._isUpToDate && value == x[i]) {
+        return x;
       } else {
-        result.add(mid);
+        result.add(value);
       }
     }
-    clearCache();
     return result;
   }
 
-  /// Cleas the cached random numbers for each interval.
-  void clearCache() {
+  /// Clears the cached random numbers for each interval.
+  void _clearCache() {
     _intervals.forEach((interval) {
       interval.clearCache();
     });
   }
 
-  /// Returns the sample space size along each dimension.
+  /// Lazy variable storing the search space size.
+  late final Lazy<List<num>> _size;
+
+  /// Returns an estimate of the search space size.
   ///
-  /// Note:
-  /// Parametric interval sizes are sampled
-  /// 50 times and the maximum values are returned.
-  List<num> get size {
+  /// Note: If all intervals are of type `FixedInterval` the reported interval
+  /// sizes are exact.
+  List<num> estimateSize() {
+    if (_intervals.every((interval) => interval is FixedInterval)) {
+      return List<num>.generate(dimension, (i) => _intervals[i]._size);
+    }
+
     final sizes = List<List<num>>.generate(50, (_) {
-      clearCache();
+      _clearCache();
       return List<num>.generate(dimension, (i) => _intervals[i]._size);
     });
-    return sizes.reduce((maxSize, current) {
+
+    return sizes.reduce((value, current) {
       for (var i = 0; i < dimension; ++i) {
-        maxSize[i] = max(maxSize[i], current[i]);
+        value[i] = max(value[i], current[i]);
       }
-      return maxSize;
+      return value;
     });
+  }
+
+  /// Returns the search space size along each dimension.
+  ///
+  /// Note: For parametric intervals the size is estimated by sampling the
+  /// interval 50 times and returning the difference between the sample
+  /// maximum and the sample minimum.
+  List<num> get size => _size();
+
+  /// Returns true if the point `x` belongs to the search space `this`.
+  bool contains(List<num> x) {
+    if (x.length != dimension) {
+      throw ErrorOfType<IncompatibleVector>(
+          message: 'Could not generate random point around $x.',
+          invalidState: 'Dimension mismatch: $dimension != ${x.length}.',
+          expectedState: 'The vector x must have length $dimension.');
+    }
+    for (var i = 0; i < dimension; ++i) {
+      if (!_intervals[i].contains(x[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @override
+  String toString() {
+    final b = StringBuffer();
+    b.writeln('Search Space: ');
+    b.writeln('  size: $size');
+    b.writeln('  dxMin: $dxMin');
+    b.writeln('  dxMax: $dxMax');
+    b.writeln('  dimension: $dimension');
+    for (var i = 0; i < dimension; ++i) {
+      b.writeln('  ${_intervals[i]}'.replaceAll('\n', '\n  '));
+    }
+    return b.toString();
   }
 }
