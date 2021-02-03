@@ -1,46 +1,56 @@
-import 'dart:collection';
+/// Provides functions of typedef `TemperatureSequence` for generating
+/// *linear*, *geometric*, *normal*, and *exponential* sequences.
+library annealing_schedule;
+
 import 'dart:math';
 
-import '../extensions/list_utils.dart';
+typedef TemperatureSequence = List<num> Function(
+  num tStart,
+  num tEnd, {
+  int iterations,
+});
 
 /// Linear temperature sequence with entries:
 ///
-/// `tStart, tStart - dt, ..., tStart - n * dt` where `dt = (tEnd - tStart)/(n - 1)`
-List<num> linearSequence(num tStart, num tEnd, {int n = 3000}) {
-  final dt = (tEnd - tStart) / (n - 1);
-  return List<num>.generate(n, (i) => tStart + dt * i);
+/// `tStart, tStart - dt, ..., tStart - n * dt`
+/// where `dt = (tEnd - tStart)/(n - 1)`
+List<num> linearSequence(num tStart, num tEnd, {int iterations = 1000}) {
+  final dt = (tEnd - tStart) / (iterations - 1);
+  return List<num>.generate(iterations, (i) => tStart + dt * i);
 }
 
 /// Returns a geometric sequence with
 /// entries:
 ///
-/// `tStart * beta(0), tStart * beta(0)* beta(1), ..., tStart * beta(0) * ... * beta(n-1)`.
+/// `tStart, tStart * beta, ..., tStart * pow(beta, n-1)`.
 ///
-/// where `beta` is linearly interpolated between `betaStart` and `betaEnd`.
+/// The factor `beta` is calculated such that the last
+/// entry of the sequence is equal to `tEnd`.
 List<num> geometricSequence(
-  num tStart, {
-  betaStart = 0.99,
-  betaEnd = 0.999,
-  int n = 3000,
+  num tStart,
+  num tEnd, {
+  int iterations = 1000,
 }) {
-  final beta = linearSequence(betaStart, betaEnd, n: n - 1);
-  beta.insert(0, 1);
+  final beta = exp(log(tEnd / tStart) / (iterations - 1));
   var current = tStart.abs();
-  return List<num>.generate(n, (i) => current = current * beta[i]);
+  final result =
+      List<num>.generate(iterations - 1, (i) => current = current * beta);
+  return result..insert(0, tStart.abs());
 }
 
-/// Returns a monotonically decreasing sequence with entries: `tStart, ..., tEnd`.
+/// Returns a monotonically decreasing sequence with
+/// entries: `tStart, ..., tEnd`.
 ///
-/// `tK = tStart * exp(-pow(k / (2 * sigma), 2)` where
+/// `t(k) = tStart * exp(-pow(k / (2 * sigma), 2)` where
 /// `sigma = n/sqrt(2 * log(tStart / tEnd))`.
 List<num> normalSequence(
   num tStart,
   num tEnd, {
-  int n = 3000,
+  int iterations = 1000,
 }) {
-  final invTwoSigmaSq = log(tStart / tEnd) / pow(n - 1, 2);
-  print(invTwoSigmaSq);
-  return List<num>.generate(n, (i) => tStart * exp(-i * i * invTwoSigmaSq));
+  final invTwoSigmaSq = log(tStart / tEnd) / pow(iterations - 1, 2);
+  return List<num>.generate(
+      iterations, (i) => tStart * exp(-i * i * invTwoSigmaSq));
 }
 
 /// Exponentially decreasing sequence with start value `tStart` and
@@ -48,101 +58,20 @@ List<num> normalSequence(
 ///
 /// The general form of the sequence members is:
 ///
-/// `t_k = t0 * exp( -lambda * k)` where
+/// `t(k) = tStart * exp( -lambda * k)` where
 /// `lambda = -log(tEnd.abs() / tStart.abs()) / (n - 1)`.
-List<num> exponentialSequence(num tStart, num tEnd, {int n = 3000}) {
-  final lambda = -log(tEnd.abs() / tStart.abs()) / (n - 1);
+List<num> exponentialSequence(num tStart, num tEnd, {int iterations = 1000}) {
+  final lambda = -log(tEnd.abs() / tStart.abs()) / (iterations - 1);
   final beta = exp(-lambda);
   var prev = tStart / beta;
-  return List<num>.generate(n, (i) => prev = prev * beta);
-}
-
-/// Exponentially decreasing sequence,
-///
-/// After `n05` iterations the temperature will be `tStart / 2`.
-///
-/// Note: The function is not continous but has a kink at `tStart/2`.
-/// For `n > n05` the decay constant is calculated such that the last element
-/// in the sequence is equal to `tEnd`.
-List<num> exponentialSequenceN05(
-  num tStart,
-  num tEnd, {
-  int n05 = 600,
-  int n = 3000,
-}) {
-  final _tStart = tStart.abs();
-  final lambda = 1 / n05.abs();
-  final firstPart =
-      List<num>.generate(n05, (i) => _tStart * pow(2, -lambda * i));
-  final secondPart = exponentialSequence(tStart / 2, tEnd, n: n - n05);
-  return <num>[...firstPart, ...secondPart];
+  return List<num>.generate(iterations, (i) => prev = prev * beta);
 }
 
 /// Returns the sequence: `tStart, tStart / (1 + beta * tStart),`
-/// `... tStart / (1 * (n-1) * beta * tStart)`
-List<num> lundy(num tStart, num beta, {int n = 3000}) {
-  return List<num>.generate(n, (i) => tStart / (1 + i * beta * tStart));
-}
-
-/// Annealing schedule consisting of a sequence of temperatures.
-/// The initial temperature must be the largest value in the sequence.
-///
-/// The sequence should decrease
-/// (not necessarily monotonically) and tend towards zero.
-class AnnealingSchedule {
-  /// Constructs an object of type `AnnealingSchedule`.
-  /// * `temperatures`: sequence of temperatures,
-  /// * `dxMax`: Vector components containing the maximum perturbation
-  /// magnitudes (typically the size of the search space along each
-  /// dimension).
-  /// * `dxMin`: Vector components containing the minimum perturbation
-  /// magnitudes (tyically related to the
-  /// required solution precision).
-  AnnealingSchedule(
-    List<num> temperatures,
-    List<num> dxMax,
-    List<num> dxMin,
-  )   : _temperatures =
-            List<num>.generate(temperatures.length, (i) => temperatures[i]),
-        dxMax = UnmodifiableListView(dxMax),
-        dxMin = UnmodifiableListView(dxMin),
-        _a = UnmodifiableListView(
-            (dxMax - dxMin).divide(temperatures.first - temperatures.last)),
-        _b = UnmodifiableListView(dxMax -
-            (dxMax - dxMin).times(
-                temperatures.first / (temperatures.first - temperatures.last)));
-
-  /// Sequence of temperatures defining the annealing schedule.
-  /// * The initial temperature `tStart` must be the largest temperature
-  /// in the sequence as it is used to estimate the system
-  /// Boltzmann constant `kB`.
-  final List<num> _temperatures;
-
-  /// Initial temperature.
-  num get tStart => _temperatures.first;
-
-  /// Final temperature.
-  num get tEnd => _temperatures.last;
-
-  /// Annealing temperatures.
-  List<num> get temperatures => List<num>.of(_temperatures);
-
-  /// Sample space size. Parameter used by the neighbourhood function.
-  final UnmodifiableListView<num> dxMax;
-
-  /// Minimum size of the search neighbourhood.
-  ///
-  /// For continuous problems this parameter determines the solution precision.
-  final UnmodifiableListView<num> dxMin;
-
-  /// Returns the factor a used in dx = _a * temperature + _b.
-  final List<num> _a;
-
-  /// Returns the factor b used in dx = _a * temperature + _b.
-  final List<num> _b;
-
-  /// Returns the neighbourhood vector for a given temperature.
-  /// * `dx(tStart) == dxMax`
-  /// * `dx(tEnd) == dxMin`
-  List<num> dx(num temperature) => _a.times(temperature).plus(_b);
+/// `..., tStart / (1 * (n-1) * beta * tStart)`
+/// where `beta = (1 / tEnd - 1 / tStart) / (n - 1)`.
+List<num> lundySequence(num tStart, num tEnd, {int iterations = 1000}) {
+  final beta = (1 / tEnd - 1 / tStart) / (iterations - 1);
+  return List<num>.generate(
+      iterations, (i) => tStart / (1 + i * beta * tStart));
 }
