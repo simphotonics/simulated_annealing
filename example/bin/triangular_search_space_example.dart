@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:list_operators/list_operators.dart';
 import 'package:simulated_annealing/simulated_annealing.dart';
 
 void main() async {
@@ -11,7 +12,7 @@ void main() async {
       () => yMax - 15 * x.next(), () => yMin + 15 * x.next());
 
   // Defining a spherical search space.
-  final space = SearchSpace([x, y]);
+  final space = SearchSpace([x, y], dxMin: [1e-6, 1e-6]);
 
   print('Space sizes: ${space.size}.');
 
