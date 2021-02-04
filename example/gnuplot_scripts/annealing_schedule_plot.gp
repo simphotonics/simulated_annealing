@@ -1,6 +1,8 @@
-set key inside box right top font ", 14"
+reset
 
-set title "Annealing Schedule" font ",18"
+set key box inside left bottom font ", 14"
+
+##set title "Annealing Schedule" font ",18"
 
 set grid lw 2
 
@@ -17,5 +19,9 @@ set yrange [ * : * ] noreverse writeback
 set y2range [ * : * ] noreverse writeback
 
 
-plot '../data/log.dat' using ($7)  w l lw 3 lc "#00cc4433" t 'Temperature', \
-     '../data/log.dat' using ($8)  w l lw 3 t "Perturbation magnitude dx", \
+set term qt size 1000, 480 font "Sans,14"
+
+set logscale y
+
+plot '../data/log.dat' using ($10) w l  lw 3 lc "#00cc4433" t 'Temperature', \
+     '../data/log.dat' using ($4)  w l lw 3 t "Perturbation magnitude dx", \
