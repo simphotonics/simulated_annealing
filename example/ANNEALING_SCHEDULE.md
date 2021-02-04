@@ -20,7 +20,7 @@ function: **dx**(T)&nbsp;=&nbsp;**a**\*&nbsp;T&nbsp;+&nbsp;**b**,
 where **a**&nbsp;=&nbsp;(**dxMax**&nbsp;-&nbsp;**dxMin**)/(T<sub>0</sub>&nbsp;-&nbsp;T<sub>n</sub>)
 and **b**&nbsp;=&nbsp;**dxMax**&nbsp;-&nbsp;**a**\*t<sub>0</sub>.
 
-![Annealing Schedule](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/annealing_schedule.png)!
+![Annealing Schedule](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/annealing_schedule.png)
 ![Temperature 3D](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/temperature.png)
 
 The perturbation magnitude **dx** specifies a region of the search space around
