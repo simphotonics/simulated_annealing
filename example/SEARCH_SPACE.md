@@ -33,6 +33,9 @@ final z = ParametricInterval(
 );
 
 // Defining a spherical search space.
+// Note: dxMax defaults to the space size. If a smaller initial
+//       perturbation magnitude is required it can be specified
+//       as a constructor argument.
 final space = SearchSpace([x, y, z], dxMin: [1e-6, 1e-6, 1e-6]);
 
 void main() async {
@@ -40,13 +43,13 @@ void main() async {
     print(space.estimateSize());
   }
 
-  final testPoint = [1.2, 1.0, 0.6];
-  final magnitudes = [0.6, 0.6, 0.6];
+  final xTest = [1.2, 1.0, 0.6];
+  final dx = [0.6, 0.6, 0.6];
 
   final sample = List<List<num>>.generate(2000, (_) => space.next());
 
   final perturbation = List<List<num>>.generate(
-      500, (_) => space.perturb(testPoint, magnitudes));
+      500, (_) => space.perturb(xTest, dx));
 
   await File('../data/spherical_search_space.dat').writeAsString(
     sample.export(),
@@ -58,7 +61,7 @@ void main() async {
   await File('../data/spherical_search_space_center_point.dat')
       .writeAsString('''
     # Perturbation Centerpoint
-    ${[testPoint].export()}''');
+    ${[xTest].export()}''');
 
   // The search space can be visualized by navigating to the folder
   // 'example/gnuplot_scripts' and running the commands:
@@ -76,13 +79,14 @@ void main() async {
 The figure below shows 2000 random points sampled from the spherical search space.
 The point were generated using the method `next` provided by the class [`SearchSpace`][SearchSpace].
 
-The (red) test point T<sub>test</sub> has coordinates (1.2, 1.0, 1.6).
-The green dots represent points sampled for a neighbourhood T<sub>test</sub> &pm; m around T<sub>test</sub>, where m&nbsp;=&nbsp;(0.4, 0.4, 0.4) are the perturbation magnitudes along each dimension.
+The (red) test point **x**<sub>test</sub> has coordinates (1.2, 1.0, 1.6).
+The green dots represent points sampled for a neighbourhood **x**<sub>test</sub> &pm; **dx** around **x**<sub>test</sub>,
+where **dx**&nbsp;=&nbsp;(0.6, 0.6, 0.6) are the perturbation magnitudes along each dimension.
 These points were generated using the method `perturb`.
 
 Notice that the perturbation neighbourdood does not extend beyond the margins of the
-search space. If the search space does not intersect the region T<sub>test</sub> &pm; m,
-T<sub>test</sub> is returned unperturbed.
+search space. If the search space does not intersect the region **x**<sub>test</sub> &pm; **dx**,
+**x**<sub>test</sub> is returned unperturbed.
 
 
 ## Features and bugs
