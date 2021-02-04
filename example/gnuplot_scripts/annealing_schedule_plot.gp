@@ -1,25 +1,25 @@
 reset
 
-set key box inside left bottom font ", 14"
+set key box inside left bottom font ", 12"
 
 ##set title "Annealing Schedule" font ",18"
 
 set grid lw 2
 
-set tics font ", 16"
+set tics font ", 12"
 
 set format y "    %1.E";
 
-set xlabel "Iteration" font ", 20"
+set xlabel "Iteration" font ", 12"
 set xrange [ * : 750 ] noreverse writeback
 set x2range [ * : * ] noreverse writeback
 
-set ylabel "" font ", 20"
-set yrange [ * : * ] noreverse writeback
+set ylabel "" font ", 12"
+set yrange [ 1e-8 : * ] noreverse writeback
 set y2range [ * : * ] noreverse writeback
 
 
-set term qt size 1000, 480 font "Sans,14"
+set term qt size 500, 300 font "Sans,12"
 
 set logscale y
 
