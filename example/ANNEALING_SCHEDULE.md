@@ -9,7 +9,7 @@ These functions have typedef `TemperatureSequence` and can be used as an argumen
 constructing objects of type `Simulator`.
 
 
-![Annealing Schedule](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/annealing_schedule.jpg)
+![Annealing Schedule](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/annealing_schedule.png)
 
 The annealing schedule shown above consists of a monotonically decreasing exponential sequence
 with 750 elements, start value T<sub>start</sub> = 1902.4 and end value T<sub>end</sub> = 1e-3.
@@ -30,7 +30,7 @@ search neighbourhood, **dx**, during each (outer) SA iteration until the require
 is reached.
 
 
-![Temperature 3D](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/temperature.jpg)
+![Temperature 3D](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/temperature.png)
 
 The figure above shows the temperature during an SA process. At high temperatures (red dots) **dx** approaches **dxMax**&nbsp;=&nbsp;\[2.0,&nbsp;2.0,&nbsp;2.0\] and the potential solutions are selected from the entire search space.
 As the temperature decreases (blue dots) **dx** approaches **dxMin** and, in this example, the solution converges towards the global minimum.
@@ -39,4 +39,3 @@ As the temperature decreases (blue dots) **dx** approaches **dxMin** and, in thi
 Please file feature requests and bugs at the [issue tracker].
 
 [issue tracker]: https://github.com/simphotonics/simulated_annealing/issues
-
