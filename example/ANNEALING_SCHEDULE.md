@@ -1,7 +1,7 @@
 ##  Annealing Schedule - Example
 [![Build Status](https://travis-ci.com/simphotonics/simulated_annealing.svg?branch=main)](https://travis-ci.com/simphotonics/simulated_annealing)
 
-The library [`annealing_schedule`][annealing_schedule] includes functions for generating
+The library `annealing_schedule` includes functions for generating
 *linear*, *geometric*, *normal*, *exponential*, and *Lundy*
 temperature sequences.
 
@@ -40,4 +40,3 @@ Please file feature requests and bugs at the [issue tracker].
 
 [issue tracker]: https://github.com/simphotonics/simulated_annealing/issues
 
-[AnnealingSchedule]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/AnnealingSchedule-class.html
