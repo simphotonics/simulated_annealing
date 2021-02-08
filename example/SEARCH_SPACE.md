@@ -232,4 +232,4 @@ Please file feature requests and bugs at the [issue tracker].
 
 [ParametricInterval]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/ParametricInterval-class.html
 
-[hemispheric_search_space_example.dart][bin/hemispheric_search_space_example.dart]
+[hemispheric_search_space_example.dart]:bin/hemispheric_search_space_example.dart
