@@ -4,11 +4,12 @@
 The class [`SearchSpace`][SearchSpace] is used to define a region from which points are
 randomly sampled. A search space is defined in terms of intervals along each dimension.
 
-The example below demonstrates how to define a
-spherical 3D search space using cartesian coordinates. (The search space includes the
-points situated on the surface as well as the points conclosed by the sphere. )
+The example below demonstrates how to define a ball shaped 3D
+search space using cartesian coordinates. (The search space includes the
+points situated on the spherical surface as well as the inner points).
 The interval `x` is an object of type [`FixedInterval`][FixedInterval] that is
-the left and right boundary are constant numbers. The intervals `y` and `z` are objects of type [`ParametricInterval`][ParametricInterval]
+the left and right boundary are constant numbers.
+The intervals `y` and `z` are objects of type [`ParametricInterval`][ParametricInterval]
 and their boundaries are specified in terms of a numerical function that depends on other
 intervals.
 
@@ -132,7 +133,9 @@ cdf<sup>-1</sup>(p,&nbsp;x<sub>min</sub>,&nbsp;x<sub>max</sub>) = x<sub>min</sub
 The graph on the right above shows the implicit iCDF of the interval `x` for different interval
 boundaries.
 
-To render the 2D PDF of the triangular search space uniform we need to provide a suitable iCDF when creating the interval `x`.
+
+
+In order to make the 2D-PDF of the triangular search space uniform we need to provide a suitable iCDF when creating the interval `x`.
 It is clear that the PDF of `x` must satisfy the conditions: pdf(x <= x<sub>min</sub>) = 0 and  pdf(x > x<sub>max</sub>) = 0, since these are the limits of the interval.
 Further, assuming that the PDF increases linearly from 0 and is normalized we arrive at:
 
@@ -158,15 +161,14 @@ final y = ParametricInterval(
 // Defining a spherical search space.
 final triangularSpace = SearchSpace([x, y], dxMin: [1e-6, 1e-6]);
 ```
-Inspecting the plot on the left in the figure below it is evident that the random points are distributed more uniformly across the search space.
+Inspecting the plot on the left in the figure below it is apparent that the random points are distributed uniformly across the search space.
 ![Triangular Search Space Uniform PDF](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/triangular_search_space_uniform.png)
 ![Inverse CDF of a linear PDF](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/inverseCdfLinear.png)
 
 
-
 ###  Spherical Search Space.
 
-The first section showed how to use parametric interval to define a ball shaped search space using
+The first section showed how to use parametric intervals to define a ball shaped search space using
 Cartesian coordinates. A spherical search space can also be defined in terms of
 spherical coordinates. In that case we keep the radius constant and define one interval
 for the azimuthal angle &phi; and one for the polar angle &theta;:
@@ -189,9 +191,13 @@ right show the iCDF used for the interval &theta;.
 ![Inverse CDF of Theta](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/inverseCdfThetaUniform.png)
 
 
- In order to correct the 2-dimensional spherical PDF we have to explicitly specify an inverse CDF when creating the interval `theta`. The corrected inverse CDF of theta take the form:
+ In order to correct the 2-dimensional spherical PDF we have to explicitly specify an iCDF when creating the interval `theta`. The corrected iCDF of theta take the form:
 
  cdf<sup>-1</sup>(p, theta<sub>min</sub>, theta<sub>max</sub>) = arccos( p &middot; ( cos(theta<sub>min</sub>) - cos(theta<sub>max</sub>) ) - cos(theta<sub>min</sub>) ).
+
+ To derive the formula above one starts with the surface area: dA = d&phi; d&theta; sin(&theta;) of the sphere with unity radius to
+ construct the PDF then the CDF and final the iCDF.
+
 
 ```Dart
 double inverseCdf(num p, num thetaMin, num thetaMax) {
