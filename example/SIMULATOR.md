@@ -96,15 +96,15 @@ with 750 elements, start value T<sub>0</sub> = 100 and end value T<sub>n</sub> =
 
 
 
-In order to demonstrate the ability of the algorithm to escape from a local minimum, we have
-initialized **x**<sub>min</sub> as **x**<sub>loc</sub>. The figure above shows the
+The figure above (left) shows the
 system energy evaluated at each point selected during the annealing
-process. The energy is represented as a colour and varies between a maximum at 4.0 (red) and a minimum value of 0.0 (blue). The initial point can be identified as a green point situated at
-**x**<sub>loc</sub> = \[-1.0, -1.0, -0.5\].
+process. The energy is represented as a colour and varies between a maximum at 4.0 (red) and a minimum value of 0.0 (blue).
 
-As the energy decreases the solution approaches **x**<sub>glob</sub> = \[0.5, 0.7, 0.8\] asymptotically (blue dots). A typical solution is **x**<sub>min</sub> = \[0.5000000457219432, 0.6999999722831786, 0.800000105007227\]. The solution precision is determined by the minimum value of the perturbation magnitude
-**dxMin** (see [annealing schedule]).
+As the energy decreases the solution approaches **x**<sub>glob</sub> = \[0.5, 0.7, 0.8\] asymptotically (blue dots). A typical solution is **x**<sub>min</sub> = \[0.5000000457219432, 0.6999999722831786, 0.800000105007227\]. The solution precision is determined by the minimum value of the perturbation magnitude **dxMin** (see [annealing schedule]).
 
+The figure on the right show the temperature during the annealing process. At high temperatures the
+algorithm selects potential solutions from the entire search space. As the temperature decreases
+the search region around the current solution is contracted.
 
 
 ## Features and bugs
