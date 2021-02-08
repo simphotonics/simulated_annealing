@@ -89,8 +89,8 @@ search space. If the search space does not intersect the region **x**<sub>test</
 ![Spherical Search Space](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/spherical_space.png)
 ![Hemispheric Search Space](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/hemispherical_search_space.png)
 
-The figure above (right) shows 2000 random points sampled from a triangular search space. The
-program used to generate the data points is available in file [triangular_search_space_example.dart][triangular_search_space_example].
+The figure above (right) shows 2000 random points sampled from a hemispheric search space. The
+program used to generate the data points is available in file [hemispheric_search_space_example.dart][hemispheric_search_space_example].
 
 
 ## Search Spaces With a Uniform Probability Distribution
@@ -103,63 +103,116 @@ The examples below aim to demonstrate the problem and its solution.
 
 ### Triangular Search Space
 
-A triangular search space can be defined with using the following lines of code:
+A triangular search space can be defined with the following lines of code:
 ```Dart
-final gradiant = 15.0;
+final gradient = 15.0;
 final x = FixedInterval(0, 10);
 final y = ParametricInterval(
       () => gradient * x.next(), () => gradient * x.next());
 // Defining a spherical search space.
 final triangularSpace = SearchSpace([x, y], dxMin: [1e-6, 1e-6]);
 ```
-
 The left figure in the image below shows 2000 points randomly selected from the triangular search space (magneta dots).
-The is an aggreggation of dots towards the left side of the search space boundary indicating that the PDF of `triangularSpace`
-is not continous.
+There is an aggreggation of points towards the left side of the search space boundary indicating that the 2D PDF of the search_space `triangularSpace`
+is not uniform.
 
 ![Triangular Search Space](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/triangular_search_space.png)
-![Triangular Search Space Uniform PDF](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/triangular_search_space_uniform.png)
+![Inverse CDF of a uniform PDF](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/inverseCdfUniform.png)
 
-The clustering of points on the left is a result of the uniform PDF of `x`. Whenever,
-an `Interval` is constructed without providing an argument for the parameter: `inverseCdf`, it is
-implicitly assumed that the values are distributed uniformly between the left and right
-interval boundaries. In fact, the default inverse cummulative distribution (CDF) for a uniform PDF is show below in the left graph.
+The clustering of points on the left is a result of the uniform PDF of `x`. For a sufficiently large sample, the number of points with the x-coordinate between 0 and 1
+is approximately equal to the number of points
+with the x-coordinate between 9 and 10.
 
-The render the 2D PDF of the triangular search space uniform we need to provide a suitable CDF when
-creating the interval `x`.
-It is clear that that the PDF of `x` must satisfy the conditions: pdf(x < x<sub>min</sub>) = 0 and  pdf(x > x<sub>max</sub>) = 0, since these are the limits of the interval.
-Further, assuming that the PDF is linear and normalized we arrive at:
-pdf(x, x<sub>min</sub>, x<sub>max</sub>) = 2&middot;(x - x<sub>min</sub>)/(x<sub>max</sub> - x<sub>min</sub>)<sup>2</sup>. From this it
-follows that the cummulative distribution function (CDF) is: cdf(x, x<sub>min</sub>, x<sub>max</sub>)&nbsp;=&nbsp;(x&nbsp;-&nbsp;x<sub>min</sub>)<sup>2</sup>/(x<sub>max</sub> - x<sub>min</sub>)<sup>2</sup> and the
-inverse cummulative distribution function is: cdf<sup>-1</sup>(p, x<sub>min</sub>, x<sub>max</sub>) = x<sub>min</sub> + p*&middot;(x<sub>max</sub> - x<sub>min</sub>).
+Whenever,
+an `Interval` is constructed without providing an argument for the parameter: `inverseCdf`, it is implicitly assumed that the values are distributed uniformly between the left and right
+interval boundaries and the inverse cummulative distribution function (iCDF) is of the form:
 
-The CDF derived above is shown on the right in the image below. It ensures that values of `x` that are
+cdf<sup>-1</sup>(p,&nbsp;x<sub>min</sub>,&nbsp;x<sub>max</sub>) = x<sub>min</sub> + (x<sub>max</sub> - x<sub>min</sub>)&middot;p.
+
+The graph on the right above shows the implicit iCDF of the interval `x` for different interval
+boundaries.
+
+To render the 2D PDF of the triangular search space uniform we need to provide a suitable iCDF when creating the interval `x`.
+It is clear that the PDF of `x` must satisfy the conditions: pdf(x <= x<sub>min</sub>) = 0 and  pdf(x > x<sub>max</sub>) = 0, since these are the limits of the interval.
+Further, assuming that the PDF increases linearly from 0 and is normalized we arrive at:
+
+pdf(x, x<sub>min</sub>, x<sub>max</sub>) = 2&middot;(x - x<sub>min</sub>)/(x<sub>max</sub> - x<sub>min</sub>)<sup>2</sup>.
+
+From this it follows that the cummulative distribution function (CDF) is:
+cdf(x, x<sub>min</sub>, x<sub>max</sub>)&nbsp;=&nbsp;(x&nbsp;-&nbsp;x<sub>min</sub>)<sup>2</sup>/(x<sub>max</sub> - x<sub>min</sub>)<sup>2</sup> and the
+inverse cummulative distribution function is:
+
+cdf<sup>-1</sup>(p, x<sub>min</sub>, x<sub>max</sub>) = x<sub>min</sub> + (x<sub>max</sub> - x<sub>min</sub>)&middot;&Sqrt;p.
+
+The iCDF derived above is shown on the right in the image below. It ensures that values of `x` that are
 closer to zero are less likely to be selected.
 The corrected triangular space can be instantiated with the following lines of code:
 ```Dart
 /// The inverse CDF of the interval x.
 double inverseCDF(num p, num xMin, num xMax) => xMin + (xMax - xMin) * sqrt(p);
 
-final gradiant = 15.0;
+final gradient = 15.0;
 final x = FixedInterval(0, 10, inverseCdf: inverseCdf);
 final y = ParametricInterval(
       () => gradient * x.next(), () => gradient * x.next());
 // Defining a spherical search space.
 final triangularSpace = SearchSpace([x, y], dxMin: [1e-6, 1e-6]);
 ```
-Inspecting the plot on the right in the figure above it is evident that the random points are distributed more uniformly across the search space.
-
-![Inverse CDF of a uniform PDF](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/inverseCdfUniform.png)
+Inspecting the plot on the left in the figure below it is evident that the random points are distributed more uniformly across the search space.
+![Triangular Search Space Uniform PDF](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/triangular_search_space_uniform.png)
 ![Inverse CDF of a linear PDF](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/inverseCdfLinear.png)
 
 
 
+###  Spherical Search Space.
+
+The first section showed how to use parametric interval to define a ball shaped search space using
+Cartesian coordinates. A spherical search space can also be defined in terms of
+spherical coordinates. In that case we keep the radius constant and define one interval
+for the azimuthal angle &phi; and one for the polar angle &theta;:
+```Dart
+// Define intervals.
+final radius = 2;
+final phi = FixedInterval(0, 2 * pi);
+final theta = FixedInterval(0, pi);
+
+// Defining a spherical search space.
+final space = SearchSpace([phi, theta], dxMin: [1e-6, 1e-6, 1e-6]);
+```
+The figure below shows 2000 points randomly selected from the search space.
+It is evident that there is an aggregation of points around the polar areas.
+The graphs on the
+right show the iCDF used for the interval &theta;.
 
 
+![Spherical Surface](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/spherical_space_surface.png)
+![Inverse CDF of Theta](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/inverseCdfThetaUniform.png)
 
 
+ In order to correct the 2-dimensional spherical PDF we have to explicitly specify an inverse CDF when creating the interval `theta`. The corrected inverse CDF of theta take the form:
 
+ cdf<sup>-1</sup>(p, theta<sub>min</sub>, theta<sub>max</sub>) = arccos( p &middot; ( cos(theta<sub>min</sub>) - cos(theta<sub>max</sub>) ) - cos(theta<sub>min</sub>) ).
 
+```Dart
+double inverseCdf(num p, num thetaMin, num thetaMax) {
+  final cosThetaMin = cos(thetaMin);
+  return acos(-p * (cosThetaMin - cos(thetaMax)) + cosThetaMin);
+}
+// Define intervals.
+final radius = 2;
+final phi = FixedInterval(0, 2 * pi, inverseCdf: inverseCdf);
+final theta = FixedInterval(0, pi);
+
+// Defining a spherical search space.
+final space = SearchSpace([phi, theta], dxMin: [1e-6, 1e-6, 1e-6]);
+```
+
+ The figure below shows 2000 points randomly selected from the search space with a uniform 2D PDF.
+ The graphs on the right shows a plot of the iCDF for different boundaries theta<sub>min</sub>
+ and theta<sub>max</sub>.
+
+ ![Spherical Surface](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/spherical_space_surface_uniform.png)
+![Inverse CDF of Theta](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/inverseCdfTheta.png)
 
 
 ## Features and bugs
