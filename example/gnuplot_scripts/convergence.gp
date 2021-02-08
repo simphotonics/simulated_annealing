@@ -44,12 +44,6 @@ set cbrange [ * : * ] noreverse writeback
 set rrange [ * : * ] noreverse writeback
 
 
-
-# Gnuplot script plotting a 3D graph of the system energy.
-set palette defined (-10 "red", -5 "yellow", 0 "green", 5 "turquoise",  10 "blue" )
-
-
-
 plot '../data/log.dat' using 9 ps 1.0 pt 7 lc "#00cc4433" t 'Acceptance Probability', \
      '../data/log.dat' using ($1) ps 0.75 pt 7 t "X - Coordinate", \
      '../data/log.dat' using ($7) ps 1.25 pt 6 t "System Energy", \

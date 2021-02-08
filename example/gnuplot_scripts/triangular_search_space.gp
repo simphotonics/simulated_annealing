@@ -3,20 +3,22 @@
 
 reset
 
-set term qt size 1000, 600
 
-set key font ", 14"  inside bottom left enhanced
+set key box font ", 12"  inside top left enhanced
 
 set tics font ", 14"
+
+set yrange [ -175 : 175 ] noreverse writeback
 
 #set title "Spherical Search Space" font ",18"
 
 set grid lw 2
 
+set term qt size 500, 500
 
-plot '../data/triangular_search_space.dat' lt 1 ps 0.5 pt 4 t "Points In Search Space", \
-'../data/triangular_search_space_perturbation.dat' ps 0.75 pt 7 lt 2 t "Points In Neighbourhood Around Test Point", \
-'../data/triangular_search_space_center_point.dat' ps 2 pt 7 lt 1 lc "red" t "Test Point", \
-"-" w p ps 2 pt 9 lt 9 lc "blue" t "Center Point"
-0 0
-e
+plot '../data/triangular_search_space.dat' lt 1 ps 0.4 pt 7 t "Points In Search Space", \
+ '../data/triangular_search_space_perturbation.dat' ps 0.6 pt 7 lt 2 t "Perturbation Points", \
+ '../data/triangular_search_space_center_point.dat' ps 2 pt 7 lt 1 lc "red" t "Test Point", \
+ "-" w p ps 2 pt 9 lt 9 lc "blue" t "Center Point"
+ 0 0
+ e

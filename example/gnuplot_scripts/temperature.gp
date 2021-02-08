@@ -1,14 +1,14 @@
 reset
 
-set key left bottom nobox font ", 12"
+set key left top nobox font ", 12"
 
-set title "Simulated Annealing - System Temperature" font ",18"
+#set title "Simulated Annealing - System Temperature" font ",18"
 
 set grid lw 2
 
 set xyplane 0
 
-set border 31+32+64+256+512 linecolor rgb "#333333" lw 1.5
+#set border 31+32+64+256+512 linecolor rgb "#333333" lw 1.5
 
 set style line 1 lt 1 pt 6 lc rgb "#0608aaff" lw 3.5
 
@@ -28,17 +28,19 @@ set style line 1 lt 1 pt 6 lc rgb "#0608aaff" lw 3.5
 #             2048   no effect   top right front
 #             4096   polar       no effect
 
-set tics font ", 14"
+set tics font ", 12"
 
-set xlabel "X" font ", 20"
+set cbtics font ", 9"
+
+#set xlabel "X" font ", 14"
 set xrange [ * : * ] noreverse writeback
 set x2range [ * : * ] noreverse writeback
 
-set ylabel "Y" font ", 20"
+#set ylabel "Y" font ", 14"
 set yrange [ * : * ] noreverse writeback
 set y2range [ * : * ] noreverse writeback
 
-set zlabel "Z" font ", 20"
+#set zlabel "Z" font ", 14"
 set zrange [ * : * ] noreverse writeback
 set cbrange [ 0 : 2000 ] noreverse writeback
 set rrange [ * : * ] noreverse writeback
@@ -48,8 +50,12 @@ set rrange [ * : * ] noreverse writeback
 # Gnuplot script plotting a 3D graph of the system energy.
 set palette defined (2 "blue", 10 "#4444FF99", 20 "#9999FF99", 100 "turquoise",  250 "green", 600 "yellow",  2000 "red" )
 
-set term qt size 1000, 1000 font "Sans,14"
+set term qt size 565, 500 font "Sans,12"
+
+unset colorbox
+
+set colorbox user origin .8,.4 size .01,.4
 
 
-splot '../data/log.dat' using 1:2:3:($7) ps 2 pt 7 pal t "System Temperature", \
+splot '../data/log.dat' using 1:2:3:($10) ps 2 pt 7 pal t "System Temperature", \
 '../data/spherical_search_space2D.dat' using 1:2:3 ps 0.45 lc "#44444455" pt 7 t "Search Region",

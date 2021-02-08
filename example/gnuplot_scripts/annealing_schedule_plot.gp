@@ -19,7 +19,7 @@ set yrange [ 1e-8 : * ] noreverse writeback
 set y2range [ * : * ] noreverse writeback
 
 
-set term qt size 500, 300 font "Sans,12"
+set term qt size 500, 500 font "Sans,12"
 
 set logscale y
 

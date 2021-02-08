@@ -32,9 +32,9 @@ set rrange [ * : * ] noreverse writeback
 set term qt size 565, 500 font "Sans,12"
 
 
-splot '../data/spherical_search_space2D.dat' lt 1 ps 0.4 pt 7 t "Points In Search Space", \
-'../data/spherical_search_space2D_perturbation.dat' ps 0.75 pt 7 lt 2 t "Random Points Around Test Point", \
-'../data/spherical_search_space2D_test_point.dat' ps 2 pt 7 lt 1 lc "red" t "Test Point", \
+splot '../data/hemisphere.dat' lt 1 ps 0.5 pt 4 t "Points In Search Space", \
+'../data/hemisphere_perturbation.dat' ps 0.75 pt 7 lt 2 t "Random Points Around Test Point", \
+'../data/hemisphere_test_point.dat' ps 2 pt 7 lt 1 lc "red" t "Test Point", \
 "-" w p ps 3 pt 9 lt 9 lc "blue" t "Origin"
 0 0 0
 e
