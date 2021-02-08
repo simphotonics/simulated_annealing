@@ -94,6 +94,8 @@ with 750 elements, start value T<sub>0</sub> = 100 and end value T<sub>n</sub> =
 ![Temperature 3D](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/temperature.png)
 
 
+
+
 In order to demonstrate the ability of the algorithm to escape from a local minimum, we have
 initialized **x**<sub>min</sub> as **x**<sub>loc</sub>. The figure above shows the
 system energy evaluated at each point selected during the annealing
