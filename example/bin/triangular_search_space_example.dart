@@ -1,13 +1,17 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:list_operators/list_operators.dart';
 import 'package:simulated_annealing/simulated_annealing.dart';
 
+double invCDF(num p, num xMin, num xMax) => xMin + (xMax - xMin) * sqrt(p);
+
 void main() async {
   // Define intervals.
-  final yMax = 6;
-  final yMin = -2;
-  final x = FixedInterval((yMax - yMin)/30, 10);
+  final yMax = 0;
+  final yMin = -0;
+
+  final x = FixedInterval((yMax - yMin) / 30, 10, inverseCdf: invCDF);
   final y = ParametricInterval(
       () => yMax - 15 * x.next(), () => yMin + 15 * x.next());
 
@@ -22,7 +26,7 @@ void main() async {
   final sample = List<List<num>>.generate(2000, (_) => space.next());
 
   final perturbation = List<List<num>>.generate(
-      500, (_) => space.perturb(testPoint, magnitudes));
+      200, (_) => space.perturb(testPoint, magnitudes));
 
   await File('../data/triangular_search_space.dat').writeAsString(
     sample.export(),
@@ -31,7 +35,8 @@ void main() async {
     perturbation.export(),
   );
 
-  await File('../data/triangular_search_space_center_point.dat').writeAsString('''
+  await File('../data/triangular_search_space_center_point.dat')
+      .writeAsString('''
     # Perturbation Centerpoint
     ${[testPoint].export()}''');
 

@@ -5,15 +5,18 @@ import 'package:list_operators/list_operators.dart';
 import 'package:simulated_annealing/simulated_annealing.dart';
 
 // Define intervals.
-final radius = 2;
-var x = FixedInterval(-radius, radius);
+final r = 2;
+final hemisphere = () => Random().nextIntFromList([-1, 1]);
+var x = FixedInterval(-r, r);
 final y = ParametricInterval(
-  () => -sqrt(pow(radius, 2) - pow(x.next(), 2)),
-  () => sqrt(pow(radius, 2) - pow(x.next(), 2)),
+  () => -sqrt(pow(r, 2) - pow(x.next(), 2)),
+  () => sqrt(pow(r, 2) - pow(x.next(), 2)),
 );
+
+final zRange = () => sqrt(pow(r, 2) - pow(y.next(), 2) - pow(x.next(), 2));
 final z = ParametricInterval(
-  () => -sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
-  () => sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
+  () => zRange(),
+  () => zRange(),
 );
 
 // Defining a spherical search space.
@@ -24,24 +27,24 @@ void main() async {
     print(space.estimateSize());
   }
 
-  final xTest = [1.2, 1.0, 0.6];
+  final xTest = [0.8, 0.2, 1.8];
   final dx = [0.6, 0.6, 0.6];
 
-  final sample = List<List<num>>.generate(2000, (_) => space.next());
+  final sample = List<List<num>>.generate(1000, (_) => space.next());
 
-  final perturbation = List<List<num>>.generate(
-      500, (_) => space.perturb(xTest, dx));
+  final perturbation =
+      List<List<num>>.generate(100, (_) => space.perturb(xTest, dx));
 
-  await File('../data/spherical_search_space.dat').writeAsString(
+  await File('../data/hemisphere.dat').writeAsString(
     sample.export(),
   );
-  await File('../data/spherical_search_space_perturbation.dat').writeAsString(
+  await File('../data/hemisphere_perturbation.dat').writeAsString(
     perturbation.export(),
   );
 
-  await File('../data/spherical_search_space_center_point.dat')
+  await File('../data/hemisphere_test_point.dat')
       .writeAsString('''
-    # Perturbation Centerpoint
+    # Test Point
     ${[xTest].export()}''');
 
   // The search space can be visualized by navigating to the folder
