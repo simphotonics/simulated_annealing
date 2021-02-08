@@ -12,7 +12,9 @@ typedef ParametricPoint = num Function();
 
 /// Abstract class representing a numerical interval.
 abstract class Interval {
-  Interval();
+  Interval({this.inverseCdf});
+
+  final InverseCdf? inverseCdf;
 
   /// Returns the next random number in the interval.
   num next();
@@ -54,7 +56,10 @@ abstract class Interval {
 /// the start point `start` and the end point `end`.
 class FixedInterval extends Interval {
   /// Constructs a fixed interval (`start`, `end`).
-  FixedInterval(this.start, this.end);
+  FixedInterval(this.start, this.end, {InverseCdf? inverseCdf})
+      : super(
+          inverseCdf: inverseCdf,
+        );
 
   /// Start point of the numerical interval.
   final num start;
@@ -72,7 +77,11 @@ class FixedInterval extends Interval {
       return _cache;
     } else {
       _isUpToDate = true;
-      return _cache = Interval.random.nextDoubleInRange(start, end);
+      return _cache = Interval.random.nextDoubleInRange(
+        start,
+        end,
+        inverseCdf,
+      );
     }
   }
 
@@ -89,6 +98,7 @@ class FixedInterval extends Interval {
       return _cache = Interval.random.nextDoubleInRange(
         max(x - dx, start),
         min(x + dx, end),
+        inverseCdf,
       );
     } else {
       _isUpToDate = false;
@@ -134,7 +144,10 @@ class FixedInterval extends Interval {
 /// the parametric start point function `pStart` and the end point `pEnd`.
 class ParametricInterval extends Interval {
   /// Constructs a parametric interval.
-  ParametricInterval(this.pStart, this.pEnd);
+  ParametricInterval(this.pStart, this.pEnd, {InverseCdf? inverseCdf})
+      : super(
+          inverseCdf: inverseCdf,
+        );
 
   /// Start point of the numerical interval.
   final ParametricPoint pStart;
@@ -167,7 +180,11 @@ class ParametricInterval extends Interval {
       return _cache;
     } else {
       _isUpToDate = true;
-      return _cache = Interval.random.nextDoubleInRange(pStart(), pEnd());
+      return _cache = Interval.random.nextDoubleInRange(
+        pStart(),
+        pEnd(),
+        inverseCdf,
+      );
     }
   }
 
@@ -184,6 +201,7 @@ class ParametricInterval extends Interval {
       return _cache = Interval.random.nextDoubleInRange(
         max(x - dx, pStart()),
         min(x + dx, pEnd()),
+        inverseCdf,
       );
     } else {
       _isUpToDate = false;
