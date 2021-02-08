@@ -9,7 +9,8 @@ E(**x**) = 4.0 - 4.0&middot;e<sup>-4&middot;|**x** - **x**<sub>glob</sub>|</sup>
 defined for a spherical search space centred around the origin.
 Hereby, |**x** - **y**| = &#8730; ( &sum;<sub> i</sub><sup>3</sup> (x<sub>i</sub> - y<sub>i</sub>)<sup>2</sup> ) is the distance between the vectors **x** and **y**.
 
-![Energy Function](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/energy2d.jpg)
+![Energy Function X-Y Projection](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/energy_xy_proj.png)
+![Spherical Search Space](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/spherical_space.png)
 
 
 The figure above shows a projection of E onto the x-y plane. The global minimum of E(**x**)
