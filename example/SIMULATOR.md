@@ -13,11 +13,11 @@ Hereby, |**x** - **y**| = &#8730; ( &sum;<sub> i</sub><sup>3</sup> (x<sub>i</sub
 ![Spherical Search Space](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/spherical_space.png)
 
 
-The figure above shows a projection of E onto the x-y plane. The global minimum of E(**x**)
+The figure above (left) shows a projection of E onto the x-y plane. The global minimum of E(**x**)
 is situated at **x**<sub>glob</sub> = \[0.5, 0.7, 0.8\]. The function has a local minimum
 at **x**<sub>loc</sub>&nbsp;= \[-1, -1, -0.5\].
 
-After defining a [search space]  and the system `EnergyField` (see source code below),
+After defining a ball shaped [search space] (right figure above) and the system `EnergyField` (see source code below),
 we create an instance of `LoggingSimulator`. The annealing process is started by calling the method [`anneal`][anneal].
 
 <details><summary> Click to show source code.</summary>
@@ -77,13 +77,11 @@ void main() async {
   print('Solution: $xSol');
 }
 
-
-
 ```
 </details>
 
 
-![Convergence Graph](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/convergence.jpg)
+![Convergence Graph](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/convergence.png)
 
 The figure above shows the system energy, min. system energy, temperature, and acceptance probability during the SA process.
 
