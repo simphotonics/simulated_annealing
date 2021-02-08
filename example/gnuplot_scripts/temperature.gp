@@ -57,5 +57,5 @@ unset colorbox
 set colorbox user origin .8,.4 size .01,.4
 
 
-splot '../data/log.dat' using 1:2:3:($10) ps 2 pt 7 pal t "System Temperature", \
-'../data/spherical_search_space2D.dat' using 1:2:3 ps 0.45 lc "#44444455" pt 7 t "Search Region",
+splot  '../data/spherical_search_space2D.dat' using 1:2:3 ps 0.45 lc "#44444455" pt 7 t "Search Region",\
+'../data/log.dat' using 1:2:3:($10) ps 2 pt 7 pal t "System Temperature",
