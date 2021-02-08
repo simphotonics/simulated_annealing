@@ -91,7 +91,7 @@ search space. If the search space does not intersect the region **x**<sub>test</
 ![Hemispheric Search Space](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/hemispherical_search_space.png)
 
 The figure above (right) shows 2000 random points sampled from a hemispheric search space. The
-program used to generate the data points is listed in the file [hemispheric_search_space_example.dart][hemispheric_search_space_example].
+program used to generate the data points is listed in the file [hemispheric_search_space_example.dart][hemispheric_search_space_example.dart].
 
 
 ## Search Spaces With a Uniform Probability Distribution
@@ -232,4 +232,4 @@ Please file feature requests and bugs at the [issue tracker].
 
 [ParametricInterval]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/ParametricInterval-class.html
 
-[hemispheric_search_space_example.dart]:bin/hemispheric_search_space_example.dart
+[hemispheric_search_space_example.dart]: bin/hemispheric_search_space_example.dart
