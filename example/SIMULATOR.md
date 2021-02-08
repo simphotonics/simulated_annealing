@@ -90,7 +90,9 @@ The graphs were generated using [gnuplot] and the scripts are available in the f
 The annealing schedule (blue curve) consists of a monotonically decreasing exponential sequence
 with 750 elements, start value T<sub>0</sub> = 100 and end value T<sub>n</sub> = 1e-8. At high temperatures the algorithm explores the entire search space for the x-coordinate (values ranging between -2 and 2), and new solutions are accepted with high probability (red dots along the line y = 1). As the temperature decreases fewer solutions are accepted and the x-coordinate converges towards 0.5.
 
-![System Energy](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/energy.jpg)
+![System Energy](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/energy.png)
+![Temperature 3D](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/temperature.png)
+
 
 In order to demonstrate the ability of the algorithm to escape from a local minimum, we have
 initialized **x**<sub>min</sub> as **x**<sub>loc</sub>. The figure above shows the
