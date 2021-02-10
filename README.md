@@ -9,6 +9,10 @@ The function to be minimized can be interpreted as the
 **system energy**. In that case, the global minimum represents
 the **ground state** of the system.
 
+![Energy Simulated Annealing](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/energy.gif)
+![Convergence Graph](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/energy_xy_proj.png)
+
+
 The algorithm name was coined by Kirkpatrick et al. [\[1\]][kirkpatrick1983] and was
 derived from the process of annealing a metal alloy or glass.
 The first step of the annealing process consists of heating a
@@ -106,12 +110,11 @@ final energyField = EnergyField(
   print('Solution: $xSol');
 }
 
-
 ```
 </details>
 
 ## Algorithm Tuning
-It can be shown that by selecting a sufficiently high initial
+For discrete problems it can be shown that by selecting a sufficiently high initial
 factor k<sub>B</sub>&middot;T
 the algorithm converges to the global minimum if the annealing schedule
 decreases on a logarithmic scale (slow cooling) and
@@ -133,10 +136,8 @@ and calculating the sample standard deviation &sigma;<sub>E</sub> [\[3\]][ledesm
 
 For continuous problems, the size of the search region around the current solution is gradually contracted
 to &omega;<sub>end</sub> in order to generate a solution with the required precision.
-
 The constant k<sub>B</sub> is set such that the probability of accepting a
 solution P(&Delta;E<sub>end</sub> = &sigma;<sub>E</sub>(&omega;<sub>end</sub>), T<sub>end</sub>) = &gamma;<sub>end</sub> where T<sub>end</sub> is the final annealing temperature.
-
 The initial temperature is then set such that the initial acceptance probability is &gamma;<sub>start</sub>.
 
 Note: When using the standard deviation as a measure of the average variation of E it is possible
@@ -167,7 +168,7 @@ quantities like the current system energy, temperature, and the intermediate sol
 
 
 The figure below shows a typical SA log where the x-coordinate of the solution (green dots)
-converges asymptotically to 0.5 after 750 iteration. 
+converges asymptotically to 0.5 after 750 iteration.
 The graph is discussed in more detail [here].
 
 ![Convergence Graph](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/convergence.png)
