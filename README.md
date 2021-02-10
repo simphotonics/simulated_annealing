@@ -10,7 +10,7 @@ The function to be minimized can be interpreted as the
 the **ground state** of the system.
 
 ![Energy Simulated Annealing](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/energy.gif)
-![Convergence Graph](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/energy_xy_proj.png)
+![Convergence Graph](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/convergence.gif)
 
 
 The algorithm name was coined by Kirkpatrick et al. [\[1\]][kirkpatrick1983] and was
