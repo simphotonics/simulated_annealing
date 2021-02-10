@@ -9,8 +9,8 @@ The function to be minimized can be interpreted as the
 **system energy**. In that case, the global minimum represents
 the **ground state** of the system.
 
-![Energy Simulated Annealing](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/energy_450px.gif)
-![Convergence Graph](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/energy_xy_proj_450px.gif)
+![Energy Simulated Annealing](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/energy.gif)
+![Convergence Graph](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/energy_xy_proj.png)
 
 
 The algorithm name was coined by Kirkpatrick et al. [\[1\]][kirkpatrick1983] and was
