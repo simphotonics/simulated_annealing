@@ -9,9 +9,6 @@ The function to be minimized can be interpreted as the
 **system energy**. In that case, the global minimum represents
 the **ground state** of the system.
 
-![Energy Simulated Annealing](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/energy.gif)
-![Convergence Graph](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/energy_xy_proj.png)
-
 
 The algorithm name was coined by Kirkpatrick et al. [\[1\]][kirkpatrick1983] and was
 derived from the process of annealing a metal alloy or glass.
@@ -27,6 +24,8 @@ evaluating the energy function, and deciding if the new solution is accepted or 
 If for a newly selected point the energy E is lower that the previous minimum energy
 E<sub>min</sub>, the new solution is accepted: P(&Delta;E&nbsp;<&nbsp;0,&nbsp;T)&nbsp;=&nbsp;1,
 where &Delta;E = E - E<sub>min</sub>.
+
+![Energy Simulated Annealing](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/energy_composite.gif)
 
  Crucially, if &Delta;E > 0, the algorithm still accepts the
  new solution with probability: P(&Delta;E > 0, T) = e<sup>-&Delta;E/(k<sub>B</sub>&middot;T)</sup>.
@@ -171,7 +170,7 @@ The figure below shows a typical SA log where the x-coordinate of the solution (
 converges asymptotically to 0.5 after 750 iteration.
 The graph is discussed in more detail [here].
 
-![Convergence Graph](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/convergence.png)
+![Convergence Graph](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/convergence.gif)
 
 The number of inner iterations (performed while the temperature is kept constant)
 is also referred to as Markov chain length and is determined by a function with typedef [`MarkovChainLength`][MarkovChainLength], see method [`anneal`][anneal].
