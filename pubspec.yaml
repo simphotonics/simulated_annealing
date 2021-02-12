@@ -1,7 +1,7 @@
 name: simulated_annealing
 
 description: Simulated annealing framework for Dart. Enables quickly setting
-up a simulator for finding the global minimum of multi-variate functions.
+  up a simulator for finding the global minimum of multi-variate functions.
 
 version: 0.1.1-nullsafety
 
