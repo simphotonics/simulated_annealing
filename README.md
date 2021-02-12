@@ -230,6 +230,8 @@ Please file feature requests and bugs at the [issue tracker][tracker].
 
 [ledesma2008]: https://cdn.intechopen.com/pdfs/4631/InTech-Practical_considerations_for_simulated_annealing_implementation.pdf
 
+[LoggingSimulator]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/LoggingSimulator-class.html
+
 [here]: example/SIMULATOR.md
 
 [simulated_annealing]: https://pub.dev/packages/simulated_annealing
@@ -246,6 +248,6 @@ Please file feature requests and bugs at the [issue tracker][tracker].
 
 [anneal]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/Simulator/anneal.html
 
-[energy]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/Energy-class.html
+[energy_field]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/EnergyField-class.html
 
 [MarkovChainLength]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/MarkovChainLength.html
