@@ -50,5 +50,5 @@ void main() async {
   // The search space can be visualized by navigating to the folder
   // 'example/gnuplot_scripts' and running the commands:
   // # gnuplot
-  // gnuplot> load 'spherical_search_space.gp'
+  // gnuplot> load 'hemispherical_search_space.gp'
 }
