@@ -30,10 +30,10 @@ void main() async {
   final xTest = [0.8, 0.2, 1.8];
   final dx = [0.6, 0.6, 0.6];
 
-  final sample = List<List<num>>.generate(1000, (_) => space.next());
+  final sample = List<List<num>>.generate(1200, (_) => space.next());
 
   final perturbation =
-      List<List<num>>.generate(100, (_) => space.perturb(xTest, dx));
+      List<List<num>>.generate(400, (_) => space.perturb(xTest, dx));
 
   await File('../data/hemisphere.dat').writeAsString(
     sample.export(),

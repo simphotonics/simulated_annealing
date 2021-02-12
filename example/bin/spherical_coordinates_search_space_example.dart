@@ -11,7 +11,7 @@ double inverseCdf(num p, num thetaMin, num thetaMax) {
 
 // Define intervals.
 final radius = 2;
-final theta = FixedInterval(0, pi, inverseCdf: inverseCdf);
+final theta = FixedInterval(0, pi);//, inverseCdf: inverseCdf);
 final phi = FixedInterval(0, 2 * pi);
 
 // Defining a spherical search space.
@@ -30,7 +30,7 @@ void main() async {
   ];
 
   final sampleSize = 2000;
-  final perturbationSampeSize = 600;
+  final perturbationSampelSize = 600;
 
   final sampleSC = List<List<num>>.generate(sampleSize, (_) => space.next());
 
@@ -44,7 +44,7 @@ void main() async {
   );
 
   final perturbationSC = List<List<num>>.generate(
-      perturbationSampeSize, (_) => space.perturb(testPointSC, magnitudesSC));
+      perturbationSampelSize, (_) => space.perturb(testPointSC, magnitudesSC));
 
   // Transform to Cartesian coordinates.
   final perturbationCC = List<List<num>>.generate(
