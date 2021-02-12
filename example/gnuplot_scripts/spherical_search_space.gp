@@ -14,6 +14,11 @@ set xyplane 0
 
 set tics font ", 14"
 
+set xtics ('-2' -2.0, '-1' -1.0, '0' 0.0, '1' 1.0, '2' 2.0);
+set ytics ('-2' -2.0, '-1' -1.0, '0' 0.0, '1' 1.0, '2' 2.0);
+set ztics ('-2' -2.0, '-1' -1.0, '0' 0.0, '1' 1.0, '2' 2.0);
+
+
 #set xlabel "X" font ", 20"
 set xrange [ -2 : 2 ] noreverse writeback
 set x2range [ * : * ] noreverse writeback
@@ -48,7 +53,15 @@ set rrange [ * : * ] noreverse writeback
 
 # unset parametric
 
-set term qt size 565, 500 font "Sans,12"
+set term pngcairo size 500, 500 font "Sans,12"
+
+# set lmargin at screen 0.2
+# set rmargin at screen 0.8
+# set tmargin at screen 0.9
+# set bmargin at screen 0.2
+
+set output '../plots/spherical_search_space.png'
+
 
 splot '../data/spherical_search_space.dat' lt 1 ps 0.5 pt 4 t "Points In Search Space", \
 '../data/spherical_search_space_perturbation.dat' ps 0.75 pt 7 lt 2 t "Random Points Around Test Point", \
