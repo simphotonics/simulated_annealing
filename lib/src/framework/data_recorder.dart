@@ -120,7 +120,7 @@ class DataRecorder<T> {
 class NumericalDataRecorder extends DataRecorder<num> {
   /// Exports all records as a `String`.
   ///
-  /// All records must have the same number of entries.
+  /// All entities must have the same number of entries.
   String export({int precision = 10, String delimiter = '   '}) {
     final data = <List<num>>[];
     final b = StringBuffer();
@@ -139,6 +139,75 @@ class NumericalDataRecorder extends DataRecorder<num> {
       precision: precision,
       delimiter: delimiter,
     ));
+    return b.toString();
+  }
+
+  /// Exports the first record as a `String`.
+  ///
+  /// All entities must have at least one entry.
+  String exportFirst({int precision = 10, String delimiter = '   '}) {
+    final data = <num>[];
+    final b = StringBuffer();
+    for (var key in _vectors.keys) {
+      b.write('$key  ');
+      data.add(_vectors[key]!.first);
+    }
+    for (var key in _scalars.keys) {
+      b.write('$key  ');
+      data.add(_scalars[key]!.first);
+    }
+    b.write('\n');
+    for (var entry in data) {
+      b.write(entry.toStringAsPrecision(precision) + delimiter);
+    }
+    return b.toString();
+  }
+
+  /// Exports the first record as a `String`.
+  ///
+  /// All entities must have at least one entry.
+  /// All entities must have the same number of records (the same length).
+  String exportLast({int precision = 10, String delimiter = '   '}) {
+    // Get number of records
+    if (_dimensions.isEmpty) {
+      return 'NumericalDataRecorder: Data records are empty.';
+    }
+
+    final firstKey = _dimensions.keys.first;
+    final length = (_dimensions[firstKey] == 0)
+        ? _scalars[firstKey]!.length
+        : _vectors[firstKey + '0']!.length;
+
+    final data = <num>[];
+    final b = StringBuffer();
+    for (var key in _vectors.keys) {
+      b.write('$key  ');
+      if (length == _vectors[key]!.length) {
+        data.add(_vectors[key]!.last);
+      } else {
+        throw ErrorOf<NumericalDataRecorder>(
+            message: 'Could not export last record of entity: $key.',
+            invalidState: 'Entity $key does not have $length entries.',
+            expectedState: 'All entities must '
+                'have the same number of records.');
+      }
+    }
+    for (var key in _scalars.keys) {
+      b.write('$key  ');
+      if (length == _scalars[key]!.length) {
+        data.add(_scalars[key]!.last);
+      } else {
+        throw ErrorOf<NumericalDataRecorder>(
+            message: 'Could not export last record of entity: $key.',
+            invalidState: 'Entity $key does not have $length entries.',
+            expectedState: 'All entities must '
+                'have the same number of records.');
+      }
+    }
+    b.write('\n');
+    for (var entry in data) {
+      b.write(entry.toStringAsPrecision(precision) + delimiter);
+    }
     return b.toString();
   }
 }
