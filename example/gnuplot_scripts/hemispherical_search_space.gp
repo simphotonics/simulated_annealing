@@ -29,8 +29,13 @@ set zrange [ -2 : 2 ] noreverse writeback
 set cbrange [ * : * ] noreverse writeback
 set rrange [ * : * ] noreverse writeback
 
-set term qt size 565, 500 font "Sans,12"
+set xtics ('-2' -2.0, '-1' -1.0, '0' 0.0, '1' 1.0, '2' 2.0);
+set ytics ('-2' -2.0, '-1' -1.0, '0' 0.0, '1' 1.0, '2' 2.0);
+set ztics ('-2' -2.0, '-1' -1.0, '0' 0.0, '1' 1.0, '2' 2.0);
 
+set term pngcairo size 500, 500 font "Sans,12"
+
+set output '../plots/hemispherical_search_space.png'
 
 splot '../data/hemisphere.dat' lt 1 ps 0.5 pt 4 t "Points In Search Space", \
 '../data/hemisphere_perturbation.dat' ps 0.75 pt 7 lt 2 t "Random Points Around Test Point", \
