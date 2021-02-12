@@ -29,3 +29,4 @@ example/backup
 # Figures that can be recreated.
 example/plots/*.pdf
 example/plots/*.svg
+example/plots/animation
