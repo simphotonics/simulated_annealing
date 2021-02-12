@@ -116,9 +116,12 @@ temperature with the kinetic energy of particles in a gas.
 
 In the context of SA,
 k<sub>B</sub> relates the system temperature
-with the probability of accepting a solution where &Delta;E > 0.
-The expression used to calculate P(&Delta;E > 0, T) ensures
-that the acceptance probability decreases with decreasing temperature.
+with the probability of accepting a solution:
+
+P(&Delta;E > 0, T) = e<sup>-&Delta;E/(k<sub>B</sub>&middot;T)</sup> &nbsp;&nbsp; P(&Delta;E <0, T) = 1.0.
+
+The expression above ensures
+that the acceptance probability decreases with decreasing temperature (for &Delta;E > 0).
 As such, the temperature is a parameter that controls the probability of up-hill moves.
 
 Most authors set k<sub>B</sub> = 1 and scale the temperature to control the
@@ -132,22 +135,16 @@ can be obtained by sampling the energy function E
 at random points in the search space &omega;
 and calculating the sample standard deviation &sigma;<sub>E</sub> [\[3\]][ledesma2008].
 
-Note: When using the standard deviation as a measure of the average variation of E it is possible
-to *underestimate* &Delta;E<sub>start</sub> if the
-function E is plateau-shaped with isolated extrema.
-For this reason, &Delta;E<sub>start</sub> is calculate using:
-
-&Delta;E<sub>start</sub> = 0.5&middot;(&sigma;<sub>E</sub> + 0.2&middot;|E<sub>max</sub> - E<sub>min</sub>|),
-
-where E<sub>max</sub> and E<sub>min</sub> are the maximum and minimum values found while
-sampling the energy function as mentioned above.
-
-For continuous problems, the size of the search region around the current solution is gradually contracted
+For continuous problems, the size of the search region around the current
+solution is gradually contracted
 to &omega;<sub>end</sub> in order to generate a solution with the required precision.
 
-By default, the constant k<sub>B</sub> is set such that the probability of accepting a
-solution P(&Delta;E<sub>end</sub> = &sigma;<sub>E</sub>(&omega;<sub>end</sub>), T<sub>end</sub>) = &gamma;<sub>end</sub> where T<sub>end</sub> is the final annealing temperature.
-The initial temperature is then set such that the initial acceptance probability is &gamma;<sub>start</sub>.
+The constant k<sub>B</sub> is fixed such that:
+P(&Delta;E<sub>end</sub>, T<sub>end</sub>) =  e<sup>-&Delta;E<sub>end</sub>/(k<sub>B</sub>&middot;T<sub>end</sub>)</sup> = &gamma;<sub>end</sub>,
+where T<sub>end</sub> is the final annealing temperature.
+
+The initial temperature is then set such that the initial acceptance probability is:
+P(&Delta;E<sub>start</sub>,T<sub>start</sub>) =  e<sup>-&Delta;E<sub>start</sub>/(k<sub>B</sub>&middot;T<sub>start</sub>)</sup> = &gamma;<sub>start</sub>.
 
 
 ## Algorithm Tuning
@@ -176,6 +173,17 @@ escaping a local miniumum. If &gamma;<sub>start</sub> is set close to 1.0 the al
 If &Delta;E<sub>start</sub> is too large the algorithm will oscillate wildy between random points and will most likely not converge towards an acceptable solution.
 On the other hand, if &Delta;E<sub>start</sub> is too small up-hill moves are unlikely and the solution
 most likely converges towards a local minimum or a point situated in a plateau-shaped region.
+
+Note: When using the standard deviation as a measure of &Delta;E it is possible
+to *underestimate* &Delta;E<sub>start</sub> if the
+function E is plateau-shaped with isolated extrema.
+For this reason, the default value of &Delta;E<sub>start</sub> is initialized as:
+
+&Delta;E<sub>start</sub> = &sigma;<sub>E</sub> + 0.1&middot;|E<sub>max</sub> - E<sub>min</sub>|,
+
+where E<sub>max</sub> and E<sub>min</sub> are the maximum and minimum values found while
+sampling the energy function as mentioned above.
+
 * `deltaEnergyEnd`: Typical energy variation &Delta;E if the current position is perturbed within the minimum
 search neighbourhood  &omega;<sub>end</sub>. It is used to calculate k<sub>B</sub>.
 * iterations: Determines the number of temperature steps in the annealing schedule.
