@@ -30,7 +30,7 @@ set style line 1 lt 1 pt 6 lc rgb "#0608aaff" lw 3.5
 
 set tics font ", 12"
 
-set cbtics font ", 9"
+set cbtics font ", 12"
 
 #set xlabel "X" font ", 14"
 set xrange [ * : * ] noreverse writeback
@@ -45,16 +45,20 @@ set zrange [ * : * ] noreverse writeback
 set cbrange [ 0 : 2000 ] noreverse writeback
 set rrange [ * : * ] noreverse writeback
 
-
+set xtics ('-2' -2.0, '-1' -1.0, '0' 0.0, '1' 1.0, '2' 2.0);
+set ytics ('-2' -2.0, '-1' -1.0, '0' 0.0, '1' 1.0, '2' 2.0);
+set ztics ('-2' -2.0, '-1' -1.0, '0' 0.0, '1' 1.0, '2' 2.0);
 
 # Gnuplot script plotting a 3D graph of the system energy.
 set palette defined (2 "blue", 10 "#4444FF99", 20 "#9999FF99", 100 "turquoise",  250 "green", 600 "yellow",  2000 "red" )
 
-set term qt size 565, 500 font "Sans,12"
+set term pngcairo size 500, 500 font "Sans,12"
 
 unset colorbox
 
-set colorbox user origin .8,.4 size .01,.4
+set colorbox user origin .8,.4 size .02,.4
+
+set output '../plots/temperature.png'
 
 
 splot  '../data/spherical_search_space2D.dat' using 1:2:3 ps 0.45 lc "#44444455" pt 7 t "Search Region",\
