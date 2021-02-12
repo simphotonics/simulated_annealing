@@ -128,14 +128,14 @@ final energyField = EnergyField(
 ## Algorithm Tuning
 For discrete problems it can be shown that by selecting a sufficiently high initial
 factor k<sub>B</sub>&middot;T
-the algorithm converges to the global minimum if the annealing schedule
-decreases on a logarithmic scale (slow cooling) and
+the algorithm converges to the global minimum if temperture
+decreases on a logarithmic scale (slow cooling schedule) and
 the number of inner iterations (Markov chain length)
 is sufficiently high [\[2\]][nikolaev2010].
 
 Practical implementations of the SA algorithm aim to generate
 an acceptable solution with *minimal* computational effort.
-For such fast cooling schedules, algorithm convergence to the global minimum is not
+For such *fast cooling* schedules, algorithm convergence to the global minimum is not
 strictly guaranteed. In that sense, SA is a heuristic approach and some
 degree of trial and error is required to determine which annealing schedule
 works best for a given problem.
@@ -146,30 +146,31 @@ can be obtained by sampling the energy function E
 at random points in the search space &omega;
 and calculating the sample standard deviation &sigma;<sub>E</sub> [\[3\]][ledesma2008].
 
-For continuous problems, the size of the search region around the current solution is gradually contracted
-to &omega;<sub>end</sub> in order to generate a solution with the required precision.
-The constant k<sub>B</sub> is set such that the probability of accepting a
-solution P(&Delta;E<sub>end</sub> = &sigma;<sub>E</sub>(&omega;<sub>end</sub>), T<sub>end</sub>) = &gamma;<sub>end</sub> where T<sub>end</sub> is the final annealing temperature.
-The initial temperature is then set such that the initial acceptance probability is &gamma;<sub>start</sub>.
-
 Note: When using the standard deviation as a measure of the average variation of E it is possible
 to *underestimate* &Delta;E<sub>start</sub> if the function E is plateau-shaped with isolated extrema.
-For this reason, the constructor of [`Simulator`][SimulatorClass] accepts the
-optional argument `dEnergyStart` with default value
-&Delta;E<sub>0</sub> = 0.5&middot;(&sigma;<sub>E</sub> + 0.2&middot;|E<sub>max</sub> - E<sub>min</sub>|), where E<sub>max</sub> and E<sub>min</sub> are the maximum and minimum values found while
+For this reason, &Delta;E<sub>start</sub> = 0.5&middot;(&sigma;<sub>E</sub> + 0.2&middot;|E<sub>max</sub> - E<sub>min</sub>|), where E<sub>max</sub> and E<sub>min</sub> are the maximum and minimum values found while
 sampling the energy function as mentioned above.
 
-&Delta;E<sub>start</sub> is a **critical SA parameter**. If &Delta;E<sub>start</sub> is too large the algorithm will oscillate wildy between random points and will most likely not converge towards an acceptable solution.
-On the other hand, if &Delta;E<sub>start</sub> is too small up-hill moves are unlikely and the solution
-most likely converges towards a local minimum or a point situated in a plateau-shaped region.
+For continuous problems, the size of the search region around the current solution is gradually contracted
+to &omega;<sub>end</sub> in order to generate a solution with the required precision.
 
+By default, the constant k<sub>B</sub> is set such that the probability of accepting a
+solution P(&Delta;E<sub>end</sub> = &sigma;<sub>E</sub>(&omega;<sub>end</sub>), T<sub>end</sub>) = &gamma;<sub>end</sub> where T<sub>end</sub> is the final annealing temperature. The initial temperature is then set such that the initial acceptance probability is &gamma;<sub>start</sub>.
 
-Since gamma represents a probability, 0 < &gamma; < 1,  however useful values for &gamma;<sub>start</sub>
+The behaviour of the annealing simulator can be tuned using the following **optional** parameters of the class [`Simulator`][SimulatorClass]:
+* `tEnd`: The final annealing temperature. It is arbitrary as it is scale with k<sub>B</sub>.
+* `gammaStart`: Initial acceptance probability. Useful values for &gamma;<sub>start</sub>
 are in the range of (0.7, 0.9). If &gamma;<sub>start</sub> is too low, up-hill moves are unlikely (potentially) preventing the SA algorithm from
 escaping a local miniumum. If &gamma;<sub>start</sub> is set close to 1.0 the algorithm will accept too many up-hill moves at high temperatures wasting computational time and delaying convergence.
+* `gammaEnd`: Final acceptance probability. Towards the end of the annealing process one assumes that the solution has converged towards the global minimum and up-hill moves should be restricted. For this reason &gamma;<sub>end</sub> has default value 0.05.
+* `deltaEnergyStart`: A **critical SA parameter** used to estimate the initial temperature.
+If &Delta;E<sub>start</sub> is too large the algorithm will oscillate wildy between random points and will most likely not converge towards an acceptable solution.
+On the other hand, if &Delta;E<sub>start</sub> is too small up-hill moves are unlikely and the solution
+most likely converges towards a local minimum or a point situated in a plateau-shaped region.
+* `deltaEnergyEnd`: Typical energy variation &Delta;E if the current position is perturbed within the minimum
+search neighbourhood  &omega;<sub>end</sub>.
+* iterations: Number of temperature steps defining the annealing schedule.
 
-Towards the end of the annealing process one assumes that the solution has converged towards the global
-minimum and up-hill moves should be restricted. For this reason &gamma;<sub>end</sub> has default value 0.05.
 
 
 ### Selecting an annealing schedule.
@@ -180,13 +181,14 @@ quantities like the current system energy, temperature, and the intermediate sol
 
 
 The figure below shows a typical SA log where the x-coordinate of the solution (green dots)
-converges asymptotically to 0.5 after 750 iteration.
+converges asymptotically to 0.5.
 The graph is discussed in more detail [here].
 
 ![Convergence Graph](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/convergence.gif)
 
 The number of inner iterations (performed while the temperature is kept constant)
-is also referred to as Markov chain length and is determined by a function with typedef [`MarkovChainLength`][MarkovChainLength], see method [`anneal`][anneal].
+is also referred to as Markov chain length and is determined by a function with typedef [`MarkovChainLength`][MarkovChainLength]
+see method [`anneal`][anneal].
 
 For fast cooling schedules convergence to an acceptable solution can be improved by
 increasing the number of inner iterations.
