@@ -1,3 +1,7 @@
+## 0.1.1-nullsafety
+
+- Removed dependency on `dart:io`.
+
 ## 0.1.0-nullsafety
 
 - Computationally costly methods of `Simulator` and `EnergyField`  are now asynchronous.
