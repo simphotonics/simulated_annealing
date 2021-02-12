@@ -21,15 +21,28 @@ in order to minimize atomic lattice defects as the material solidifies.
 *Simulated* annealing works by randomly selecting a new point in the neighbourhood of the
 current solution,
 evaluating the energy function, and deciding if the new solution is accepted or rejected.
+
 If for a newly selected point the energy E is lower that the previous minimum energy
 E<sub>min</sub>, the new solution is accepted: P(&Delta;E&nbsp;<&nbsp;0,&nbsp;T)&nbsp;=&nbsp;1,
 where &Delta;E = E - E<sub>min</sub>.
 
-![Energy Simulated Annealing](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/energy_composite.gif)
-
  Crucially, if &Delta;E > 0, the algorithm still accepts the
  new solution with probability: P(&Delta;E > 0, T) = e<sup>-&Delta;E/(k<sub>B</sub>&middot;T)</sup>.
  Accepting up-hill moves provides a method of escaping from local energy minima.
+
+![Energy Simulated Annealing](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/energy_composite.gif)
+
+The process is demonstrated in the animation above. The left figure shows the
+spherical 3D search space (the energy value is represented by colour).
+The figure on the right shows a projection of the energy function onto the
+x-y plane. Initially, random points are chosen
+from a large region encompasing the entire spherical search space.
+ In the simulation shown above, intermediate solutions
+near the local minimum are followed by up-hill moves.
+As the temperature drops the search neighourhood is contracted and the solution converges to the
+global minimum.
+
+---
 
 The [Boltzmann constant][Boltzmann] k<sub>B</sub> relates the system
 temperature with the kinetic energy of particles in a gas. In the context of SA,
