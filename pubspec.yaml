@@ -16,4 +16,4 @@ dependencies:
 
 dev_dependencies:
   minimal_test: ^2.0.1-nullsafety
-  pedantic: ^1.9.2
+  pedantic: ^1.10.0
