@@ -72,5 +72,17 @@ void main() {
           '\n'
           '');
     });
+    test('exportFirst', () {
+      expect(
+          numRec.exportFirst(precision: 4),
+          'position0  position1  position2  temperature  \n'
+          '0.000   0.000   0.000   100.0   ');
+    });
+    test('exportLast', () {
+      expect(
+          numRec.exportFirst(precision: 4),
+          'position0  position1  position2  temperature  \n'
+          '0.000   0.000   0.000   100.0   ');
+    });
   });
 }
