@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math' as math;
 import 'dart:math';
 
@@ -323,7 +322,6 @@ abstract class Simulator {
       print('Warning: E($globalMinPosition) = $globalMinEnergy '
           '< E($_currentMinPosition) = $_currentMinEnergy!');
       if (isRecursive) {
-        stdin.readLineSync();
         _currentMinPosition = globalMinPosition;
         _currentMinEnergy = globalMinEnergy;
 
