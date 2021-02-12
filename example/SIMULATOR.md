@@ -7,7 +7,7 @@ to find the global minimum of the function:
 E(**x**) = 4.0 - 4.0&middot;e<sup>-4&middot;|**x** - **x**<sub>glob</sub>|</sup> - 2.0&middot; e<sup>-6*&middot;|**x** - **x**<sub>loc</sub>|</sup>
 
 defined for a spherical search space centred around the origin.
-Hereby, |**x** - **y**| = &#8730; ( &sum;<sub> i</sub><sup>3</sup> (x<sub>i</sub> - y<sub>i</sub>)<sup>2</sup> ) is the distance between the vectors **x** and **y**.
+Hereby, |**x** - **y**| = &#8730; ( &sum;<sub> i = 1,..., 3</sub> (x<sub>i</sub> - y<sub>i</sub>)<sup>2</sup> ) is the distance between the vectors **x** and **y**.
 
 
 ![Energy Simulated Annealing](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/energy_composite.gif)
