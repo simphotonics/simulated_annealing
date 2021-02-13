@@ -377,7 +377,7 @@ class SearchSpace {
   bool contains(List<num> x) {
     if (x.length != dimension) {
       throw ErrorOfType<IncompatibleVector>(
-          message: 'Could not generate random point around $x.',
+          message: 'Could determine if the search space contains $x.',
           invalidState: 'Dimension mismatch: $dimension != ${x.length}.',
           expectedState: 'The vector x must have length $dimension.');
     }
