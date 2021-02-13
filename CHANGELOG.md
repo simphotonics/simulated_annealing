@@ -1,3 +1,7 @@
+## 0.1.2-nullsafety
+
+-Amended message attached to Error throw in method `contains` of class `SearchSpace`.
+
 ## 0.1.1-nullsafety
 
 - Removed dependency on `dart:io`.
