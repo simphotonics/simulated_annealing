@@ -371,15 +371,15 @@ class SearchSpace {
   /// Note: For parametric intervals the size is estimated by sampling the
   /// interval 50 times and returning the difference between the sample
   /// maximum and the sample minimum.
-  List<num> get size => _size();
+  UnmodifiableListView<num> get size => UnmodifiableListView(_size());
 
   /// Returns true if the point `x` belongs to the search space `this`.
   bool contains(List<num> x) {
     if (x.length != dimension) {
       throw ErrorOfType<IncompatibleVector>(
-          message: 'Could determine if the search space contains $x.',
-          invalidState: 'Dimension mismatch: $dimension != ${x.length}.',
-          expectedState: 'The vector x must have length $dimension.');
+          message: 'Error encountered in method: \'contains($x)\'.',
+          invalidState: 'Space dimension $dimension != $x.length.',
+          expectedState: 'The vector argument must have length $dimension.');
     }
     for (var i = 0; i < dimension; ++i) {
       if (!_intervals[i].contains(x[i])) {
