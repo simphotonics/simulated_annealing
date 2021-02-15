@@ -1,6 +1,11 @@
+## 0.1.3-nullsafety
+
+- Removed public access to internal variables of type `List` used by class `EnergyField`.
+- Removed public access to variables `temperatures` and `perturbationMagnitudes` used by class `Simulator`.
+
 ## 0.1.2-nullsafety
 
--Amended message attached to Error throw in method `contains` of class `SearchSpace`.
+- Amended message attached to Error thrown in method `contains` of class `SearchSpace`.
 
 ## 0.1.1-nullsafety
 
