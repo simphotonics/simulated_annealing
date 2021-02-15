@@ -8,7 +8,7 @@ import 'energy_field_example.dart';
 /// $ dart simulated_annealing_example.dart
 void main() async {
   // Construct a simulator instance.
-  final simulator = LoggingSimulator(energyField, exponentialSequence,
+  final simulator = LoggingSimulator(field, exponentialSequence,
       perturbationSequence,
       iterations: 750, gammaStart: 0.7, gammaEnd: 0.05);
 
