@@ -62,8 +62,9 @@ void main() async {
   final result = await simulator.anneal((num temperature) => 1);
   final dEnergyStart = await simulatorWithPresets.dEnergyStart;
   final dEnergyEnd = await simulatorWithPresets.dEnergyEnd;
-  final temperatures = await simulator.temperatures;
-  final perturbationMagnitudes = await simulator.perturbationMagnitudes;
+  final temperatures = exponentialSequence(tStart, simulator.tEnd);
+  final perturbationMagnitudes =
+      perturbationSequence(temperatures, space.dxMax, space.dxMin);
 
   group('Simulator:', () {
     test('GammaStart', () {
@@ -81,9 +82,7 @@ void main() async {
     test('dEnergyEnd', () {
       expect(dEnergyEnd, 1e-6);
     });
-    test('temperatures', () {
-      expect(temperatures.last, simulator.tEnd);
-    });
+
     test('startPosition', () {
       expect(simulatorWithPresets.currentPosition, [0, 0, 0]);
       expect(
@@ -96,8 +95,12 @@ void main() async {
         energyField.energy([0, 0, 0]),
       );
     });
-    test('perturbationMagnitudes', () {
+  });
+  group('Perturbation Magnitudes:', () {
+    test('start', () {
       expect(perturbationMagnitudes.first, space.dxMax);
+    });
+    test('end', () {
       expect(perturbationMagnitudes.last, space.dxMin);
     });
   });
