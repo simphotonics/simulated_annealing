@@ -27,14 +27,13 @@ num energy(List<num> x) {
       2.0 * exp(-6 * xLocalMin.distance(x));
 }
 
-final energyField = EnergyField(
+final field = EnergyField(
   energy,
   space,
 );
 
-
 void main(List<String> args) {
-  print(energyField);
+  print(field);
 
-  energyField.info.then((info) => print(info));
+  field.info.then((info) => print(info));
 }
