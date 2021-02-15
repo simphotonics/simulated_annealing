@@ -75,16 +75,7 @@ class EnergyField {
   late List<num> _position;
 
   /// Returns the current field position.
-  List<num> get position => _position;
-
-  /// Stores the previous field position.
-  late List<num> _previousPosition;
-
-  List<num> get previousPosition => _previousPosition;
-
-  late num _previousValue;
-
-  num get previousValue => _previousValue;
+  List<num> get position => List<num>.from(_position);
 
   /// Stores the current energy value.
   late num _value;
@@ -99,7 +90,7 @@ class EnergyField {
   late List<num> _minPosition;
 
   /// Returns the field position with the smallest energy encountered.
-  List<num> get minPosition => _minPosition;
+  List<num> get minPosition => List<num>.from(_minPosition);
 
   /// Lazy variable returning the random sample of energy values.
   late final Lazy<Future<List<num>>> _sample;
@@ -125,8 +116,8 @@ class EnergyField {
   Future<num> get stdDev => _stdDev();
 
   /// Corrected standard deviation of the energy values at
-  /// random positions around `xMin` with maximum perturbation
-  /// magnitude `dxMin`.
+  /// random positions around `minPosition` with maximum perturbation
+  /// magnitude `deltaPositionMin`.
   late final num stdDevMin;
 
   /// Smallest energy value encountered.
@@ -214,7 +205,7 @@ class EnergyField {
       }).stdDev();
 
   /// Returns the size of the energy field domain (the search space).
-  List<num> get size => _searchSpace.size;
+  UnmodifiableListView<num> get size => _searchSpace.size;
 
   @override
   String toString() {
