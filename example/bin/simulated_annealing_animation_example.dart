@@ -7,7 +7,7 @@ import 'snapshot_logging_simulator.dart';
 void main() async {
   // Construct a simulator instance.
   final simulator = SnapshotLoggingSimulator(
-      energyField, exponentialSequence, perturbationSequence,
+      field, exponentialSequence, perturbationSequence,
       '../data/animation/log_',
       nth:1,
       iterations: 750, gammaStart: 0.7, gammaEnd: 0.05);
