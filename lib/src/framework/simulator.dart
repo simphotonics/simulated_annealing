@@ -124,7 +124,7 @@ abstract class Simulator {
           temperatureSequence(_tStart, tEnd, iterations: iterations)),
     );
     _perturbationMagnitudes = Lazy<Future<List<List<num>>>>(
-      () => temperatures
+      () => _temperatures()
           .then<List<List<num>>>((temperatures) => perturbationSequence(
                 temperatures,
                 _field.deltaPositionMax,
@@ -169,14 +169,8 @@ abstract class Simulator {
   /// Annealing temperatures.
   late final Lazy<Future<List<num>>> _temperatures;
 
-  /// Annealing temperatures.
-  Future<List<num>> get temperatures => _temperatures();
-
   /// Perturbation magnitudes.
   late final Lazy<Future<List<List<num>>>> _perturbationMagnitudes;
-
-  Future<List<List<num>>> get perturbationMagnitudes =>
-      _perturbationMagnitudes();
 
   /// Initial annealing temperature.
   late final Lazy<Future<num>> _tStart;
@@ -214,7 +208,7 @@ abstract class Simulator {
 
   /// Current energy minimizing solution. If the argument `startPosition` is not
   /// specified in the constructor it is initialized as `field.minPosition`.
-  List<num> get currentMinPosition => _currentMinPosition;
+  List<num> get currentMinPosition => List<num>.from(_currentMinPosition);
 
   /// Current energy minimum.
   late num _currentMinEnergy;
@@ -238,7 +232,7 @@ abstract class Simulator {
   late List<num> _dx;
 
   /// Current perturbation magnitude.
-  List<num> get dx => _dx;
+  List<num> get dx => List.from(_dx);
 
   /// Acceptance probability of current solution.
   late num _acceptanceProbability;
@@ -277,8 +271,8 @@ abstract class Simulator {
     final kB = await this.kB;
 
     /// Initialize parameters:
-    final temperatures = await this.temperatures;
-    final perturbationMagnitudes = await this.perturbationMagnitudes;
+    final temperatures = await _temperatures();
+    final perturbationMagnitudes = await _perturbationMagnitudes();
     num dE = 0;
 
     if (_recursionCounter == 0) {
