@@ -1,7 +1,7 @@
 import 'package:exception_templates/exception_templates.dart';
 import 'package:list_operators/list_operators.dart';
 
-/// Records numerical data of type `T` and `List<T>`.
+/// Records data of type `T` and `List<T>`.
 class DataRecorder<T> {
   /// Data storage.
   final _scalars = <String, List<T>>{};
@@ -117,6 +117,7 @@ class DataRecorder<T> {
   }
 }
 
+/// Records data of type `num` and `List<num>`.
 class NumericalDataRecorder extends DataRecorder<num> {
   /// Exports all records as a `String`.
   ///
