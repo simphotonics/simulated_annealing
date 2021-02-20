@@ -1,3 +1,8 @@
+## 0.1.4-nullsafety
+
+- Amended the calculation of `dEnergyStart` and `dEnergyEnd` used to estimate the
+  starting temperature of the annealing schedule.
+
 ## 0.1.3-nullsafety
 
 - Removed public access to internal variables of type `List` used by class `EnergyField`.
