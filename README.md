@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.com/simphotonics/simulated_annealing.svg?branch=main)](https://travis-ci.com/simphotonics/simulated_annealing)
 
 ## Introduction
-[Simulated annealing][SA-Wiki] (SA) is an algorithm aimed at finding the *global* minimum of
+[Simulated annealing][SA-Wiki] (SA) is an algorithm aimed at finding the *global* minimum
 of a function E(x<sub>0</sub>,&nbsp;x<sub>1</sub>,&nbsp;...,&nbsp;x<sub>n</sub>)
 for a given region &omega;(x<sub>0</sub>,&nbsp;x<sub>1</sub>,&nbsp;...,&nbsp;x<sub>n</sub>).
 The function to be minimized can be interpreted as the
@@ -32,8 +32,8 @@ where &Delta;E = E - E<sub>min</sub>.
 
 ![Energy Simulated Annealing](https://github.com/simphotonics/simulated_annealing/raw/main/example/plots/energy_composite.gif)
 
-The process is demonstrated in the animation above. The left figure shows the
-spherical 3D search space (the energy value is represented by colour).
+The process is demonstrated in the animation above. The left figure shows a
+spherical 3D search space while the energy value is represented by colour.
 The figure on the right shows a projection of the energy function onto the
 x-y plane. Initially, random points are chosen
 from a large region encompasing the entire spherical search space.
