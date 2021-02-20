@@ -38,7 +38,7 @@ final simulator = LoggingSimulator(
   energyField,
   exponentialSequence,
   perturbationSequence,
-  iterations: 750,
+  iterations: 1200,
   gammaStart: 0.7,
   gammaEnd: 0.05,
 );
