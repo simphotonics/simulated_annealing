@@ -173,14 +173,6 @@ escaping a local miniumum. If &gamma;<sub>start</sub> is set close to 1.0 the al
    If &Delta;E<sub>start</sub> is too large the algorithm will oscillate wildy between random points and will most likely not converge towards an acceptable solution.
    On the other hand, if &Delta;E<sub>start</sub> is too small up-hill moves are unlikely and the solution
    most likely converges towards a local minimum or a point situated in a plateau-shaped region.
-   Note: When using the standard deviation as a measure of &Delta;E it is possible
-   to *underestimate* &Delta;E<sub>start</sub> if the
-   function E is plateau-shaped with isolated extrema.
-   For this reason, the default value of &Delta;E<sub>start</sub> is initialized as:
-
-   &Delta;E<sub>start</sub> = &sigma;<sub>E</sub> + 0.1&middot;|E<sub>max</sub> - E<sub>min</sub>|, where E<sub>max</sub> and E<sub>min</sub> are the maximum and minimum values found while
-   sampling the energy function as mentioned above.
-
 * `deltaEnergyEnd`: Typical energy variation &Delta;E if the current position is perturbed within the minimum
 search neighbourhood  &omega;<sub>end</sub>. It is used to calculate k<sub>B</sub>.
 * `iterations`: Determines the number of temperature steps in the annealing schedule.
