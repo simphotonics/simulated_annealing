@@ -93,8 +93,8 @@ abstract class Simulator {
     TemperatureSequence temperatureSequence,
     PertubationSequence perturbationSequence, {
     this.tEnd = 1e-4,
-    this.gammaStart = 0.8,
-    this.gammaEnd = 0.1,
+    this.gammaStart = 0.7,
+    this.gammaEnd = 0.05,
     this.iterations = 750,
     List<num>? startPosition,
     num? dEnergyStart,
@@ -128,13 +128,15 @@ abstract class Simulator {
           .then<List<List<num>>>((temperatures) => perturbationSequence(
                 temperatures,
                 _field.deltaPositionMax,
-                _field.deltaPositionMin,
+                _field.deltaPositionMin * 0.5,
               )),
     );
 
     /// Set initial position:
     if (startPosition != null) {
       _field.perturb(startPosition, _field.deltaPositionMin * 0.0);
+    } else {
+      _field.perturb(_field.minPosition, _field.deltaPositionMin * 0.0);
     }
     _currentMinEnergy = _field.value;
     _currentMinPosition = _field.position;
@@ -267,6 +269,7 @@ abstract class Simulator {
     MarkovChainLength markov, {
     bool isRecursive = false,
     num ratio = 0.5,
+    bool isVerbose = false,
   }) async {
     final kB = await this.kB;
 
@@ -282,10 +285,16 @@ abstract class Simulator {
       recordLog();
     }
 
-    // During the first iteration ratio = 1.0 and i = 0.
-    ratio = pow(ratio.abs(), _recursionCounter);
-    var i = (temperatures.length * (1.0 - ratio)).toInt();
+    // During the first iteration _ratio = 1.0 and i = 0.
+    final _ratio = pow(ratio.abs(), _recursionCounter);
+    var i = (temperatures.length * (1.0 - _ratio)).toInt();
 
+    if (_recursionCounter > 0 && isVerbose) {
+      print('Restarted annealing at:');
+      print('  temperature: ${temperatures[i]},');
+      print('  position: $_currentMinPosition, ');
+      print('  energy: $_currentMinEnergy');
+    }
     ++_recursionCounter;
 
     // Outer iteration loop.
@@ -313,12 +322,16 @@ abstract class Simulator {
       }
     }
     if (globalMinEnergy < _currentMinEnergy) {
-      print('Warning: E($globalMinPosition) = $globalMinEnergy '
-          '< E($_currentMinPosition) = $_currentMinEnergy!');
+      if (isVerbose) {
+        print('------------------------------------------------');
+        print('E_min_global($globalMinPosition) = $globalMinEnergy ');
+        print('E_min($_currentMinPosition) = $_currentMinEnergy!');
+        print('Returning global minimum solution!');
+        print('');
+      }
+      _currentMinPosition = globalMinPosition;
+      _currentMinEnergy = globalMinEnergy;
       if (isRecursive) {
-        _currentMinPosition = globalMinPosition;
-        _currentMinEnergy = globalMinEnergy;
-
         _currentMinPosition = await anneal(
           markov,
           isRecursive: isRecursive,
@@ -338,13 +351,14 @@ abstract class Simulator {
   Future<String> get info async {
     final b = StringBuffer();
     b.writeln('Simulator: ');
-    b.writeln('  iteration: $iterations');
+    b.writeln('  iterations: $iterations');
     b.writeln('  dEnergyStart: ${await dEnergyStart}');
     b.writeln('  dEnergyEnd: ${await dEnergyEnd}');
-    b.writeln('  kB: ${await _kB}');
+    b.writeln('  kB: ${await _kB()}');
     b.writeln('  xMin: ${_field.minPosition}');
     b.writeln('  tStart: ${await tStart}');
     b.writeln('  tEnd: ${await tEnd}');
+    b.writeln('  Field: ${await _field.info}'.replaceAll('\n', '\n  '));
     return b.toString();
   }
 }
