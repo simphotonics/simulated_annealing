@@ -21,24 +21,42 @@ class EnergyField {
   EnergyField(
     this.energy,
     SearchSpace searchSpace, {
-    this.sampleSize = 600,
+    this.sampleSize = 500,
   })  : _searchSpace = searchSpace,
         _minValue = double.infinity {
     // Populate field _minPosition with a random point in the search space.
     next();
     // Initialize late variables
-    _sample = Lazy<Future<List<num>>>(() => sampleField());
+    _sample = Lazy<Future<List<num>>>(() => sampleField(
+          sampleSize: sampleSize,
+        ));
     _mean = Lazy<Future<num>>(() => _sample().then((sample) => sample.mean()));
     _max = Lazy<Future<num>>(() => _sample().then((sample) => sample.max()));
     _stdDev = Lazy<Future<num>>(
       () => _sample().then((value) => value.stdDev()),
     );
-    // _min = Lazy<Future<num>>(() => _sample().then((sample) => sample.min()));
-    _dEnergyStart = Lazy<Future<num>>(() => Future.wait<num>([stdDev, mean])
-        .then((result) => result[0] + 0.1 * (result[1] - _minValue)));
-    // Using _sample() to make sure that _minPosition holds a meaningful value.
+    _dEnergyStart = Lazy<Future<num>>(
+      () => _sample().then(
+        (_) => sampleNeighbourhood(
+          _minPosition,
+          deltaPositionMax,
+          sampleSize: sampleSize,
+        ).then<num>(
+          (result) => result.stdDev(),
+        ),
+      ),
+    );
     _dEnergyEnd = Lazy<Future<num>>(
-        () => _sample().then((_) => _calculateEnergyEnd(_minPosition)));
+      () => _dEnergyStart().then(
+        (_) => sampleNeighbourhood(
+          _minPosition,
+          deltaPositionMin,
+          sampleSize: sampleSize,
+        ).then<num>(
+          (result) => result.stdDev(),
+        ),
+      ),
+    );
   }
 
   /// Returns a shallow copy of `energyField` using the parameters:
@@ -192,18 +210,6 @@ class EnergyField {
   }) async =>
       List<num>.generate(sampleSize, (_) => perturb(x, dx));
 
-  /// Returns an estimate for the energy variation around `position`
-  /// when perturbed with maximum magnitude `deltaPositionMin`.
-  Future<num> _calculateEnergyEnd(List<num> position) async =>
-      List<num>.generate(sampleSize, (_) {
-        final e = energy(position);
-        num result = double.negativeInfinity;
-        do {
-          result = e - perturb(position, deltaPositionMin);
-        } while (result < 0.0);
-        return result;
-      }).stdDev();
-
   /// Returns the size of the energy field domain (the search space).
   UnmodifiableListView<num> get size => _searchSpace.size;
 
@@ -228,6 +234,7 @@ class EnergyField {
     b.writeln('  energy stdDev: ${await stdDev}');
     b.writeln('  dEnergyStart: ${await dEnergyStart}');
     b.writeln('  dEnergyEnd: ${await dEnergyEnd}');
+    b.writeln('  sampleSize: $sampleSize');
     b.writeln('  $_searchSpace'.replaceAll('\n', '\n  '));
     return b.toString();
   }
