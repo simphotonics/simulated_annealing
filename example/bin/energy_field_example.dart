@@ -15,7 +15,11 @@ final z = ParametricInterval(
   () => sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
 );
 final dxMin = <num>[1e-6, 1e-6, 1e-6];
-final space = SearchSpace([x, y, z], dxMin: [1e-6, 1e-6, 1e-6]);
+final space = SearchSpace(
+  [x, y, z],
+  dxMin: [1e-6, 1e-6, 1e-6],
+  //dxMax: [1, 1, 1],
+);
 
 // Defining an energy function.
 // The energy function has a minimum at xMin.
