@@ -1,3 +1,8 @@
+## 0.1.5-nullsafety
+
+- Changed the signature and name of the function `nextDoubleInRange()`.
+  The function is now called `nextInRange()` and returns an object of type `num`.
+
 ## 0.1.4-nullsafety
 
 - Amended the calculation of `dEnergyStart` and `dEnergyEnd` used to estimate the
