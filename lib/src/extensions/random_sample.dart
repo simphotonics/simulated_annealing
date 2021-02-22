@@ -10,8 +10,8 @@ import 'package:exception_templates/exception_templates.dart';
 /// * `xMax`: the upper limit.
 typedef InverseCdf = num Function(num p, num xMin, num xMax);
 
-/// Extension on Random providing the method
-/// `nextDoubleInRange`.
+/// Extension on Random providing the methods
+/// `nextInRange` and `nextIntFromList`.
 extension RandomInRange on Random {
   /// Generates a random floating point
   /// value in the range from `xMin`,
