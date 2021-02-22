@@ -2,11 +2,13 @@ import 'dart:math';
 
 import 'package:exception_templates/exception_templates.dart';
 
-/// Inverse cummulative distribution function.
-/// * `p`: A probability,
+/// Inverse cummulative distribution function of a probability distribution
+/// function with non-zero support over the interval: `(xMin, xMax)`.
+/// The function must return a numerical value in the interval: `(xMin, xMax)`.
+/// * `p`: A probability `0 <= p < 1`,
 /// * `xMin`: the lower limit,
 /// * `xMax`: the upper limit.
-typedef InverseCdf = double Function(num p, num xMin, num xMax);
+typedef InverseCdf = num Function(num p, num xMin, num xMax);
 
 /// Extension on Random providing the method
 /// `nextDoubleInRange`.
@@ -18,7 +20,7 @@ extension RandomInRange on Random {
   ///   uniformly distributed.
   /// * If `inverseCdf` is non-null, the random value is generated using
   ///   inversion sampling.
-  double nextDoubleInRange(
+  num nextInRange(
     num xMin,
     num xMax,
     InverseCdf? inverseCdf,
