@@ -71,7 +71,7 @@ void main() async {
       expect(exp(-dE / (kB * tStart)), simulator.gammaStart);
     });
     test('Convergence', () {
-      expect(result, xGlobalMin, precision: 1e-6);
+      expect(result, xGlobalMin, precision: 1e-5);
     });
     test('tEnd', () {
       expect(simulator.tEnd, 1e-3);
