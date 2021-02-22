@@ -77,7 +77,7 @@ class FixedInterval extends Interval {
       return _cache;
     } else {
       _isUpToDate = true;
-      return _cache = Interval.random.nextDoubleInRange(
+      return _cache = Interval.random.nextInRange(
         start,
         end,
         inverseCdf,
@@ -95,7 +95,7 @@ class FixedInterval extends Interval {
   num perturb(num x, num dx) {
     if (overlaps(x - dx, x + dx)) {
       _isUpToDate = true;
-      return _cache = Interval.random.nextDoubleInRange(
+      return _cache = Interval.random.nextInRange(
         max(x - dx, start),
         min(x + dx, end),
         inverseCdf,
@@ -180,7 +180,7 @@ class ParametricInterval extends Interval {
       return _cache;
     } else {
       _isUpToDate = true;
-      return _cache = Interval.random.nextDoubleInRange(
+      return _cache = Interval.random.nextInRange(
         pStart(),
         pEnd(),
         inverseCdf,
@@ -198,7 +198,7 @@ class ParametricInterval extends Interval {
   num perturb(num x, num dx) {
     if (overlaps(x - dx, x + dx)) {
       _isUpToDate = true;
-      return _cache = Interval.random.nextDoubleInRange(
+      return _cache = Interval.random.nextInRange(
         max(x - dx, pStart()),
         min(x + dx, pEnd()),
         inverseCdf,
