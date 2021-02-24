@@ -20,6 +20,7 @@ final z = ParametricInterval(
 );
 
 // Defining a spherical search space.
+// Intervals are listed in order of dependence.
 final space = SearchSpace([x, y, z], dxMin: [1e-6, 1e-6, 1e-6]);
 
 void main() async {

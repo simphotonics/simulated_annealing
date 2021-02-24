@@ -6,7 +6,7 @@ import 'package:simulated_annealing/simulated_annealing.dart';
 /// Annealing simulator class that writes intermediate snapshots of the
 /// log to a file.
 ///
-/// Not included with the framework because the class used dart:io.
+/// Not included with the framework because the class uses dart:io.
 class SnapshotLoggingSimulator extends LoggingSimulator {
   SnapshotLoggingSimulator(
     EnergyField field,

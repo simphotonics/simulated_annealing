@@ -1,3 +1,8 @@
+## 0.1.6-nullsafety
+
+- Amended docs highlighting the fact that when instantiating an object of type [`SearchSpace`][SearchSpace],
+  parameteric intervals must be listed in order of dependence.
+
 ## 0.1.5-nullsafety
 
 - Changed the signature and name of the function `nextDoubleInRange()`.
@@ -42,3 +47,6 @@
 ## 0.0.1-nullsafety
 
 - Initial version
+
+
+[SearchSpace]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/SearchSpace-class.html

@@ -18,6 +18,15 @@ The intervals `y` and `z` are objects of type [`ParametricInterval`][ParametricI
 and their boundaries are specified in terms of a numerical function that depends on other
 intervals.
 
+**Important**: When constructing an object of type [`SearchSpace`][SearchSpace]
+parameteric intervals must be listed in order of dependence. In the example shown
+below interval `x` is independent, while `y` depends on `x` and `z` depends on `x` and `y`.
+For this reason the variable `space` is initialized using the
+following line of source code:
+```Dart
+final space = SearchSpace([x, y, z], dxMin: [1e-6, 1e-6, 1e-6]);
+```
+
 <details><summary> Click to show source code.</summary>
 
 ```Dart
@@ -40,6 +49,8 @@ final z = ParametricInterval(
 );
 
 // Defining a spherical search space.
+// Note: List intervals in order of dependence.
+//
 // Note: dxMax defaults to the space size. If a smaller initial
 //       perturbation magnitude is required it can be specified
 //       as a constructor argument.
@@ -106,7 +117,7 @@ use a search space where each point is equally likely to be chosen.
 When constructing a search space using parametric intervals
 the resulting multi-dimensional probability distribution
 function (PDF) might be **non-uniform** even if the
-interval along each dimension have a uniform PDF.
+intervals along each dimension have a uniform PDF.
 
 The examples below aim to demonstrate the problem and its solution.
 

@@ -250,6 +250,8 @@ class ParametricInterval extends Interval {
 class SearchSpace {
   /// Constructs an object of type `SearchSpace`.
   /// * `intervals`: A list of intervals defining the search space.
+  ///    Note: Parametric intervals must be listed
+  ///    after the intervals they depend on.
   /// * `dxMin`: The smallest perturbation magnitudes used with
   ///    the method `perturb`. For a discrete search space
   ///    it corresponds to the solution precision.
