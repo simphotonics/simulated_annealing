@@ -134,9 +134,7 @@ and calculating the sample standard deviation &sigma;<sub>E</sub> [\[3\]][ledesm
 The initial temperature is set such that the initial acceptance probability is:
 
 P(&Delta;E<sub>start</sub>,T<sub>start</sub>) =  e<sup>-&Delta;E<sub>start</sub>/T<sup>start</sup>
-= &gamma;<sub>start</sub>
-
-where &gamma;<sub>start</sub> is a simulator parameter with default value 0.7.
+= &gamma;<sub>start</sub>, where &gamma;<sub>start</sub> is a simulator parameter with default value 0.7.
 
 For continuous problems, the size of the search region around the current
 solution is gradually contracted
@@ -146,7 +144,6 @@ points in the neighbourhood around the current minimizing solution and
 calculating the standard deviation. The final annealing temperature T<sub>end</sub> is set such that:
 
 P(&Delta;E<sub>end</sub>, T<sub>end</sub>) =  e<sup>-&Delta;E<sub>end</sub>/T</sup> = &gamma;<sub>end</sub>,
-
 where &gamma;<sub>end</sub> is a simulator parameter with default value 0.05.
 
 The following parameters are required to define an annealing schedule:
