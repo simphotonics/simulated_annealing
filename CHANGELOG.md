@@ -1,6 +1,6 @@
 ## 0.2.1-nullsafety
 
-- Amended docs.
+- Amended docs. Updated figures. 
 
 ## 0.2.0-nullsafety
 
