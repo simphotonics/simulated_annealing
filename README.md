@@ -119,27 +119,28 @@ temperature with the kinetic energy of particles in a gas.
 In the context of SA, it is customary to set k<sub>B</sub> &equiv; 1.
 With this convention, the probability of accepting a new solution is given by:
 
-P(&Delta;E > 0, T) = e<sup>-&Delta;E/T</sup> &nbsp;&nbsp; P(&Delta;E <0, T) = 1.0,
+P(&Delta;E > 0, T) = e<sup>-&Delta;E/T</sup>&nbsp;&nbsp;and&nbsp;&nbsp;P(&Delta;E <0, T) = 1.0,
 where &Delta;E = E - E<sub>min</sub>.
 
 The expression above ensures
 that the acceptance probability decreases with decreasing temperature (for &Delta;E > 0).
 As such, the temperature is a parameter that controls the probability of up-hill moves.
 
-An estimate for the average scale of the variation of the energy function &Delta;E
+An estimate for the average scale of the variation of the energy
+function &Delta;E<sub>start</sub>
 can be obtained by sampling the energy function E
 at random points in the search space &omega;
 and calculating the sample standard deviation &sigma;<sub>E</sub> [\[3\]][ledesma2008].
+The initial temperature is set such that the initial acceptance probability is:
+P(&Delta;E<sub>start</sub>,T<sub>start</sub>) =  e<sup>-&Delta;E<sub>start</sub>/T<sup>start</sup> = &gamma;<sub>start</sub>.
 
 For continuous problems, the size of the search region around the current
 solution is gradually contracted
 to &omega;<sub>end</sub> in order to generate a solution with the required precision.
-
-The final annealing temperature T<sub>end</sub> is set such that:
+An estimate of &Delta;E<sub>end</sub> can be obtained by sampling the energy at
+points in the neighbourhood around the current minimizing solution and
+calculating the standard deviation. The final annealing temperature T<sub>end</sub> is set such that:
 P(&Delta;E<sub>end</sub>, T<sub>end</sub>) =  e<sup>-&Delta;E<sub>end</sub>/T = &gamma;<sub>end</sub>.
-
-The initial temperature is set such that the initial acceptance probability is:
-P(&Delta;E<sub>start</sub>,T<sub>start</sub>) =  e<sup>-&Delta;E<sub>start</sub>/T<sup>start</sup> = &gamma;<sub>start</sub>.
 
 The following parameters are required to define an annealing schedule:
 * T<sub>start</sub>, the initial temperature,
