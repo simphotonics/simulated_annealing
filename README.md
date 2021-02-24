@@ -194,11 +194,11 @@ escaping a local miniumum. If &gamma;<sub>start</sub> is set close to 1.0 the al
 too many up-hill moves at high temperatures wasting computational time and delaying convergence.
 * `gammaEnd`: Final acceptance probability. Towards the end of the annealing process one assumes
    that the solution has converged towards the global minimum and up-hill moves should be restricted. For this reason &gamma;<sub>end</sub> has default value 0.05.
-* `deltaEnergyStart`: A **critical SA parameter** used to estimate the initial temperature T<sub>start</sub>. It has default value `field.deltaEnergyStart`.
+* `dEnergyStart`: A **critical SA parameter** used to estimate the initial temperature T<sub>start</sub>. It has default value `field.dEnergyStart`.
    If &Delta;E<sub>start</sub> is too large the algorithm will oscillate wildy between random points and will most likely not converge towards an acceptable solution.
    On the other hand, if &Delta;E<sub>start</sub> is too small up-hill moves are unlikely and the solution
    most likely converges towards a local minimum or a point situated in a plateau-shaped region.
-* `deltaEnergyEnd`: Typical energy variation &Delta;E if the current position is perturbed within the minimum
+* `dEnergyEnd`: Typical energy variation &Delta;E if the current position is perturbed within the minimum
 search neighbourhood  &omega;<sub>end</sub>. It is used to calculate T<sub>end</sub>.
 * `iterations`: Determines the number of temperature steps in the annealing schedule.
 
