@@ -117,9 +117,10 @@ The [Boltzmann constant][Boltzmann] k<sub>B</sub> relates the system
 temperature with the kinetic energy of particles in a gas.
 
 In the context of SA, it is customary to set k<sub>B</sub> &equiv; 1.
-With this convention, the probability of accepting the a now solution is given by:
+With this convention, the probability of accepting a new solution is given by:
 
-P(&Delta;E > 0, T) = e<sup>-&Delta;E/T</sup> &nbsp;&nbsp; P(&Delta;E <0, T) = 1.0.
+P(&Delta;E > 0, T) = e<sup>-&Delta;E/T</sup> &nbsp;&nbsp; P(&Delta;E <0, T) = 1.0,
+where &Delta;E = E - E<sub>min</sub>.
 
 The expression above ensures
 that the acceptance probability decreases with decreasing temperature (for &Delta;E > 0).
