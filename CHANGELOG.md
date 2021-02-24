@@ -1,6 +1,12 @@
+## 0.2.2-nullsafety
+
+- Renamed variables in class [`SearchSpace`][SearchSpace].
+  x -> position, dx -> dPosition.
+- Updated docs.
+
 ## 0.2.1-nullsafety
 
-- Amended docs. Updated figures. 
+- Amended docs. Updated figures.
 
 ## 0.2.0-nullsafety
 
