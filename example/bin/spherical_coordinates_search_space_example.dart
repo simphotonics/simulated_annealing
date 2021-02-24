@@ -11,15 +11,15 @@ double inverseCdf(num p, num thetaMin, num thetaMax) {
 
 // Define intervals.
 final radius = 2;
-final theta = FixedInterval(0, pi);//, inverseCdf: inverseCdf);
+final theta = FixedInterval(0, pi); //, inverseCdf: inverseCdf);
 final phi = FixedInterval(0, 2 * pi);
 
 // Defining a spherical search space.
-final space = SearchSpace([phi, theta], dxMin: [1e-6, 1e-6, 1e-6]);
+final space = SearchSpace([phi, theta], dPositionMin: [1e-6, 1e-6, 1e-6]);
 
 void main() async {
-  final testPointSC = [2*pi-0.5, pi/4];
-  final magnitudesSC = [pi/8, pi/8];
+  final testPointSC = [2 * pi - 0.5, pi / 4];
+  final magnitudesSC = [pi / 8, pi / 8];
 
   print(space.perturb(testPointSC, magnitudesSC));
 

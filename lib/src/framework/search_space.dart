@@ -20,9 +20,9 @@ abstract class Interval {
   num next();
 
   /// Returns the next random number in the intersection of the intervals
-  /// `(start, end)` and `(x - dx, x + dx)`.
-  /// Returns `x` if the intersection is the empty interval.
-  num perturb(num x, num dx);
+  /// `(start, end)` and `(position - dPosition, position + dPosition)`.
+  /// Returns `position` if the intersection is the empty interval.
+  num perturb(num position, num dPosition);
 
   /// Returns true if `point` belongs to the interval.
   bool contains(num point);
@@ -87,22 +87,22 @@ class FixedInterval extends Interval {
 
   /// Returns the next random number sampled from the interval
   /// obtained by intersecting:
-  /// `(start, end)` and `(x - dx, x + dx)`.
-  /// * If the intersection is empty, `x` is returned unperturbed.
+  /// `(start, end)` and `(position - dPosition, position + dPosition)`.
+  /// * If the intersection is empty, `position` is returned unperturbed.
   /// * Returns a cached value if the cache is up-to-date.
   /// * If the cache is stale an new random number is returned and cached.
   @override
-  num perturb(num x, num dx) {
-    if (overlaps(x - dx, x + dx)) {
+  num perturb(num position, num dPosition) {
+    if (overlaps(position - dPosition, position + dPosition)) {
       _isUpToDate = true;
       return _cache = Interval.random.nextInRange(
-        max(x - dx, start),
-        min(x + dx, end),
+        max(position - dPosition, start),
+        min(position + dPosition, end),
         inverseCdf,
       );
     } else {
       _isUpToDate = false;
-      return x;
+      return position;
     }
   }
 
@@ -121,10 +121,12 @@ class FixedInterval extends Interval {
     return b.toString();
   }
 
-  /// Returns true if x is safisfying
-  /// `(x >= start && x<= end)`.
+  /// Returns true if position is safisfying
+  /// `(position >= start && x<= end)`.
   @override
-  bool contains(num x) => (x >= start && x <= end) || (x >= end && x <= start);
+  bool contains(num position) =>
+      (position >= start && position <= end) ||
+      (position >= end && position <= start);
 
   /// Returns true if the interval defined by the points
   /// `left` and `right` overlaps `this`.
@@ -190,30 +192,30 @@ class ParametricInterval extends Interval {
 
   /// Returns the next random number sampled from the interval
   /// obtained by intersecting:
-  /// `(start, end)` and `(x - dx, x + dx)`.
-  /// * If the intersection is empty, `x` is returned unperturbed.
+  /// `(start, end)` and `(position - dPosition, position + dPosition)`.
+  /// * If the intersection is empty, `position` is returned unperturbed.
   /// * Returns a cached value if the cache is up-to-date.
   /// * If the cache is stale an new random number is returned and cached.
   @override
-  num perturb(num x, num dx) {
-    if (overlaps(x - dx, x + dx)) {
+  num perturb(num position, num dPosition) {
+    if (overlaps(position - dPosition, position + dPosition)) {
       _isUpToDate = true;
       return _cache = Interval.random.nextInRange(
-        max(x - dx, pStart()),
-        min(x + dx, pEnd()),
+        max(position - dPosition, pStart()),
+        min(position + dPosition, pEnd()),
         inverseCdf,
       );
     } else {
       _isUpToDate = false;
-      return x;
+      return position;
     }
   }
 
-  /// Returns true if `x` is safisfying
-  /// `(x >= pStart() && x<= pEnd()))`.
+  /// Returns true if `position` is safisfying
+  /// `(position >= pStart() && x<= pEnd()))`.
   @override
-  bool contains(num x) =>
-      (x >= pStart() && x <= pEnd() || x >= pEnd() && x <= pStart());
+  bool contains(num position) => (position >= pStart() && position <= pEnd() ||
+      position >= pEnd() && position <= pStart());
 
   /// Returns true if the interval defined by the points
   /// `left` and `right` overlaps with `this`.
@@ -252,23 +254,23 @@ class SearchSpace {
   /// * `intervals`: A list of intervals defining the search space.
   ///    Note: Parametric intervals must be listed
   ///    after the intervals they depend on.
-  /// * `dxMin`: The smallest perturbation magnitudes used with
+  /// * `dPositionMin`: The smallest perturbation magnitudes used with
   ///    the method `perturb`. For a discrete search space
   ///    it corresponds to the solution precision.
-  /// * `dxMax`: The largest perturbation magnitudes used with
+  /// * `dPositionMax`: The largest perturbation magnitudes used with
   ///    the method `perturb`. This parameter is optional. It
   ///    defaults to the search space `size`.
   SearchSpace(
     List<Interval> intervals, {
-    required List<num> dxMin,
-    List<num>? dxMax,
+    required List<num> dPositionMin,
+    List<num>? dPositionMax,
   })  : _intervals = List<Interval>.of(intervals),
-        dxMin = UnmodifiableListView<num>(dxMin),
+        dPositionMin = UnmodifiableListView<num>(dPositionMin),
         dimension = intervals.length {
     _size = Lazy<List<num>>(() => estimateSize());
-    this.dxMax = (dxMax == null)
+    this.dPositionMax = (dPositionMax == null)
         ? UnmodifiableListView(size)
-        : UnmodifiableListView(dxMax);
+        : UnmodifiableListView(dPositionMax);
   }
 
   /// Search space dimension.
@@ -280,12 +282,12 @@ class SearchSpace {
   final List<Interval> _intervals;
 
   // Maximum size of the search neighbourhood.
-  late final UnmodifiableListView<num> dxMax;
+  late final UnmodifiableListView<num> dPositionMax;
 
   /// Minimum size of the search neighbourhood.
   ///
   /// For continuous problems this parameter determines the solution precision.
-  final UnmodifiableListView<num> dxMin;
+  final UnmodifiableListView<num> dPositionMin;
 
   /// Returns a random vector of length `dimension`. Each vector coordinate
   /// is generated by drawing samples from the corresponding
@@ -301,34 +303,37 @@ class SearchSpace {
   /// Returns a random vector of length `dimension`
   /// sampled from the interval
   /// obtained by intersecting `this` with the generalized rectangle
-  /// centred at `x` with edge lengths `(x - dx, x + dx)`.
+  /// centred at `position` with edge lengths
+  /// `(position - dPosition, position + dPosition)`.
   ///
   /// Note: If the intersection is empty, the input
-  /// `x` is returned unperturbed.
+  /// `position` is returned unperturbed.
   ///
   /// Throws an error of type `ErrorOfType<InCompatibleVector>` if the
-  /// length of the `x` or `dx` does not match `this.dimension`.
-  List<num> perturb(List<num> x, List<num> dx) {
-    if (x.length != dimension) {
+  /// length of the `position` or `dPosition` does not match `this.dimension`.
+  List<num> perturb(List<num> position, List<num> dPosition) {
+    if (position.length != dimension) {
       throw ErrorOfType<IncompatibleVector>(
-          message: 'Could not generate random point around $x.',
-          invalidState: 'Dimension mismatch: $dimension != ${x.length}.',
-          expectedState: 'The vector x must have length $dimension.');
+          message: 'Could not generate random point around $position.',
+          invalidState: 'Dimension mismatch: $dimension != ${position.length}.',
+          expectedState: 'The vector position must have length $dimension.');
     }
-    if (dx.length != dimension) {
+    if (dPosition.length != dimension) {
       throw ErrorOfType<IncompatibleVector>(
-          message: 'Could not generate perturbation using magnitudes $dx.',
-          invalidState: 'Dimension mismatch: $dimension != ${dx.length}.',
-          expectedState: 'The vector dx must have length $dimension.');
+          message:
+              'Could not generate perturbation using magnitudes $dPosition.',
+          invalidState:
+              'Dimension mismatch: $dimension != ${dPosition.length}.',
+          expectedState: 'The vector dPosition must have length $dimension.');
     }
     _clearCache();
     // Generating the random sample.
     final result = <num>[];
     num value = 0;
     for (var i = 0; i < dimension; ++i) {
-      value = _intervals[i].perturb(x[i], dx[i]);
-      if (!_intervals[i]._isUpToDate && value == x[i]) {
-        return x;
+      value = _intervals[i].perturb(position[i], dPosition[i]);
+      if (!_intervals[i]._isUpToDate && value == position[i]) {
+        return position;
       } else {
         result.add(value);
       }
@@ -375,16 +380,16 @@ class SearchSpace {
   /// maximum and the sample minimum.
   UnmodifiableListView<num> get size => UnmodifiableListView(_size());
 
-  /// Returns true if the point `x` belongs to the search space `this`.
-  bool contains(List<num> x) {
-    if (x.length != dimension) {
+  /// Returns true if the point `position` belongs to the search space `this`.
+  bool contains(List<num> position) {
+    if (position.length != dimension) {
       throw ErrorOfType<IncompatibleVector>(
-          message: 'Error encountered in method: \'contains($x)\'.',
-          invalidState: 'Space dimension $dimension != $x.length.',
+          message: 'Error encountered in method: \'contains($position)\'.',
+          invalidState: 'Space dimension $dimension != $position.length.',
           expectedState: 'The vector argument must have length $dimension.');
     }
     for (var i = 0; i < dimension; ++i) {
-      if (!_intervals[i].contains(x[i])) {
+      if (!_intervals[i].contains(position[i])) {
         return false;
       }
     }
@@ -396,8 +401,8 @@ class SearchSpace {
     final b = StringBuffer();
     b.writeln('Search Space: ');
     b.writeln('  size: $size');
-    b.writeln('  dxMin: $dxMin');
-    b.writeln('  dxMax: $dxMax');
+    b.writeln('  dPositionMin: $dPositionMin');
+    b.writeln('  dPositionMax: $dPositionMax');
     b.writeln('  dimension: $dimension');
     for (var i = 0; i < dimension; ++i) {
       b.writeln('  ${_intervals[i]}'.replaceAll('\n', '\n  '));

@@ -16,8 +16,8 @@ final z = ParametricInterval(
   () => -sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
   () => sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
 );
-final dxMin = <num>[1e-6, 1e-6, 1e-6];
-final space = SearchSpace([x, y, z], dxMin: [1e-6, 1e-6, 1e-6]);
+final dPositionMin = <num>[1e-6, 1e-6, 1e-6];
+final space = SearchSpace([x, y, z], dPositionMin: [1e-6, 1e-6, 1e-6]);
 
 // Defining an energy function.
 // The energy function has a minimum at xMin.
@@ -63,8 +63,8 @@ void main() async {
   final dEnergyStart = await simulatorWithPresets.dEnergyStart;
   final dEnergyEnd = await simulatorWithPresets.dEnergyEnd;
   final temperatures = exponentialSequence(tStart, tEnd);
-  final perturbationMagnitudes =
-      perturbationSequence(temperatures, space.dxMax, space.dxMin);
+  final perturbationMagnitudes = perturbationSequence(
+      temperatures, space.dPositionMax, space.dPositionMin);
 
   group('Simulator:', () {
     test('GammaStart', () {
@@ -94,10 +94,10 @@ void main() async {
   });
   group('Perturbation Magnitudes:', () {
     test('start', () {
-      expect(perturbationMagnitudes.first, space.dxMax);
+      expect(perturbationMagnitudes.first, space.dPositionMax);
     });
     test('end', () {
-      expect(perturbationMagnitudes.last, space.dxMin);
+      expect(perturbationMagnitudes.last, space.dPositionMin);
     });
   });
 }

@@ -26,8 +26,8 @@ typedef PertubationSequence = List<List<num>> Function(
 /// by interpolating between
 /// `dPositionMax` and `dPositionMin`.
 /// * `temperatures`: A sequence of temperatures.
-/// * `dxMax`: The initial perturbation magnitude vector.
-/// * `dxMin`: The final perturbation magnitude vector.
+/// * `dPositionMax`: The initial perturbation magnitude vector.
+/// * `dPositionMin`: The final perturbation magnitude vector.
 List<List<num>> perturbationSequence(
   List<num> temperatures,
   List<num> dPositionMax,
@@ -82,11 +82,11 @@ abstract class Simulator {
   /// * dEnergyStart: Defaults to `field.dEnergyStart`. Can be used for testing
   ///   purposes. It is an estimate of the typical variation of
   ///   the energy function when perturbing the current position randomly with
-  ///   magnitude `dxMax`.
+  ///   magnitude `dPositionMax`.
   /// * dEnergyEnd: Defaults to `field.dEnergyEnd`. Can be used for testing
   ///   purposes. It is an estimate of the typical variation of
   ///   the system energy function when perturbing the current position
-  ///   randomly with magnitude `dxMin`.
+  ///   randomly with magnitude `dPositionMin`.
   Simulator(
     EnergyField field,
     TemperatureSequence temperatureSequence,
@@ -226,10 +226,10 @@ abstract class Simulator {
   num get t => _t;
 
   /// Current perturbation magnitude.
-  late List<num> _dx;
+  late List<num> _dPosition;
 
   /// Current perturbation magnitude.
-  List<num> get dx => List.from(_dx);
+  List<num> get dPosition => List.from(_dPosition);
 
   /// Acceptance probability of current solution.
   late num _acceptanceProbability;
@@ -273,7 +273,7 @@ abstract class Simulator {
 
     if (_recursionCounter == 0) {
       _t = temperatures.first;
-      _dx = perturbationMagnitudes.first;
+      _dPosition = perturbationMagnitudes.first;
       prepareLog();
       recordLog();
     }
@@ -293,12 +293,13 @@ abstract class Simulator {
     // Outer iteration loop.
     for (i; i < temperatures.length; i++) {
       _t = temperatures[i];
-      _dx = perturbationMagnitudes[i];
+      _dPosition = perturbationMagnitudes[i];
 
       // Inner iteration loop.
       for (var j = 0; j < markov(_t); j++) {
         // Choose next random point and calculate energy difference.
-        dE = _field.perturb(_currentMinPosition, _dx) - _currentMinEnergy;
+        dE =
+            _field.perturb(_currentMinPosition, _dPosition) - _currentMinEnergy;
 
         if (dE < 0) {
           _currentMinEnergy = _field.value;

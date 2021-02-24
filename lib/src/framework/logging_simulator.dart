@@ -27,11 +27,11 @@ class LoggingSimulator extends Simulator {
   /// * dEnergyStart: Defaults to `field.dEnergyStart`. Can be used for testing
   ///   purposes. It is an estimate of the typical variation of
   ///   the energy function when perturbing the current position randomly with
-  ///   magnitude `dxMax`.
+  ///   magnitude `dPositionMax`.
   /// * dEnergyEnd: Defaults to `field.dEnergyEnd`. Can be used for testing
   ///   purposes. It is an estimate of the typical variation of
   ///   the system energy function when perturbing the current position
-  ///   randomly with magnitude `dxMin`.
+  ///   randomly with magnitude `dPositionMin`.
   LoggingSimulator(
     EnergyField field,
     TemperatureSequence temperatureSequence,
@@ -88,7 +88,7 @@ class LoggingSimulator extends Simulator {
   List<List<num>> get currentPositionLog => _rec.getVector('x');
 
   /// Returns the current perturbation magnitude log.
-  List<List<num>> get dxLog => _rec.getVector('dx');
+  List<List<num>> get dPositionLog => _rec.getVector('dPosition');
 
   /// Returns the current energy log.
   List<num> get currentEnergyLog => _rec.getScalar('Energy');
@@ -114,7 +114,7 @@ class LoggingSimulator extends Simulator {
   @override
   void recordLog() {
     _rec.addVector('x', currentPosition);
-    _rec.addVector('dx', dx);
+    _rec.addVector('dPosition', dPosition);
     _rec.addScalar('Energy', currentEnergy);
     _rec.addScalar('Energy Min', currentMinEnergy);
     _rec.addScalar('P(dE > 0)', acceptanceProbability);

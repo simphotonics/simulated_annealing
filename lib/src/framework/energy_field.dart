@@ -78,12 +78,12 @@ class EnergyField {
   final SearchSpace _searchSpace;
 
   // Maximum size of the search neighbourhood.
-  UnmodifiableListView<num> get dPositionMax => _searchSpace.dxMax;
+  UnmodifiableListView<num> get dPositionMax => _searchSpace.dPositionMax;
 
   /// Minimum size of the search neighbourhood.
   ///
   /// For continuous problems this parameter determines the solution precision.
-  UnmodifiableListView<num> get dPositionMin => _searchSpace.dxMin;
+  UnmodifiableListView<num> get dPositionMin => _searchSpace.dPositionMin;
 
   /// Size of energy value sample used to
   /// determine the quantities: `mean`, `stdDev`, `max`.
@@ -155,12 +155,12 @@ class EnergyField {
 
   /// Returns the energy standard deviation of the sample obtained
   /// by evaluating the energy at random points around
-  /// `minPosition` with maximum perturbation magnitude `dxMin`.
+  /// `minPosition` with maximum perturbation magnitude `dPositionMin`.
   late final Lazy<Future<num>> _dEnergyEnd;
 
   /// Returns the energy standard deviation of the sample obtained
   /// by evaluating the energy at random points around
-  /// `minPosition` with maximum perturbation magnitude `dxMin`.
+  /// `minPosition` with maximum perturbation magnitude `dPositionMin`.
   Future<num> get dEnergyEnd => _dEnergyEnd();
 
   /// Returns the energy at a point selected randomly
@@ -202,13 +202,13 @@ class EnergyField {
 
   /// Returns a list of energy values sampled from a neighbourhood
   /// around `x` using perturbation
-  /// magnitudes `dx`.
+  /// magnitudes `dPosition`.
   Future<List<num>> sampleNeighbourhood(
     List<num> x,
-    List<num> dx, {
+    List<num> dPosition, {
     int sampleSize = 100,
   }) async =>
-      List<num>.generate(sampleSize, (_) => perturb(x, dx));
+      List<num>.generate(sampleSize, (_) => perturb(x, dPosition));
 
   /// Returns the size of the energy field domain (the search space).
   UnmodifiableListView<num> get size => _searchSpace.size;

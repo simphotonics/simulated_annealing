@@ -29,7 +29,7 @@ final z = ParametricInterval(
   () => -sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
   () => sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
 );
-final space = SearchSpace([x, y, z], dxMin: [1e-4, 1e-4, 1e-4]);
+final space = SearchSpace([x, y, z], dPositionMin: [1e-4, 1e-4, 1e-4]);
 final field = EnergyField(energyFunction, space, sampleSize: 600);
 
 void main(List<String> args) {

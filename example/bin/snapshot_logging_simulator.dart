@@ -28,11 +28,11 @@ class SnapshotLoggingSimulator extends LoggingSimulator {
   /// * dEnergyStart: Defaults to `field.dEnergyStart`. Can be used for testing
   ///   purposes. It is an estimate of the typical variation of
   ///   the energy function when perturbing the current position randomly with
-  ///   magnitude `dxMax`.
+  ///   magnitude `dPositionMax`.
   /// * dEnergyEnd: Defaults to `field.dEnergyEnd`. Can be used for testing
   ///   purposes. It is an estimate of the typical variation of
   ///   the system energy function when perturbing the current position
-  ///   randomly with magnitude `dxMin`.
+  ///   randomly with magnitude `dPositionMin`.
   /// Not included with the framework because the class uses dart:io.
   ///
   SnapshotLoggingSimulator(

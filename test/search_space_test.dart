@@ -21,12 +21,12 @@ void main(List<String> args) {
       expect(interval.next() != prev, true);
     });
     test('perturb', () {
-      final x = 2.8;
-      final dx = 0.4;
+      final position = 2.8;
+      final dPosition = 0.4;
       interval.clearCache();
-      final xRand = interval.perturb(x, dx);
-      expect(x - dx < xRand && xRand < x + dx, true);
-      expect(interval.contains(xRand) || xRand == x, true);
+      final xRand = interval.perturb(position, dPosition);
+      expect(position - dPosition < xRand && xRand < position + dPosition, true);
+      expect(interval.contains(xRand) || xRand == position, true);
     });
     test('contains', () {
       expect(interval.contains(0), true);
@@ -55,13 +55,13 @@ void main(List<String> args) {
       expect(x1.next() != prev, true);
     });
     test('perturb', () {
-      final x = 2.8;
-      final dx = 0.4;
+      final position = 2.8;
+      final dPosition = 0.4;
       x1.clearCache();
-      final xRand = x1.perturb(x, dx);
-      expect(xRand < x + dx, true);
-      expect(x - dx < xRand, true);
-      expect(x1.contains(xRand) || xRand == x, true);
+      final xRand = x1.perturb(position, dPosition);
+      expect(xRand < position + dPosition, true);
+      expect(position - dPosition < xRand, true);
+      expect(x1.contains(xRand) || xRand == position, true);
     });
     test('contains', () {
       expect(x1.contains(0), true);
@@ -76,18 +76,18 @@ void main(List<String> args) {
   group('SearchSpace: Fixed', () {
     final space = SearchSpace(
       [FixedInterval(0, 2), FixedInterval(10, 100)],
-      dxMin: [0.1, 0.1],
+      dPositionMin: [0.1, 0.1],
     );
     test('limits', () {
       final point = space.next();
       expect(<num>[0, 10] < point && point < [2, 100], true);
     });
     test('perturbation', () {
-      final x = <num>[1, 20];
-      final dx = [1e-2, 1e-1];
-      final point = space.perturb(x, dx);
-      expect(x - dx < point && point < x.plus(dx), true);
-      expect(space.contains(point) || match(point, x), true);
+      final position = <num>[1, 20];
+      final dPosition = [1e-2, 1e-1];
+      final point = space.perturb(position, dPosition);
+      expect(position - dPosition < point && point < position.plus(dPosition), true);
+      expect(space.contains(point) || match(point, position), true);
     });
     test('size', () {
       expect(space.size, [2, 90]);
@@ -105,17 +105,17 @@ void main(List<String> args) {
       () => -sqrt(pow(radius, 2) - pow(x1.next(), 2) - pow(x0.next(), 2)),
       () => sqrt(pow(radius, 2) - pow(x1.next(), 2) - pow(x0.next(), 2)),
     );
-    final dxMin = [1e-6, 1e-6, 1e-6];
-    final space = SearchSpace([x0, x1, x2], dxMin: dxMin);
-    final x = [0.5, 0.7, 0.8];
+    final dPositionMin = [1e-6, 1e-6, 1e-6];
+    final space = SearchSpace([x0, x1, x2], dPositionMin: dPositionMin);
+    final position = [0.5, 0.7, 0.8];
     test('next()', () {
       final point = space.next();
       expect(<num>[-2, -2, -2] < point && point < [2, 2, 2], true);
     });
     test('contains()', () {
       expect(space.contains(space.next()), true);
-      final point = space.perturb(x, dxMin);
-      expect(space.contains(point) || match(point, x), true);
+      final point = space.perturb(position, dPositionMin);
+      expect(space.contains(point) || match(point, position), true);
     });
 
     test('size', () {

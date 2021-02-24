@@ -77,10 +77,10 @@ final z = ParametricInterval(
   () => -sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
   () => sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
 );
-final dxMin = <num>[1e-6, 1e-6, 1e-6];
+final dPositionMin = <num>[1e-6, 1e-6, 1e-6];
 // Parameteric intervals must be listed in order of dependence.
 // Example: y depends on x, z depends on x and y => list order: [x, y, z].
-final space = SearchSpace([x, y, z], dxMin: [1e-6, 1e-6, 1e-6]);
+final space = SearchSpace([x, y, z], dPositionMin: [1e-6, 1e-6, 1e-6]);
 
 // Defining an energy function.
 final xGlobalMin = [0.5, 0.7, 0.8];

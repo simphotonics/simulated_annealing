@@ -17,7 +17,7 @@ void main() async {
 
   // Defining a spherical search space.
   // Intervals are listed in order of dependence.
-  final space = SearchSpace([x, y], dxMin: [1e-6, 1e-6]);
+  final space = SearchSpace([x, y], dPositionMin: [1e-6, 1e-6]);
 
   print('Space sizes: ${space.size}.');
 

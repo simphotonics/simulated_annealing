@@ -18,7 +18,7 @@ final z = ParametricInterval(
 
 // Defining a spherical search space.
 // Intervals are listed in order of dependence.
-final space = SearchSpace([x, y, z], dxMin: [1e-6, 1e-6, 1e-6]);
+final space = SearchSpace([x, y, z], dPositionMin: [1e-6, 1e-6, 1e-6]);
 
 void main() async {
   for (var i = 0; i < 10; i++) {
@@ -26,12 +26,12 @@ void main() async {
   }
 
   final xTest = [1.2, 1.0, 0.6];
-  final dx = [0.6, 0.6, 0.6];
+  final dPosition = [0.6, 0.6, 0.6];
 
   final sample = List<List<num>>.generate(2000, (_) => space.next());
 
-  final perturbation = List<List<num>>.generate(
-      500, (_) => space.perturb(xTest, dx));
+  final perturbation =
+      List<List<num>>.generate(500, (_) => space.perturb(xTest, dPosition));
 
   await File('../data/spherical_search_space.dat').writeAsString(
     sample.export(),

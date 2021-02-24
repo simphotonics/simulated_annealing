@@ -43,22 +43,23 @@ void main(List<String> args) {
   });
 
   group('Perturbation magnitudes', () {
-    final dxMax = [10.0, 10.0];
-    final dxMin = [1e-4, 1e-4];
+    final dPositionMax = [10.0, 10.0];
+    final dPositionMin = [1e-4, 1e-4];
     final tStart = 1000.0;
     final tEnd = 1e-2;
     final temperaturesLinear = linearSequence(tStart, tEnd, iterations: 100);
 
     test('linearSchedule', () {
-      final dxLinear = perturbationSequence(temperaturesLinear, dxMax, dxMin);
-      expect(dxLinear[0], dxMax);
-      expect(dxLinear[99], dxMin);
+      final dPositionLinear =
+          perturbationSequence(temperaturesLinear, dPositionMax, dPositionMin);
+      expect(dPositionLinear[0], dPositionMax);
+      expect(dPositionLinear[99], dPositionMin);
     });
     test('exponentialSchedule', () {
-      final dxExponential =
-          perturbationSequence(temperaturesLinear, dxMax, dxMin);
-      expect(dxExponential[0], dxMax);
-      expect(dxExponential[99], dxMin);
+      final dPositionExponential =
+          perturbationSequence(temperaturesLinear, dPositionMax, dPositionMin);
+      expect(dPositionExponential[0], dPositionMax);
+      expect(dPositionExponential[99], dPositionMin);
     });
   });
   group('Markov Chain length', () {

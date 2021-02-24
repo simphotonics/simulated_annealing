@@ -21,7 +21,7 @@ final z = ParametricInterval(
 
 // Defining a spherical search space.
 // Intervals are listed in order of dependence.
-final space = SearchSpace([x, y, z], dxMin: [1e-6, 1e-6, 1e-6]);
+final space = SearchSpace([x, y, z], dPositionMin: [1e-6, 1e-6, 1e-6]);
 
 void main() async {
   for (var i = 0; i < 10; i++) {
@@ -29,12 +29,12 @@ void main() async {
   }
 
   final xTest = [0.8, 0.2, 1.8];
-  final dx = [0.6, 0.6, 0.6];
+  final dPosition = [0.6, 0.6, 0.6];
 
   final sample = List<List<num>>.generate(1200, (_) => space.next());
 
   final perturbation =
-      List<List<num>>.generate(400, (_) => space.perturb(xTest, dx));
+      List<List<num>>.generate(400, (_) => space.perturb(xTest, dPosition));
 
   await File('../data/hemisphere.dat').writeAsString(
     sample.export(),
@@ -43,8 +43,7 @@ void main() async {
     perturbation.export(),
   );
 
-  await File('../data/hemisphere_test_point.dat')
-      .writeAsString('''
+  await File('../data/hemisphere_test_point.dat').writeAsString('''
     # Test Point
     ${[xTest].export()}''');
 

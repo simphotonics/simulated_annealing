@@ -24,7 +24,7 @@ below interval `x` is independent, while `y` depends on `x` and `z` depends on `
 For this reason the variable `space` is initialized using the
 following line of source code:
 ```Dart
-final space = SearchSpace([x, y, z], dxMin: [1e-6, 1e-6, 1e-6]);
+final space = SearchSpace([x, y, z], dPositionMin: [1e-6, 1e-6, 1e-6]);
 ```
 
 <details><summary> Click to show source code.</summary>
@@ -51,10 +51,10 @@ final z = ParametricInterval(
 // Defining a spherical search space.
 // Note: List intervals in order of dependence.
 //
-// Note: dxMax defaults to the space size. If a smaller initial
+// Note: dPositionMax defaults to the space size. If a smaller initial
 //       perturbation magnitude is required it can be specified
 //       as a constructor argument.
-final space = SearchSpace([x, y, z], dxMin: [1e-6, 1e-6, 1e-6]);
+final space = SearchSpace([x, y, z], dPositionMin: [1e-6, 1e-6, 1e-6]);
 
 void main() async {
   for (var i = 0; i < 10; i++) {
@@ -130,7 +130,7 @@ final x = FixedInterval(0, 10);
 final y = ParametricInterval(
       () => gradient * x.next(), () => gradient * x.next());
 // Defining a spherical search space.
-final triangularSpace = SearchSpace([x, y], dxMin: [1e-6, 1e-6]);
+final triangularSpace = SearchSpace([x, y], dPositionMin: [1e-6, 1e-6]);
 ```
 The left figure in the image below shows 2000 points randomly selected from the triangular search space (magenta coloured dots).
 There is an aggreggation of points towards the left side of the search space boundary indicating that the 2D PDF of the search_space `triangularSpace` is non-uniform.
@@ -187,7 +187,7 @@ final x = FixedInterval(0, 10, inverseCdf: inverseCdf);
 final y = ParametricInterval(
       () => gradient * x.next(), () => gradient * x.next());
 // Defining a spherical search space.
-final triangularSpace = SearchSpace([x, y], dxMin: [1e-6, 1e-6]);
+final triangularSpace = SearchSpace([x, y], dPositionMin: [1e-6, 1e-6]);
 ```
 The left figure above shows 2000 points randomly selected using the function `triangularSpace.next()`.
 It is apparent that the random points are distributed uniformly across the search space.
@@ -207,7 +207,7 @@ final phi = FixedInterval(0, 2 * pi);
 final theta = FixedInterval(0, pi);
 
 // Defining a spherical search space.
-final space = SearchSpace([phi, theta], dxMin: [1e-6, 1e-6, 1e-6]);
+final space = SearchSpace([phi, theta], dPositionMin: [1e-6, 1e-6, 1e-6]);
 ```
 The figure below shows 2000 points randomly selected from the search space.
 It is evident that there is an aggregation of points around the polar areas.
@@ -238,7 +238,7 @@ final phi = FixedInterval(0, 2 * pi, inverseCdf: inverseCdf);
 final theta = FixedInterval(0, pi);
 
 // Defining a spherical search space.
-final space = SearchSpace([phi, theta], dxMin: [1e-6, 1e-6, 1e-6]);
+final space = SearchSpace([phi, theta], dPositionMin: [1e-6, 1e-6, 1e-6]);
 ```
 
  The figure below shows 2000 points randomly selected from the search space with a uniform 2D PDF.
