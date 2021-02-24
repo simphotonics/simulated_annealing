@@ -25,7 +25,8 @@ void main(List<String> args) {
       final dPosition = 0.4;
       interval.clearCache();
       final xRand = interval.perturb(position, dPosition);
-      expect(position - dPosition < xRand && xRand < position + dPosition, true);
+      expect(
+          position - dPosition < xRand && xRand < position + dPosition, true);
       expect(interval.contains(xRand) || xRand == position, true);
     });
     test('contains', () {
@@ -86,7 +87,8 @@ void main(List<String> args) {
       final position = <num>[1, 20];
       final dPosition = [1e-2, 1e-1];
       final point = space.perturb(position, dPosition);
-      expect(position - dPosition < point && point < position.plus(dPosition), true);
+      expect(position - dPosition < point && point < position.plus(dPosition),
+          true);
       expect(space.contains(point) || match(point, position), true);
     });
     test('size', () {
