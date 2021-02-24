@@ -32,6 +32,10 @@ set tics font ", 12"
 
 set cbtics font ", 12"
 
+# Reading maximum temperature
+stats '../data/log.dat' using 10 nooutput
+tmax = STATS_max
+
 #set xlabel "X" font ", 14"
 set xrange [ * : * ] noreverse writeback
 set x2range [ * : * ] noreverse writeback
@@ -42,7 +46,7 @@ set y2range [ * : * ] noreverse writeback
 
 #set zlabel "Z" font ", 14"
 set zrange [ * : * ] noreverse writeback
-set cbrange [ 0 : 2000 ] noreverse writeback
+set cbrange [ 0 : tmax ] noreverse writeback
 set rrange [ * : * ] noreverse writeback
 
 set xtics ('-2' -2.0, '-1' -1.0, '0' 0.0, '1' 1.0, '2' 2.0);
@@ -50,7 +54,8 @@ set ytics ('-2' -2.0, '-1' -1.0, '0' 0.0, '1' 1.0, '2' 2.0);
 set ztics ('-2' -2.0, '-1' -1.0, '0' 0.0, '1' 1.0, '2' 2.0);
 
 # Gnuplot script plotting a 3D graph of the system energy.
-set palette defined (2 "blue", 10 "#4444FF99", 20 "#9999FF99", 100 "turquoise",  250 "green", 600 "yellow",  2000 "red" )
+set palette defined (tmax*0.001 "blue", tmax*0.005 "#4444FF99", tmax*0.01 "#9999FF99", \
+  tmax*0.05 "turquoise",  tmax*0.15 "green", tmax*0.45 "yellow",  tmax "red" )
 
 set term pngcairo size 500, 500 font "Sans,12"
 

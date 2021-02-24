@@ -43,6 +43,8 @@ set zrange [ * : * ] noreverse writeback
 set cbrange [ * : * ] noreverse writeback
 set rrange [ * : * ] noreverse writeback
 
+stats '../data/animation/log_0' using 10 nooutput
+scale = 3/STATS_max
 
 
 
@@ -52,7 +54,7 @@ do for [i=0:299] {
 
      plot sprintf('../data/animation/log_%i',i) using 9 ps 2 pt 9 lc "#007300c7" t 'Acceptance Probability', \
        sprintf('../data/animation/log_%i',i) using ($7) ps 1.2 pt 7 lc "#00FFA144" t "System Energy", \
-       sprintf('../data/animation/log_%i',i) using ($10*0.002) w l lw 4  lc "#00FF4545" t 'Temperature * 0.002', \
+       sprintf('../data/animation/log_%i',i) using ($10*scale) w l lw 4  lc "#00FF4545" t sprintf('Temperature * %.2f', scale), \
        sprintf('../data/animation/log_%i',i) using ($1) w l lw 4 lc "#0000c77e"t "X - Coordinate"
 
 }

@@ -28,10 +28,16 @@ set border 31+32+64+256+512 linecolor rgb "#333333" lw 1.5
 #             2048   no effect   top right front
 #             4096   polar       no effect
 
+# Reading maximum temperature
+stats '../data/log.dat' using 10 nooutput
+scale = 3/STATS_max
+# Reading number of iterations.
+records = STATS_records
+
 set tics font ", 16"
 
 set xlabel "Iteration" font ", 20"
-set xrange [ * : * ] noreverse writeback
+set xrange [ * : records ] noreverse writeback
 set x2range [ * : * ] noreverse writeback
 
 set ylabel "" font ", 20"
@@ -44,8 +50,10 @@ set cbrange [ * : * ] noreverse writeback
 set rrange [ * : * ] noreverse writeback
 
 
+
+
 plot '../data/log.dat' using 9 ps 1.0 pt 7 lc "#00cc4433" t 'Acceptance Probability', \
      '../data/log.dat' using ($1) ps 0.75 pt 7 t "X - Coordinate", \
      '../data/log.dat' using ($7) ps 1.25 pt 6 t "System Energy", \
       '../data/log.dat' using 8 ps 0.25 pt 50 lc "magenta" t "Min. System Energy", \
-      '../data/log.dat' using ($10*0.002) with lines lw 2 lc "blue" t 'Temperature * 0.002'
+      '../data/log.dat' using ($10*scale) with lines lw 2 lc "blue" t sprintf('Temperature * %.2f', scale)
