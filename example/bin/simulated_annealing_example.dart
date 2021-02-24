@@ -13,14 +13,14 @@ void main() async {
     field,
     exponentialSequence,
     perturbationSequence,
-    iterations: 450,
+    iterations: 750,
     gammaStart: 0.7,
     gammaEnd: 0.05,
   );
 
   print(await simulator.info);
 
-  final xSol = await simulator.anneal((_) => 3, isRecursive: true, ratio: 0.5);
+  final xSol = await simulator.anneal((_) => 1, isRecursive: true, ratio: 0.5);
   await File('../data/log.dat').writeAsString(simulator.export());
 
   print('Solution: $xSol');
