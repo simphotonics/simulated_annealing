@@ -132,7 +132,8 @@ can be obtained by sampling the energy function E
 at random points in the search space &omega;
 and calculating the sample standard deviation &sigma;<sub>E</sub> [\[3\]][ledesma2008].
 The initial temperature is set such that the initial acceptance probability is:
-P(&Delta;E<sub>start</sub>,T<sub>start</sub>) =  e<sup>-&Delta;E<sub>start</sub>/T<sup>start</sup> = &gamma;<sub>start</sub>.
+P(&Delta;E<sub>start</sub>,T<sub>start</sub>) =  e<sup>-&Delta;E<sub>start</sub>/T<sup>start</sup>
+= &gamma;<sub>start</sub> where &gamma;<sub>start</sub> is simulator parameter with default value 0.7.
 
 For continuous problems, the size of the search region around the current
 solution is gradually contracted
@@ -140,7 +141,8 @@ to &omega;<sub>end</sub> in order to generate a solution with the required preci
 An estimate of &Delta;E<sub>end</sub> can be obtained by sampling the energy at
 points in the neighbourhood around the current minimizing solution and
 calculating the standard deviation. The final annealing temperature T<sub>end</sub> is set such that:
-P(&Delta;E<sub>end</sub>, T<sub>end</sub>) =  e<sup>-&Delta;E<sub>end</sub>/T = &gamma;<sub>end</sub>.
+P(&Delta;E<sub>end</sub>, T<sub>end</sub>) =  e<sup>-&Delta;E<sub>end</sub>/T = &gamma;<sub>end</sub>,
+where &gamma;<sub>end</sub> is simulator parameter with default value 0.05.
 
 The following parameters are required to define an annealing schedule:
 * T<sub>start</sub>, the initial temperature,
