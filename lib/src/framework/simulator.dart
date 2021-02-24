@@ -18,25 +18,25 @@ typedef MarkovChainLength = int Function(num temperature);
 /// magnitude vectors.
 typedef PertubationSequence = List<List<num>> Function(
   List<num> temperatures,
-  List<num> deltaPositionMax,
-  List<num> deltaPositionMin,
+  List<num> dPositionMax,
+  List<num> dPositionMin,
 );
 
 /// Returns a sequence of pertubation magnitude vectors
 /// by interpolating between
-/// `deltaPositionMax` and `deltaPositionMin`.
+/// `dPositionMax` and `dPositionMin`.
 /// * `temperatures`: A sequence of temperatures.
 /// * `dxMax`: The initial perturbation magnitude vector.
 /// * `dxMin`: The final perturbation magnitude vector.
 List<List<num>> perturbationSequence(
   List<num> temperatures,
-  List<num> deltaPositionMax,
-  List<num> deltaPositionMin,
+  List<num> dPositionMax,
+  List<num> dPositionMin,
 ) {
-  final a = (deltaPositionMax - deltaPositionMin) /
-      (temperatures.first - temperatures.last);
-  final b = deltaPositionMax -
-      (deltaPositionMax - deltaPositionMin) *
+  final a =
+      (dPositionMax - dPositionMin) / (temperatures.first - temperatures.last);
+  final b = dPositionMax -
+      (dPositionMax - dPositionMin) *
           (temperatures.first / (temperatures.first - temperatures.last));
   return List<List<num>>.generate(
       temperatures.length, (i) => (a * temperatures[i]).plus(b));
@@ -129,16 +129,16 @@ abstract class Simulator {
       () => _temperatures()
           .then<List<List<num>>>((temperatures) => perturbationSequence(
                 temperatures,
-                _field.deltaPositionMax,
-                _field.deltaPositionMin * 0.5,
+                _field.dPositionMax,
+                _field.dPositionMin * 0.5,
               )),
     );
 
     /// Set initial position:
     if (startPosition != null) {
-      _field.perturb(startPosition, _field.deltaPositionMin * 0.0);
+      _field.perturb(startPosition, _field.dPositionMin * 0.0);
     } else {
-      _field.perturb(_field.minPosition, _field.deltaPositionMin * 0.0);
+      _field.perturb(_field.minPosition, _field.dPositionMin * 0.0);
     }
     _currentMinEnergy = _field.value;
     _currentMinPosition = _field.position;
@@ -179,19 +179,19 @@ abstract class Simulator {
   Future<num> get tEnd => _tEnd();
 
   /// Estimated energy difference when perturbing the current position
-  /// randomly with magnitude `deltaPositionMax`.
+  /// randomly with magnitude `dPositionMax`.
   late final Lazy<Future<num>> _dEnergyStart;
 
   /// Estimated energy difference when perturbing the current position
-  /// randomly with magnitude `deltaPositionMax`.
+  /// randomly with magnitude `dPositionMax`.
   Future<num> get dEnergyStart => _dEnergyStart();
 
   /// Estimated energy difference when perturbing the current position
-  /// randomly with magnitude `deltaPositionMin`.
+  /// randomly with magnitude `dPositionMin`.
   late final Lazy<Future<num>> _dEnergyEnd;
 
   /// Estimated energy difference when perturbing the current position
-  /// randomly with magnitude `deltaPositionMin`.
+  /// randomly with magnitude `dPositionMin`.
   Future<num> get dEnergyEnd => _dEnergyEnd();
 
   /// Current field position.

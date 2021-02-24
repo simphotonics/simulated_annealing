@@ -39,7 +39,7 @@ class EnergyField {
       () => _sample().then(
         (_) => sampleNeighbourhood(
           _minPosition,
-          deltaPositionMax,
+          dPositionMax,
           sampleSize: sampleSize,
         ).then<num>(
           (result) => result.stdDev(),
@@ -50,7 +50,7 @@ class EnergyField {
       () => _dEnergyStart().then(
         (_) => sampleNeighbourhood(
           _minPosition,
-          deltaPositionMin,
+          dPositionMin,
           sampleSize: sampleSize,
         ).then<num>(
           (result) => result.stdDev(),
@@ -78,12 +78,12 @@ class EnergyField {
   final SearchSpace _searchSpace;
 
   // Maximum size of the search neighbourhood.
-  UnmodifiableListView<num> get deltaPositionMax => _searchSpace.dxMax;
+  UnmodifiableListView<num> get dPositionMax => _searchSpace.dxMax;
 
   /// Minimum size of the search neighbourhood.
   ///
   /// For continuous problems this parameter determines the solution precision.
-  UnmodifiableListView<num> get deltaPositionMin => _searchSpace.dxMin;
+  UnmodifiableListView<num> get dPositionMin => _searchSpace.dxMin;
 
   /// Size of energy value sample used to
   /// determine the quantities: `mean`, `stdDev`, `max`.
@@ -135,7 +135,7 @@ class EnergyField {
 
   /// Corrected standard deviation of the energy values at
   /// random positions around `minPosition` with maximum perturbation
-  /// magnitude `deltaPositionMin`.
+  /// magnitude `dPositionMin`.
   late final num stdDevMin;
 
   /// Smallest energy value encountered.
@@ -164,14 +164,14 @@ class EnergyField {
   Future<num> get dEnergyEnd => _dEnergyEnd();
 
   /// Returns the energy at a point selected randomly
-  /// from the region (`position - deltaPosition, position + deltaPosition`).
-  /// * The quantity `deltaPosition` represents a vector. Each component specifies the
+  /// from the region (`position - dPosition, position + dPosition`).
+  /// * The quantity `dPosition` represents a vector. Each component specifies the
   /// max. perturbation magnitude along the corrsponding dimension.
   /// * The new position can be accessed via the getter
   /// `this.position`. The return value of `next()` can
   /// also be accessed via `this.value`.
-  num perturb(List<num> position, List<num> deltaPosition) {
-    _position = _searchSpace.perturb(position, deltaPosition);
+  num perturb(List<num> position, List<num> dPosition) {
+    _position = _searchSpace.perturb(position, dPosition);
     _value = energy(_position);
     if (_value < _minValue) {
       _minValue = _value;
