@@ -87,7 +87,10 @@ The figure above shows the system energy, min. system energy, temperature, and a
 The graphs were generated using [gnuplot] and the scripts are available in the folder `example/gnuplot_scripts`.
 
 The annealing schedule (blue curve) consists of a monotonically decreasing exponential sequence
-with 750 elements, start value T<sub>0</sub> = 100 and end value T<sub>n</sub> = 1e-8. At high temperatures the algorithm explores the entire search space for the x-coordinate (values ranging between -2 and 2), and new solutions are accepted with high probability (red dots along the line y = 1). As the temperature decreases fewer solutions are accepted and the x-coordinate converges towards 0.5.
+with 750 elements, start value T<sub>0</sub> = 100 and end value T<sub>n</sub> = 1e-8.
+At high temperatures the algorithm explores the entire search space for the x-coordinate (values ranging between -2 and 2),
+and new solutions are accepted with high probability (red dots along the line y = 1).
+As the temperature decreases fewer solutions are accepted and the x-coordinate converges towards 0.5.
 
 ![System Energy](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/energy.png)
 ![Temperature 3D](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/temperature.png)
@@ -99,7 +102,9 @@ The figure above (left) shows the
 system energy evaluated at each point selected during the annealing
 process. The energy is represented as a colour and varies between a maximum at 4.0 (red) and a minimum value of 0.0 (blue).
 
-As the energy decreases the solution approaches **x**<sub>glob</sub> = \[0.5, 0.7, 0.8\] asymptotically (blue dots). A typical solution is **x**<sub>min</sub> = \[0.5000000457219432, 0.6999999722831786, 0.800000105007227\]. The solution precision is determined by the minimum value of the perturbation magnitude **dxMin** (see [annealing schedule]).
+As the energy decreases the solution approaches **x**<sub>glob</sub> = \[0.5, 0.7, 0.8\] asymptotically (blue dots).
+A typical solution is **x**<sub>min</sub> = \[0.5000000457219432, 0.6999999722831786, 0.800000105007227\].
+The solution precision is determined by the minimum value of the perturbation magnitude **dxMin** (see [annealing schedule]).
 
 The figure on the right show the temperature during the annealing process. At high temperatures the
 algorithm selects potential solutions from the entire search space. As the temperature decreases
