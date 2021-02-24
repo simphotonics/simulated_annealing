@@ -11,11 +11,11 @@ set tics font ", 12"
 set format y "    %1.E";
 
 set xlabel "Iteration" font ", 12"
-set xrange [ * : 750 ] noreverse writeback
+set xrange [ * : 755 ] noreverse writeback
 set x2range [ * : * ] noreverse writeback
 
 set ylabel "" font ", 12"
-set yrange [ 1e-8 : * ] noreverse writeback
+set yrange [ * : * ] noreverse writeback
 set y2range [ * : * ] noreverse writeback
 
 
