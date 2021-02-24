@@ -1,3 +1,7 @@
+## 0.2.1-nullsafety
+
+- Amended docs.
+
 ## 0.2.0-nullsafety
 
 - Set k<sub>B</sub> &equiv;1. Removed simulator parameter `tEnd`.
