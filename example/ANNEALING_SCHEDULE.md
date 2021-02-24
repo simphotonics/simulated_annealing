@@ -5,13 +5,13 @@ The library `annealing_schedule` includes functions for generating
 *linear*, *geometric*, *normal*, *exponential*, and *Lundy*
 temperature sequences.
 
-These functions have typedef `TemperatureSequence` and can be used as an argument when
-constructing objects of type `Simulator`.
+These functions have typedef [`TemperatureSequence`][TemperatureSequence]
+and can be used as an argument when
+constructing objects of a type that extends the abstract class [`Simulator`][SimulatorClass].
 
 The annealing schedule show below (figure on the left, red line) consists of a monotonically decreasing exponential sequence
 with 750 elements, start value T<sub>start</sub> = 1902.4 and end value T<sub>end</sub> = 1e-3.
-The simulated annealing temperature schedule can be specified via the `Simulator` constructor parameters
-`temperatureSequence` and `iterations`.
+The simulated annealing temperature schedule can be specified via the [`Simulator`][SimulatorClass] constructor parameters `temperatureSequence` and `iterations`.
 
 The green curve represents the first component of the perturbation magnitudes **dx**
 calculated by interpolated between **dxMax**&nbsp;=&nbsp;\[2.0,&nbsp;2.0,&nbsp;2.0\]
@@ -43,3 +43,7 @@ in this example, the solution converges towards the global minimum.
 Please file feature requests and bugs at the [issue tracker].
 
 [issue tracker]: https://github.com/simphotonics/simulated_annealing/issues
+
+[SimulatorClass]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/Simulator-class.html
+
+[TemperatureSequence]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/TemperatureSequence.html
