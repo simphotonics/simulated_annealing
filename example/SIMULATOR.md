@@ -87,7 +87,7 @@ The figure above shows the system energy, min. system energy, temperature, and a
 The graphs were generated using [gnuplot] and the scripts are available in the folder `example/gnuplot_scripts`.
 
 The annealing schedule (blue curve) consists of a monotonically decreasing exponential sequence
-with 750 elements, with start value T<sub>start</sub> = 0.3673892633 andq end value T<sub>end</sub> = 0.0000017939.
+with 750 elements, with start value T<sub>start</sub>&nbsp;=&nbsp;0.3673892633 andq end value T<sub>end</sub>&nbsp;=&nbsp;0.0000017939.
 At high temperatures the algorithm explores the entire search space for the x-coordinate (values ranging between -2 and 2),
 and new solutions are accepted with high probability (red dots along the line y = 1).
 As the temperature decreases fewer solutions are accepted and the x-coordinate converges towards 0.5.
