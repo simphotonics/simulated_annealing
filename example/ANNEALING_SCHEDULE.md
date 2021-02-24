@@ -16,8 +16,8 @@ The green curve represents the first component of the perturbation magnitudes **
 calculated by interpolated between **dPositionMax**&nbsp;=&nbsp;\[2.0,&nbsp;2.0,&nbsp;2.0\]
 and **dPositionMin**&nbsp;=&nbsp;\[1e-6,&nbsp;1e-6,&nbsp;1e-6\] using the
 function: **dPosition**(T)&nbsp;=&nbsp;**a**\*&nbsp;T&nbsp;+&nbsp;**b**,
-where **a**&nbsp;=&nbsp;(**dPositionMax**&nbsp;-&nbsp;**dPositionMin**)/(T<sub>0</sub>&nbsp;-&nbsp;T<sub>n</sub>)
-and **b**&nbsp;=&nbsp;**dPositionMax**&nbsp;-&nbsp;**a**\*t<sub>0</sub>.
+where **a**&nbsp;=&nbsp;(**dPositionMax**&nbsp;-&nbsp;**dPositionMin**)/(T<sub>start</sub>&nbsp;-&nbsp;T<sub>end</sub>)
+and **b**&nbsp;=&nbsp;**dPositionMax**&nbsp;-&nbsp;**a**\*T<sub>start</sub>.
 
 ![Annealing Schedule](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/annealing_schedule.png)
 ![Temperature 3D](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/temperature.png)
