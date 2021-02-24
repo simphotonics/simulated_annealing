@@ -9,8 +9,7 @@ These functions have typedef [`TemperatureSequence`][TemperatureSequence]
 and can be used as an argument when
 constructing objects of a type that extends the abstract class [`Simulator`][SimulatorClass].
 
-The annealing schedule show below (figure on the left, red line) consists of a monotonically decreasing exponential sequence
-with 750 elements, start value T<sub>start</sub> = 1902.4 and end value T<sub>end</sub> = 1e-3.
+The annealing schedule show below (figure on the left, red line) consists of a monotonically decreasing exponential sequence with start value T<sub>start</sub> = 0.3673892633, end value T<sub>end</sub> = 0.0000017939, and with 750 steps.
 The simulated annealing temperature schedule can be specified via the [`Simulator`][SimulatorClass] constructor parameters `temperatureSequence` and `iterations`.
 
 The green curve represents the first component of the perturbation magnitudes **dPosition**
@@ -24,7 +23,7 @@ and **b**&nbsp;=&nbsp;**dPositionMax**&nbsp;-&nbsp;**a**\*t<sub>0</sub>.
 ![Temperature 3D](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/temperature.png)
 
 The perturbation magnitude **dPosition** specifies a region of the search space around
-the current solution **x**. From this region a random point is selected as the
+the current solution **position**. From this region a random point is selected as the
 next potential solution.
 
 SA is typically used to solve discrete optimization problems.
