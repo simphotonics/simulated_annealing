@@ -145,7 +145,8 @@ The following parameters are required to define an annealing schedule:
 * T<sub>start</sub>, the initial temperature,
 * T<sub>end</sub>, the final temperature,
 * the number of (outer) iterations,
-* a function of typedef `TemperatureSequence` that is used to determine the temperature at each (outer) iteration step.
+* a function of type [`TemperatureSequence`][TemperatureSequence]
+  that is used to determine the temperature at each (outer) iteration step.
 
 It is recommended to start with a higher number of
 outer iterations (number of entries in the sequence of temperatures) and log
@@ -184,8 +185,10 @@ works best for a given problem.
 The behaviour of the annealing simulator can be tuned using the following **optional** parameters of the class [`Simulator`][SimulatorClass]:
 * `gammaStart`: Initial acceptance probability with default value 0.7. Useful values for &gamma;<sub>start</sub>
 are in the range of (0.7, 0.9). If &gamma;<sub>start</sub> is too low, up-hill moves are unlikely (potentially) preventing the SA algorithm from
-escaping a local miniumum. If &gamma;<sub>start</sub> is set close to 1.0 the algorithm will accept too many up-hill moves at high temperatures wasting computational time and delaying convergence.
-* `gammaEnd`: Final acceptance probability. Towards the end of the annealing process one assumes that the solution has converged towards the global minimum and up-hill moves should be restricted. For this reason &gamma;<sub>end</sub> has default value 0.05.
+escaping a local miniumum. If &gamma;<sub>start</sub> is set close to 1.0 the algorithm will accept
+too many up-hill moves at high temperatures wasting computational time and delaying convergence.
+* `gammaEnd`: Final acceptance probability. Towards the end of the annealing process one assumes
+   that the solution has converged towards the global minimum and up-hill moves should be restricted. For this reason &gamma;<sub>end</sub> has default value 0.05.
 * `deltaEnergyStart`: A **critical SA parameter** used to estimate the initial temperature T<sub>start</sub>. It has default value `field.deltaEnergyStart`.
    If &Delta;E<sub>start</sub> is too large the algorithm will oscillate wildy between random points and will most likely not converge towards an acceptable solution.
    On the other hand, if &Delta;E<sub>start</sub> is too small up-hill moves are unlikely and the solution
@@ -211,17 +214,25 @@ Please file feature requests and bugs at the [issue tracker][tracker].
 
 [example]: example
 
+[anneal]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/Simulator/anneal.html
+
+[annealing schedule]: example/ANNEALING_SCHEDULE.md
+
 [Boltzmann]: https://en.wikipedia.org/wiki/Boltzmann_constant
 
-[kirkpatrick1983]: https://doi.org/10.1126%2Fscience.220.4598.671
+[energy_field]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/EnergyField-class.html
 
-[nikolaev2010]: https://doi.org/10.1007/978-1-4419-1665-5_1
+[here]: example/SIMULATOR.md
+
+[kirkpatrick1983]: https://doi.org/10.1126%2Fscience.220.4598.671
 
 [ledesma2008]: https://cdn.intechopen.com/pdfs/4631/InTech-Practical_considerations_for_simulated_annealing_implementation.pdf
 
 [LoggingSimulator]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/LoggingSimulator-class.html
 
-[here]: example/SIMULATOR.md
+[MarkovChainLength]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/MarkovChainLength.html
+
+[nikolaev2010]: https://doi.org/10.1007/978-1-4419-1665-5_1
 
 [simulated_annealing]: https://pub.dev/packages/simulated_annealing
 
@@ -231,12 +242,6 @@ Please file feature requests and bugs at the [issue tracker][tracker].
 
 [search space]: example/SEARCH_SPACE.md
 
-[annealing schedule]: example/ANNEALING_SCHEDULE.md
-
 [simulator]: example/SIMULATOR.md
 
-[anneal]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/Simulator/anneal.html
-
-[energy_field]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/EnergyField-class.html
-
-[MarkovChainLength]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/MarkovChainLength.html
+[TemperatureSequence]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/TemperatureSequence.html
