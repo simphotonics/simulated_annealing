@@ -111,26 +111,19 @@ final energyField = EnergyField(
 ```
 </details>
 
-## Estimating the Value of the System Boltzmann Constant
+## Annealing Schedule
 
 The [Boltzmann constant][Boltzmann] k<sub>B</sub> relates the system
 temperature with the kinetic energy of particles in a gas.
 
-In the context of SA,
-k<sub>B</sub> relates the system temperature
-with the probability of accepting a solution:
+In the context of SA, it is customary to set k<sub>B</sub> &equiv; 1.
+With this convention, the probability of accepting the a now solution is given by:
 
-P(&Delta;E > 0, T) = e<sup>-&Delta;E/(k<sub>B</sub>&middot;T)</sup> &nbsp;&nbsp; P(&Delta;E <0, T) = 1.0.
+P(&Delta;E > 0, T) = e<sup>-&Delta;E/T</sup> &nbsp;&nbsp; P(&Delta;E <0, T) = 1.0.
 
 The expression above ensures
 that the acceptance probability decreases with decreasing temperature (for &Delta;E > 0).
 As such, the temperature is a parameter that controls the probability of up-hill moves.
-
-Most authors set k<sub>B</sub> = 1 and scale the temperature to control the
-solution acceptance probability. I find it more practical to use an independent
-temperature scale with the lowest value T<sub>end</sub>
-and calculate the system dependent
-constant k<sub>B</sub> (see section [Algorithm Tuning](#algorithm-tuning)).
 
 An estimate for the average scale of the variation of the energy function &Delta;E
 can be obtained by sampling the energy function E
@@ -141,50 +134,21 @@ For continuous problems, the size of the search region around the current
 solution is gradually contracted
 to &omega;<sub>end</sub> in order to generate a solution with the required precision.
 
-The constant k<sub>B</sub> is fixed such that:
-P(&Delta;E<sub>end</sub>, T<sub>end</sub>) =  e<sup>-&Delta;E<sub>end</sub>/(k<sub>B</sub>&middot;T<sub>end</sub>)</sup> = &gamma;<sub>end</sub>,
-where T<sub>end</sub> is the final annealing temperature.
+The final annealing temperature T<sub>end</sub> is set such that:
+P(&Delta;E<sub>end</sub>, T<sub>end</sub>) =  e<sup>-&Delta;E<sub>end</sub>/T = &gamma;<sub>end</sub>.
 
-The initial temperature is then set such that the initial acceptance probability is:
-P(&Delta;E<sub>start</sub>,T<sub>start</sub>) =  e<sup>-&Delta;E<sub>start</sub>/(k<sub>B</sub>&middot;T<sub>start</sub>)</sup> = &gamma;<sub>start</sub>.
+The initial temperature is set such that the initial acceptance probability is:
+P(&Delta;E<sub>start</sub>,T<sub>start</sub>) =  e<sup>-&Delta;E<sub>start</sub>/T<sup>start</sup> = &gamma;<sub>start</sub>.
 
-
-## Algorithm Tuning
-
-For discrete problems it can be shown that by selecting a sufficiently high initial
-factor k<sub>B</sub>&middot;T
-the algorithm converges to the global minimum if temperture
-decreases on a logarithmic scale (slow cooling schedule) and
-the number of inner iterations (Markov chain length)
-is sufficiently high [\[2\]][nikolaev2010].
-
-Practical implementations of the SA algorithm aim to generate
-an acceptable solution with *minimal* computational effort.
-For such *fast cooling* schedules, algorithm convergence to the global minimum is not
-strictly guaranteed. In that sense, SA is a heuristic approach and some
-degree of trial and error is required to determine which annealing schedule
-works best for a given problem.
-
-The behaviour of the annealing simulator can be tuned using the following **optional** parameters of the class [`Simulator`][SimulatorClass]:
-* `tEnd`: The final annealing temperature with default value 1e-4. It is arbitrary as it is scaled with k<sub>B</sub>.
-* `gammaStart`: Initial acceptance probability with default value 0.7. Useful values for &gamma;<sub>start</sub>
-are in the range of (0.7, 0.9). If &gamma;<sub>start</sub> is too low, up-hill moves are unlikely (potentially) preventing the SA algorithm from
-escaping a local miniumum. If &gamma;<sub>start</sub> is set close to 1.0 the algorithm will accept too many up-hill moves at high temperatures wasting computational time and delaying convergence.
-* `gammaEnd`: Final acceptance probability. Towards the end of the annealing process one assumes that the solution has converged towards the global minimum and up-hill moves should be restricted. For this reason &gamma;<sub>end</sub> has default value 0.05.
-* `deltaEnergyStart`: A **critical SA parameter** used to estimate the initial temperature.
-   If &Delta;E<sub>start</sub> is too large the algorithm will oscillate wildy between random points and will most likely not converge towards an acceptable solution.
-   On the other hand, if &Delta;E<sub>start</sub> is too small up-hill moves are unlikely and the solution
-   most likely converges towards a local minimum or a point situated in a plateau-shaped region.
-* `deltaEnergyEnd`: Typical energy variation &Delta;E if the current position is perturbed within the minimum
-search neighbourhood  &omega;<sub>end</sub>. It is used to calculate k<sub>B</sub>.
-* `iterations`: Determines the number of temperature steps in the annealing schedule.
-
-### Selecting an annealing schedule.
+The following parameters are required to define an annealing schedule:
+* T<sub>start</sub>, the initial temperature,
+* T<sub>end</sub>, the final temperature,
+* the number of (outer) iterations,
+* a function of typedef `TemperatureSequence` that is used to determine the temperature at each (outer) iteration step.
 
 It is recommended to start with a higher number of
 outer iterations (number of entries in the sequence of temperatures) and log
 quantities like the current system energy, temperature, and the intermediate solutions.
-
 
 The figure below shows a typical SA log where the x-coordinate of the solution (green dots)
 converges asymptotically to 0.5.
@@ -198,6 +162,36 @@ see method [`anneal`][anneal].
 
 For fast cooling schedules convergence to an acceptable solution can be improved by
 increasing the number of inner iterations.
+
+
+## Algorithm Tuning
+
+For discrete problems it can be shown that by selecting a sufficiently high initial
+temperature the algorithm converges to the global minimum if the temperature
+decreases on a logarithmic scale (slow cooling schedule) and
+the number of inner iterations (Markov chain length)
+is sufficiently high [\[2\]][nikolaev2010].
+
+Practical implementations of the SA algorithm aim to generate
+an acceptable solution with *minimal* computational effort.
+For such *fast cooling* schedules, algorithm convergence to the global minimum is not
+strictly guaranteed. In that sense, SA is a heuristic approach and some
+degree of trial and error is required to determine which annealing schedule
+works best for a given problem.
+
+
+The behaviour of the annealing simulator can be tuned using the following **optional** parameters of the class [`Simulator`][SimulatorClass]:
+* `gammaStart`: Initial acceptance probability with default value 0.7. Useful values for &gamma;<sub>start</sub>
+are in the range of (0.7, 0.9). If &gamma;<sub>start</sub> is too low, up-hill moves are unlikely (potentially) preventing the SA algorithm from
+escaping a local miniumum. If &gamma;<sub>start</sub> is set close to 1.0 the algorithm will accept too many up-hill moves at high temperatures wasting computational time and delaying convergence.
+* `gammaEnd`: Final acceptance probability. Towards the end of the annealing process one assumes that the solution has converged towards the global minimum and up-hill moves should be restricted. For this reason &gamma;<sub>end</sub> has default value 0.05.
+* `deltaEnergyStart`: A **critical SA parameter** used to estimate the initial temperature T<sub>start</sub>. It has default value `field.deltaEnergyStart`.
+   If &Delta;E<sub>start</sub> is too large the algorithm will oscillate wildy between random points and will most likely not converge towards an acceptable solution.
+   On the other hand, if &Delta;E<sub>start</sub> is too small up-hill moves are unlikely and the solution
+   most likely converges towards a local minimum or a point situated in a plateau-shaped region.
+* `deltaEnergyEnd`: Typical energy variation &Delta;E if the current position is perturbed within the minimum
+search neighbourhood  &omega;<sub>end</sub>. It is used to calculate T<sub>end</sub>.
+* `iterations`: Determines the number of temperature steps in the annealing schedule.
 
 ## Examples
 

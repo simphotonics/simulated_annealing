@@ -56,25 +56,22 @@ final simulatorWithPresets = LoggingSimulator(
 );
 
 void main() async {
-  final kB = await simulator.kB;
   final tStart = await simulator.tStart;
+  final tEnd = await simulator.tEnd;
   final dE = await simulator.dEnergyStart;
   final result = await simulator.anneal((num temperature) => 1);
   final dEnergyStart = await simulatorWithPresets.dEnergyStart;
   final dEnergyEnd = await simulatorWithPresets.dEnergyEnd;
-  final temperatures = exponentialSequence(tStart, simulator.tEnd);
+  final temperatures = exponentialSequence(tStart, tEnd);
   final perturbationMagnitudes =
       perturbationSequence(temperatures, space.dxMax, space.dxMin);
 
   group('Simulator:', () {
     test('GammaStart', () {
-      expect(exp(-dE / (kB * tStart)), simulator.gammaStart);
+      expect(exp(-dE / tStart), simulator.gammaStart);
     });
     test('Convergence', () {
       expect(result, xGlobalMin, precision: 1e-5);
-    });
-    test('tEnd', () {
-      expect(simulator.tEnd, 1e-3);
     });
     test('dEnergyStart', () {
       expect(dEnergyStart, 0.5);
@@ -82,7 +79,6 @@ void main() async {
     test('dEnergyEnd', () {
       expect(dEnergyEnd, 1e-6);
     });
-
     test('startPosition', () {
       expect(simulatorWithPresets.currentPosition, [0, 0, 0]);
       expect(

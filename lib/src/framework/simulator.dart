@@ -70,7 +70,6 @@ abstract class Simulator {
   /// ----
   ///
   /// Optional parameters:
-  /// * tEnd: The system temperature at the end of the annealing process.
   /// * gammaStart: Probability of solution acceptance if `dE == dEnergyStart`
   ///   and the temperature is the initial temperature of the annealing process.
   /// * gammaEnd: Probability of solution acceptance if `dE == dEnergyEnd`
@@ -78,7 +77,7 @@ abstract class Simulator {
   /// * iterations: Number of iterations when cooling
   ///   the system from the initial annealing
   ///   temperature to the final temperature `tEnd`.
-  /// * xStart: Defaults to `field.minPosition`. Can be used to specify the
+  /// * startPosition: Defaults to `field.minPosition`. Can be used to specify the
   ///   starting point of the simulated annealing process.
   /// * dEnergyStart: Defaults to `field.dEnergyStart`. Can be used for testing
   ///   purposes. It is an estimate of the typical variation of
@@ -92,7 +91,6 @@ abstract class Simulator {
     EnergyField field,
     TemperatureSequence temperatureSequence,
     PertubationSequence perturbationSequence, {
-    this.tEnd = 1e-4,
     this.gammaStart = 0.7,
     this.gammaEnd = 0.05,
     this.iterations = 750,
@@ -111,18 +109,22 @@ abstract class Simulator {
           ? _field.dEnergyEnd
           : Future<num>.value(dEnergyEnd),
     );
-    _kB = Lazy<Future<num>>(
-      () =>
-          this.dEnergyEnd.then((value) => -value / (tEnd * math.log(gammaEnd))),
+
+    _tEnd = Lazy<Future<num>>(
+      () => this.dEnergyEnd.then(
+            (dE) => -dE / math.log(gammaEnd),
+          ),
     );
+
     _tStart = Lazy<Future<num>>(
-      () => Future.wait([this.dEnergyStart, kB])
-          .then((value) => -value[0] / (value[1] * math.log(gammaStart))),
+      () => this.dEnergyStart.then((dE) => -dE / math.log(gammaStart)),
     );
+
     _temperatures = Lazy<Future<List<num>>>(
-      () => tStart.then<List<num>>((_tStart) =>
-          temperatureSequence(_tStart, tEnd, iterations: iterations)),
+      () => Future.wait([tStart, tEnd])
+          .then((t) => temperatureSequence(t[0], t[1], iterations: iterations)),
     );
+
     _perturbationMagnitudes = Lazy<Future<List<List<num>>>>(
       () => _temperatures()
           .then<List<List<num>>>((temperatures) => perturbationSequence(
@@ -154,16 +156,6 @@ abstract class Simulator {
   /// `dE = dEnergyEnd`.
   final num gammaEnd;
 
-  /// System Boltzmann constant.
-  late final Lazy<Future<num>> _kB;
-
-  /// System Boltzmann constant. Relates the temperature to
-  /// the acceptance probability if `dE = E - E_min > 0`.
-  /// * `P(dE > 0, T) = exp(-dE / (kB * T))`: Uphill moves are accepted with
-  /// probability `P(dE > 0, T)`.
-  /// * Note: `P(dE < 0, T) = 1.0`: Downhill moves are always accepted.
-  Future<num> get kB async => await _kB();
-
   /// Number of outer simulated annealing iterations. Iterations at
   /// decreasing temperature.
   int iterations;
@@ -181,7 +173,10 @@ abstract class Simulator {
   Future<num> get tStart => _tStart();
 
   /// Final annealing temperature.
-  final num tEnd;
+  late final Lazy<Future<num>> _tEnd;
+
+  /// Final annealing temperature.
+  Future<num> get tEnd => _tEnd();
 
   /// Estimated energy difference when perturbing the current position
   /// randomly with magnitude `deltaPositionMax`.
@@ -271,8 +266,6 @@ abstract class Simulator {
     num ratio = 0.5,
     bool isVerbose = false,
   }) async {
-    final kB = await this.kB;
-
     /// Initialize parameters:
     final temperatures = await _temperatures();
     final perturbationMagnitudes = await _perturbationMagnitudes();
@@ -312,7 +305,7 @@ abstract class Simulator {
           _currentMinPosition = _field.position;
           _acceptanceProbability = 1.0;
         } else {
-          _acceptanceProbability = math.exp(-dE / (kB * _t));
+          _acceptanceProbability = math.exp(-dE / _t);
           if (_acceptanceProbability > Interval.random.nextDouble()) {
             _currentMinEnergy = _field.value;
             _currentMinPosition = _field.position;
@@ -354,7 +347,6 @@ abstract class Simulator {
     b.writeln('  iterations: $iterations');
     b.writeln('  dEnergyStart: ${await dEnergyStart}');
     b.writeln('  dEnergyEnd: ${await dEnergyEnd}');
-    b.writeln('  kB: ${await _kB()}');
     b.writeln('  xMin: ${_field.minPosition}');
     b.writeln('  tStart: ${await tStart}');
     b.writeln('  tEnd: ${await tEnd}');

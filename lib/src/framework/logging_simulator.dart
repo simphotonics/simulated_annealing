@@ -15,7 +15,6 @@ class LoggingSimulator extends Simulator {
   ///   It specifies the perturbation magnitudes for each annealing temperature.
   /// ----
   /// Optional parameters:
-  /// * tEnd: The system temperature at the end of the annealing process.
   /// * gammaStart: Probability of solution acceptance if `dE == dEnergyStart`
   ///   and the temperature is the initial temperature of the annealing process.
   /// * gammaEnd: Probability of solution acceptance if `dE == dEnergyEnd`
@@ -23,7 +22,7 @@ class LoggingSimulator extends Simulator {
   /// * iterations: Number of iterations when cooling
   ///   the system from the initial annealing
   ///   temperature to the final temperature `tEnd`.
-  /// * xStart: Defaults to `field.minPosition`. Can be used to specify the
+  /// * startPosition: Defaults to `field.minPosition`. Can be used to specify the
   ///   starting point of the simulated annealing process.
   /// * dEnergyStart: Defaults to `field.dEnergyStart`. Can be used for testing
   ///   purposes. It is an estimate of the typical variation of
@@ -37,10 +36,9 @@ class LoggingSimulator extends Simulator {
     EnergyField field,
     TemperatureSequence temperatureSequence,
     PertubationSequence perturbationSequence, {
-    tEnd = 1e-3,
-    gammaStart = 0.8,
-    gammaEnd = 0.1,
-    iterations = 750,
+    num gammaStart = 0.8,
+    num gammaEnd = 0.1,
+    int iterations = 750,
     List<num>? startPosition,
     num? dEnergyStart,
     num? dEnergyEnd,
@@ -48,7 +46,6 @@ class LoggingSimulator extends Simulator {
           field,
           temperatureSequence,
           perturbationSequence,
-          tEnd: tEnd,
           gammaStart: gammaStart,
           gammaEnd: gammaEnd,
           iterations: iterations,
