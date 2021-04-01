@@ -3,7 +3,7 @@
 
 ## Usage
 
-The class [`SearchSpace`][SearchSpace] is can be used to define multi-dimensional regions
+The class [`SearchSpace`][SearchSpace] can be used to define multi-dimensional regions
 from which points are randomly sampled.
 A search space is defined in terms of intervals along each dimension.
 
@@ -24,7 +24,7 @@ below interval `x` is independent, while `y` depends on `x` and `z` depends on `
 For this reason the variable `space` is initialized using the
 following line of source code:
 ```Dart
-final space = SearchSpace([x, y, z], dPositionMin: [1e-6, 1e-6, 1e-6]);
+final space = SearchSpace([x, y, z]);
 ```
 
 <details><summary> Click to show source code.</summary>
@@ -38,29 +38,16 @@ import 'package:simulated_annealing/simulated_annealing.dart';
 
 // Define intervals.
 final radius = 2;
-var x = FixedInterval(-radius, radius);
-final y = ParametricInterval(
-  () => -sqrt(pow(radius, 2) - pow(x.next(), 2)),
-  () => sqrt(pow(radius, 2) - pow(x.next(), 2)),
-);
-final z = ParametricInterval(
-  () => -sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
-  () => sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
-);
+final x = FixedInterval(-radius, radius);
 
-// Defining a spherical search space.
-// Note: List intervals in order of dependence.
-//
-// Note: dPositionMax defaults to the space size. If a smaller initial
-//       perturbation magnitude is required it can be specified
-//       as a constructor argument.
-final space = SearchSpace([x, y, z], dPositionMin: [1e-6, 1e-6, 1e-6]);
+num yLimit() => sqrt(pow(radius, 2) - pow(x.next(), 2));
+final y = ParametricInterval(() => -yLimit(), yLimit);
+
+num zLimit() => sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2));
+final z = ParametricInterval(() => -zLimit(), zLimit);
+final space = SearchSpace([x, y, z]);
 
 void main() async {
-  for (var i = 0; i < 10; i++) {
-    print(space.estimateSize());
-  }
-
   final xTest = [1.2, 1.0, 0.6];
   final dPosition = [0.6, 0.6, 0.6];
 
@@ -86,8 +73,6 @@ void main() async {
   // # gnuplot
   // gnuplot> load 'spherical_search_space.gp'
 }
-
-
 ```
 </details>
 
@@ -207,7 +192,7 @@ final phi = FixedInterval(0, 2 * pi);
 final theta = FixedInterval(0, pi);
 
 // Defining a spherical search space.
-final space = SearchSpace([phi, theta], dPositionMin: [1e-6, 1e-6, 1e-6]);
+final space = SearchSpace([phi, theta]);
 ```
 The figure below shows 2000 points randomly selected from the search space.
 It is evident that there is an aggregation of points around the polar areas.

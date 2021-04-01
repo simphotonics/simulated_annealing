@@ -1,6 +1,7 @@
 # Simulated Annealing For Dart
 [![Build Status](https://travis-ci.com/simphotonics/simulated_annealing.svg?branch=main)](https://travis-ci.com/simphotonics/simulated_annealing)
 
+
 ## Introduction
 [Simulated annealing][SA-Wiki] (SA) is an algorithm aimed at finding the *global* minimum
 of a function E(x<sub>0</sub>,&nbsp;x<sub>1</sub>,&nbsp;...,&nbsp;x<sub>n</sub>)
@@ -65,47 +66,42 @@ import 'package:list_operators/list_operators.dart';
 import 'package:simulated_annealing/simulated_annealing.dart';
 
 void main() async {
-
   // Defining a spherical space.
-final radius = 2;
-final x = FixedInterval(-radius, radius);
-final y = ParametricInterval(
-  () => -sqrt(pow(radius, 2) - pow(x.next(), 2)),
-  () => sqrt(pow(radius, 2) - pow(x.next(), 2)),
-);
-final z = ParametricInterval(
-  () => -sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
-  () => sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
-);
-final dPositionMin = <num>[1e-6, 1e-6, 1e-6];
-// Parameteric intervals must be listed in order of dependence.
-// Example: y depends on x, z depends on x and y => list order: [x, y, z].
-final space = SearchSpace([x, y, z], dPositionMin: [1e-6, 1e-6, 1e-6]);
+  final radius = 2;
+  final x = FixedInterval(-radius, radius);
 
-// Defining an energy function.
-final xGlobalMin = [0.5, 0.7, 0.8];
-final xLocalMin = [-1.0, -1.0, -0.5];
-num energy(List<num> x) {
-  return 4.0 -
-      4.0 * exp(-4 * xGlobalMin.distance(x)) -
-      2.0 * exp(-6 * xLocalMin.distance(x));
-}
+  num yLimit() => sqrt(pow(radius, 2) - pow(x.next(), 2));
+  final y = ParametricInterval(() => -yLimit(), yLimit);
 
-// Constructing an instance of `EnergyField`.
-final energyField = EnergyField(
-  energy,
-  space,
-);
-  // Constructing an instance of `LoggingSimulator`.
-  final simulator = LoggingSimulator(energyField, exponentialSequence,
-      iterations: 750, gammaStart: 0.7, gammaEnd: 0.05);
+  num zLimit() => sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2));
+  final z = ParametricInterval(() => -zLimit(), zLimit);
 
+  // Parameteric intervals must be listed in order of dependence.
+  // Example: y depends on x, z depends on x and y => list order: [x, y, z].
+  final space = SearchSpace([x, y, z]);
+
+  // Defining an energy function.
+  final xGlobalMin = [0.5, 0.7, 0.8];
+  final xLocalMin = [-1.0, -1.0, -0.5];
+  num energy(List<num> x) {
+    return 4.0 -
+        4.0 * exp(-4 * xGlobalMin.distance(x)) -
+        2.0 * exp(-6 * xLocalMin.distance(x));
+  }
+
+  // Constructing an instance of `EnergyField`.
+  final energyField = EnergyField(
+    energy,
+    space,
+  );
+  print(simulator);
   print(await simulator.info);
 
-  final xSol = await simulator.anneal((_) => 1, isRecursive: true);
-  await File('../data/log.dat').writeAsString(simulator.rec.export());
+  final xSol = await simulator.anneal((_) => 1, isRecursive: true, ratio: 0.5);
+  await File('example/data/log.dat').writeAsString(simulator.export());
 
   print('Solution: $xSol');
+
 }
 
 ```
@@ -194,12 +190,6 @@ escaping a local miniumum. If &gamma;<sub>start</sub> is set close to 1.0 the al
 too many up-hill moves at high temperatures wasting computational time and delaying convergence.
 * `gammaEnd`: Final acceptance probability. Towards the end of the annealing process one assumes
    that the solution has converged towards the global minimum and up-hill moves should be restricted. For this reason &gamma;<sub>end</sub> has default value 0.05.
-* `dEnergyStart`: A **critical SA parameter** used to estimate the initial temperature T<sub>start</sub>. It has default value `field.dEnergyStart`.
-   If &Delta;E<sub>start</sub> is too large the algorithm will oscillate wildy between random points and will most likely not converge towards an acceptable solution.
-   On the other hand, if &Delta;E<sub>start</sub> is too small up-hill moves are unlikely and the solution
-   most likely converges towards a local minimum or a point situated in a plateau-shaped region.
-* `dEnergyEnd`: Typical energy variation &Delta;E if the current position is perturbed within the minimum
-search neighbourhood  &omega;<sub>end</sub>. It is used to calculate T<sub>end</sub>.
 * `iterations`: Determines the number of temperature steps in the annealing schedule.
 
 ## Examples
