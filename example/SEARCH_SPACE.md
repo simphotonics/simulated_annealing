@@ -135,8 +135,8 @@ interval boundaries and the inverse cummulative distribution function (iCDF) is 
 
 cdf<sup>-1</sup>(p,&nbsp;x<sub>min</sub>,&nbsp;x<sub>max</sub>) = x<sub>min</sub> + (x<sub>max</sub> - x<sub>min</sub>)&middot;p &nbsp;&nbsp;&nbsp;where p &in; \[0, 1\].
 
-The iCDF is the function used internally to select the next random value.
-The graph on the right above shows the implicit iCDF of the interval `x` for different interval
+The function iCDF maps a random number in the interval \[0, 1\) to a random number in the interval \[x<sub>min</sub>, x<sub>max</sub>\).
+The graph on the right above shows the *implicit* iCDF of the interval `x` for different interval
 boundaries.
 
 ---
