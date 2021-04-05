@@ -1,15 +1,17 @@
 import 'package:exception_templates/exception_templates.dart';
-import 'package:minimal_test/minimal_test.dart';
+import 'package:test/test.dart';
 
 import 'package:simulated_annealing/simulated_annealing.dart';
 
-final rec = NumericalDataRecorder();
-
 void main() {
   group('getDimension:', () {
-    expect(rec.getDimension('non-existent'), -1);
+    final rec = NumericalDataRecorder();
+    test('non-existent record', () {
+      expect(rec.getDimension('non-existent'), -1);
+    });
   });
   group('adding entries:', () {
+    final rec = NumericalDataRecorder();
     test('scalar', () {
       rec.addScalar('temperature', 100);
       expect(rec.getScalar('temperature'), [100.0]);
@@ -32,11 +34,15 @@ void main() {
     });
   });
   group('Errors:', () {
+    final rec = NumericalDataRecorder();
     test('Adding an empty list.', () {
       try {
         rec.addVector('position', []);
       } on ErrorOf<DataRecorder> catch (e) {
-        expect(e.message, 'Could not add list: [] with label: position.');
+        expect(
+            e.message,
+            anyOf('Could not prepare storage for vector \'label\'.',
+                'Could not add list: [] with label: position.'));
       }
     });
     test('Adding a list with wrong length.', () {

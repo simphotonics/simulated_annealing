@@ -1,65 +1,111 @@
-import 'package:minimal_test/minimal_test.dart';
+import 'package:list_operators/list_operators.dart';
+import 'package:test/test.dart';
 import 'package:simulated_annealing/simulated_annealing.dart';
 
-void main(List<String> args) {
+void main() {
   // Testing class: Interval.
   group('Initial temperature', () {
     final tStart = 100.0;
     final tEnd = 1e-3;
+    final delta = 1e-12;
     test('linear', () {
-      expect(linearSequence(tStart, tEnd, iterations: 50).first, tStart);
+      expect(
+        linearSequence(tStart, tEnd, iterations: 50).first,
+        closeTo(tStart, delta),
+      );
     });
     test('exponential', () {
-      expect(exponentialSequence(tStart, tEnd, iterations: 50).first, tStart);
+      expect(
+        exponentialSequence(tStart, tEnd, iterations: 50).first,
+        closeTo(tStart, delta),
+      );
     });
     test('normal', () {
-      expect(normalSequence(tStart, tEnd, iterations: 50).first, tStart);
+      expect(
+        normalSequence(tStart, tEnd, iterations: 50).first,
+        closeTo(tStart, delta),
+      );
     });
     test('geometric', () {
-      expect(geometricSequence(tStart, tEnd, iterations: 50).first, tStart);
+      expect(
+        geometricSequence(tStart, tEnd, iterations: 50).first,
+        closeTo(tStart, delta),
+      );
     });
     test('lundy', () {
-      expect(lundySequence(tStart, tEnd, iterations: 100).last, tEnd);
+      expect(
+        lundySequence(tStart, tEnd, iterations: 100).last,
+        closeTo(tEnd, delta),
+      );
     });
   });
   group('Final temperature', () {
     final tStart = 100.0;
     final tEnd = 1e-3;
+    final delta = 1e-12;
     test('linear', () {
-      expect(linearSequence(tStart, tEnd, iterations: 50).last, tEnd);
+      expect(
+        linearSequence(tStart, tEnd, iterations: 50).last,
+        closeTo(tEnd, delta),
+      );
     });
     test('exponential', () {
-      expect(exponentialSequence(tStart, 1e-3, iterations: 50).last, tEnd);
+      expect(
+        exponentialSequence(tStart, 1e-3, iterations: 50).last,
+        closeTo(tEnd, delta),
+      );
     });
     test('normal', () {
-      expect(normalSequence(tStart, 1e-3, iterations: 50).last, tEnd);
+      expect(
+        normalSequence(tStart, 1e-3, iterations: 50).last,
+        closeTo(tEnd, delta),
+      );
     });
     test('geometric', () {
-      expect(geometricSequence(tStart, tEnd, iterations: 50).last, tEnd);
+      expect(
+        geometricSequence(tStart, tEnd, iterations: 50).last,
+        closeTo(tEnd, delta),
+      );
     });
     test('lundy', () {
-      expect(lundySequence(tStart, tEnd, iterations: 100).last, tEnd);
+      expect(
+        lundySequence(tStart, tEnd, iterations: 100).last,
+        closeTo(tEnd, delta),
+      );
     });
   });
 
   group('Perturbation magnitudes', () {
-    final dPositionMax = [10.0, 10.0];
-    final dPositionMin = [1e-4, 1e-4];
+    final deltaPositionMax = [10.0, 10.0];
+    final deltaPositionMin = [1e-4, 1e-4];
     final tStart = 1000.0;
     final tEnd = 1e-2;
     final temperaturesLinear = linearSequence(tStart, tEnd, iterations: 100);
+    final delta = [1e-12, 1e-12];
 
     test('linearSchedule', () {
-      final dPositionLinear =
-          perturbationSequence(temperaturesLinear, dPositionMax, dPositionMin);
-      expect(dPositionLinear[0], dPositionMax);
-      expect(dPositionLinear[99], dPositionMin);
+      final deltaPositionLinear = defaultPerturbationSequence(
+          temperaturesLinear, deltaPositionMax, deltaPositionMin);
+      expect(
+        deltaPositionLinear[0],
+        orderedCloseTo(deltaPositionMax, delta),
+      );
+      expect(
+        deltaPositionLinear[99],
+        orderedCloseTo(deltaPositionMin, delta),
+      );
     });
     test('exponentialSchedule', () {
-      final dPositionExponential =
-          perturbationSequence(temperaturesLinear, dPositionMax, dPositionMin);
-      expect(dPositionExponential[0], dPositionMax);
-      expect(dPositionExponential[99], dPositionMin);
+      final deltaPositionExponential = defaultPerturbationSequence(
+          temperaturesLinear, deltaPositionMax, deltaPositionMin);
+      expect(
+        deltaPositionExponential[0],
+        orderedCloseTo(deltaPositionMax, delta),
+      );
+      expect(
+        deltaPositionExponential[99],
+        orderedCloseTo(deltaPositionMin, delta),
+      );
     });
   });
   group('Markov Chain length', () {
@@ -72,7 +118,12 @@ void main(List<String> args) {
       expect(markovChainLength(tEnd, tStart: tStart, tEnd: tEnd), 20);
     });
     test('Interpolated value', () {
-      expect(markovChainLength((tStart - tEnd) / 2, tStart: tStart, tEnd: tEnd),
+      expect(
+          markovChainLength(
+            (tStart - tEnd) / 2,
+            tStart: tStart,
+            tEnd: tEnd,
+          ),
           13);
     });
   });
