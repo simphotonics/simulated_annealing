@@ -31,7 +31,7 @@ set border 31+32+64+256+512 linecolor rgb "#333333" lw 1.5
 set tics font ", 14"
 
 set xlabel "Iteration" font ", 14"
-set xrange [ * : 300 ] noreverse writeback
+set xrange [ * : 750] noreverse writeback
 set x2range [ * : * ] noreverse writeback
 
 #set ylabel "" font ", 20"
@@ -48,7 +48,7 @@ scale = 3/STATS_max
 
 
 
-do for [i=0:299] {
+do for [i=0:21] {
     print(i);
     set output sprintf('../plots/animation/convergence_%i.png', i)
 
