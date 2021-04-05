@@ -134,7 +134,7 @@ works best for a given problem.
 
 The behaviour of the annealing simulator can be tuned using the following **optional** parameters of the [`Simulator`][SimulatorClass] constructor:
 * `gammaStart`: Initial acceptance probability with default value 0.7. Useful values for &gamma;<sub>start</sub>
-are in the range of (0.7, 0.9). If &gamma;<sub>start</sub> is too low, up-hill moves are unlikely (potentially) preventing the SA algorithm from
+are in the range of \[0.7,&nbsp;0.9\]. If &gamma;<sub>start</sub> is too low, up-hill moves are unlikely (potentially) preventing the SA algorithm from
 escaping a local miniumum. If &gamma;<sub>start</sub> is set close to 1.0 the algorithm will accept
 too many up-hill moves at high temperatures wasting computational time and delaying convergence.
 * `gammaEnd`: Final acceptance probability. Towards the end of the annealing process one assumes
@@ -162,36 +162,16 @@ increasing the number of inner iterations.
 
 ## Annealing Schedule
 
-The following information is required to define an annealing schedule:
+In general, the following information is required to define an annealing schedule:
 * T<sub>start</sub>, the initial temperature,
 * T<sub>end</sub>, the final temperature,
 * the number of (outer) iterations,
 * a function of type [`TemperatureSequence`][TemperatureSequence]
   that is used to determine the temperature at each (outer) iteration step.
 
-An estimate for the average scale of the variation of the energy
-function &Delta;E<sub>start</sub>
-can be obtained by sampling the energy function E
-at random points in the search space &omega;
-and calculating the sample standard deviation &sigma;<sub>E</sub> [\[2\]][ledesma2008].
-The initial temperature is set such that the initial acceptance probability is:
-
-P(&Delta;E<sub>start</sub>,T<sub>start</sub>) =  e<sup>-&Delta;E<sub>start</sub>/T<sub>start</sub></sup>
-= &gamma;<sub>start</sub>, where &gamma;<sub>start</sub> is a simulator parameter with default value 0.7.
-
-For continuous problems, the size of the search region around the current
-solution is gradually contracted to
-&omega;<sub>end</sub> in order to generate a solution with the required precision.
-An estimate of &Delta;E<sub>end</sub> can be obtained by sampling the energy at
-points in the neighbourhood around the current minimizing solution and
-calculating the standard deviation. The final annealing temperature T<sub>end</sub> is set such that:
-
-P(&Delta;E<sub>end</sub>, T<sub>end</sub>) =  e<sup>-&Delta;E<sub>end</sub>/T<sub>end</sub></sup> = &gamma;<sub>end</sub>,
-where &gamma;<sub>end</sub> is a simulator parameter with default value 0.05.
-
-The class [`EnergyField`][EnergyField] provides the methods `start` and `tend`. These use
+The class [`EnergyField`][EnergyField] provides the methods `tStart` and `tEnd`. These use
 the algorithm introduced by Bem-Ameur to calculate the
-initial and final annealing temperature [\[3\]][ben-ameur2004].
+initial and final annealing temperature [\[2\]][ben-ameur2004].
 
 
 ## Examples
