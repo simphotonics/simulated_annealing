@@ -15,13 +15,11 @@ final theta = FixedInterval(0, pi); //, inverseCdf: inverseCdf);
 final phi = FixedInterval(0, 2 * pi);
 
 // Defining a spherical search space.
-final space = SearchSpace([phi, theta], dPositionMin: [1e-6, 1e-6, 1e-6]);
+final space = SearchSpace([phi, theta]);
 
 void main() async {
   final testPointSC = [2 * pi - 0.5, pi / 4];
   final magnitudesSC = [pi / 8, pi / 8];
-
-  print(space.perturb(testPointSC, magnitudesSC));
 
   final testPointCC = [
     radius * sin(testPointSC[1]) * cos(testPointSC[0]),
@@ -32,7 +30,8 @@ void main() async {
   final sampleSize = 2000;
   final perturbationSampelSize = 600;
 
-  final sampleSC = List<List<num>>.generate(sampleSize, (_) => space.next());
+  final sampleSC = List<List<num>>.generate(
+      sampleSize, (_) => space.next(nGrid: [30, 30, 30]));
 
   final sampleCC = List<List<num>>.generate(
     sampleSC.length,

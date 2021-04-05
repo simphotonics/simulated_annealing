@@ -11,15 +11,11 @@ final y = ParametricInterval(
   () => sqrt(pow(radius, 2) - pow(x.next(), 2)),
 );
 final z = ParametricInterval(
-  () => -sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
-  () => sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
+  () => -sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2) + 1e-50),
+  () => sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2) + 1e-50),
 );
-final dPositionMin = <num>[1e-6, 1e-6, 1e-6];
-final space = SearchSpace(
-  [x, y, z],
-  dPositionMin: [1e-6, 1e-6, 1e-6],
-  //dPositionMax: [1, 1, 1],
-);
+final deltaPositionMin = <num>[1e-6, 1e-6, 1e-6];
+final space = SearchSpace([x, y, z]);
 
 // Defining an energy function.
 // The energy function has a minimum at xMin.
@@ -36,8 +32,20 @@ final field = EnergyField(
   space,
 );
 
-void main(List<String> args) {
+void main(List<String> args) async {
   print(field);
 
-  field.info.then((info) => print(info));
+  print(await field.tStart(
+    0.01,
+    grid: [50, 50, 50],
+    deltaPosition: [1e-8, 1e-8, 1e-8],
+    sampleSize: 600,
+  ));
+
+  print(await field.tEnd(
+    0.01,
+    grid: [50, 50, 50],
+    deltaPosition: [1e-8, 1e-8, 1e-8],
+    sampleSize: 600,
+  ));
 }

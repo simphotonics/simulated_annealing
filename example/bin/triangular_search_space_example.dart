@@ -17,14 +17,18 @@ void main() async {
 
   // Defining a spherical search space.
   // Intervals are listed in order of dependence.
-  final space = SearchSpace([x, y], dPositionMin: [1e-6, 1e-6]);
+  final space = SearchSpace([x, y]);
 
   print('Space sizes: ${space.size}.');
 
   final testPoint = [3.0, 25.0];
   final magnitudes = [0.5, 25.0];
 
-  final sample = List<List<num>>.generate(2000, (_) => space.next());
+  final sample = List<List<num>>.generate(
+      2000,
+      (_) => space.next(
+            nGrid: [50, 50],
+          ));
 
   final perturbation = List<List<num>>.generate(
       200, (_) => space.perturb(testPoint, magnitudes));

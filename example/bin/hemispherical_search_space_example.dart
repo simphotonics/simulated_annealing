@@ -21,7 +21,7 @@ final z = ParametricInterval(
 
 // Defining a spherical search space.
 // Intervals are listed in order of dependence.
-final space = SearchSpace([x, y, z], dPositionMin: [1e-6, 1e-6, 1e-6]);
+final space = SearchSpace([x, y, z]);
 
 void main() async {
   for (var i = 0; i < 10; i++) {
@@ -29,12 +29,13 @@ void main() async {
   }
 
   final xTest = [0.8, 0.2, 1.8];
-  final dPosition = [0.6, 0.6, 0.6];
+  final deltaPosition = [0.6, 0.6, 0.6];
 
-  final sample = List<List<num>>.generate(1200, (_) => space.next());
+  final sample =
+      List<List<num>>.generate(1200, (_) => space.next(nGrid: [120, 120, 120]));
 
   final perturbation =
-      List<List<num>>.generate(400, (_) => space.perturb(xTest, dPosition));
+      List<List<num>>.generate(400, (_) => space.perturb(xTest, deltaPosition));
 
   await File('../data/hemisphere.dat').writeAsString(
     sample.export(),
