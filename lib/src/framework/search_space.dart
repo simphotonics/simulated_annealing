@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:exception_templates/exception_templates.dart';
 import 'package:lazy_memo/lazy_memo.dart';
 
-import '../extensions/random_sample.dart';
+import '../extensions/random_in_range.dart';
 import '../exceptions/incompatible_vectors.dart';
 
 /// Function defining an interval start/end point.
@@ -17,12 +17,15 @@ abstract class Interval {
   final InverseCdf? inverseCdf;
 
   /// Returns the next random number in the interval.
-  num next();
+  ///
+  /// If `nGrid > 1` the interval is divided in
+  /// into a grid with `nGrid` points.
+  num next({int nGrid = 0});
 
   /// Returns the next random number in the intersection of the intervals
-  /// `(start, end)` and `(position - dPosition, position + dPosition)`.
+  /// `(start, end)` and `(position - deltaPosition, position + deltaPosition)`.
   /// Returns `position` if the intersection is the empty interval.
-  num perturb(num position, num dPosition);
+  num perturb(num position, num deltaPosition, {int nGrid = 0});
 
   /// Returns true if `point` belongs to the interval.
   bool contains(num point);
@@ -32,7 +35,7 @@ abstract class Interval {
   bool overlaps(num start, num end);
 
   /// Returns the size of the interval.
-  num get _size;
+  num get size;
 
   /// Cached random number in interval.
   /// @nodoc
@@ -57,9 +60,20 @@ abstract class Interval {
 class FixedInterval extends Interval {
   /// Constructs a fixed interval (`start`, `end`).
   FixedInterval(this.start, this.end, {InverseCdf? inverseCdf})
-      : super(
+      : _size = (end - start).abs(),
+        super(
           inverseCdf: inverseCdf,
         );
+
+  /// Constructs a copy of `interval`.
+  ///
+  /// Note: The cache is *not* copied. Each instance of [FixedInterval]
+  /// manages its own cache.
+  FixedInterval.of(FixedInterval interval)
+      : start = interval.start,
+        end = interval.end,
+        _size = interval._size,
+        super(inverseCdf: interval.inverseCdf);
 
   /// Start point of the numerical interval.
   final num start;
@@ -67,12 +81,21 @@ class FixedInterval extends Interval {
   /// End point of the numerical interval.
   final num end;
 
+  /// Size
+  final _size;
+
   /// Returns the next random number sampled from
   /// the interval `(start, end)`.
   /// * Returns a cached value if the cache is up-to-date.
   /// * If the cache is stale an new random number is returned and cached.
+  /// ---
+  /// * `nGrid`: Number of grid points. If `nGrid > 1` the interval
+  ///   is divided into an equidistant grid
+  ///   with `nGrid` points: `[xMin + dx, xMin + 2 * dx, ..., xMax - dx]`
+  ///   where `dx = (xMax - xMin) / nGrid` and any random number returned
+  ///   coincides with a gridpoint.
   @override
-  num next() {
+  num next({int nGrid = 0}) {
     if (_isUpToDate) {
       return _cache;
     } else {
@@ -80,25 +103,37 @@ class FixedInterval extends Interval {
       return _cache = Interval.random.nextInRange(
         start,
         end,
-        inverseCdf,
+        inverseCdf: inverseCdf,
+        nGrid: nGrid,
       );
     }
   }
 
   /// Returns the next random number sampled from the interval
   /// obtained by intersecting:
-  /// `(start, end)` and `(position - dPosition, position + dPosition)`.
+  /// `(start, end)` and `(position - deltaPosition, position + deltaPosition)`.
   /// * If the intersection is empty, `position` is returned unperturbed.
   /// * Returns a cached value if the cache is up-to-date.
   /// * If the cache is stale an new random number is returned and cached.
+  /// ---
+  /// * `nGrid`: Number of grid points. If `nGrid > 1` the interval
+  ///   is divided into an equidistant grid
+  ///   with `nGrid` points: `[xMin + dx, xMin + 2 * dx, ..., xMax - dx]`
+  ///   where `dx = (xMax - xMin) / nGrid` and any random number returned
+  ///   coincides with a gridpoint.
   @override
-  num perturb(num position, num dPosition) {
-    if (overlaps(position - dPosition, position + dPosition)) {
+  num perturb(
+    num position,
+    num deltaPosition, {
+    int nGrid = 0,
+  }) {
+    if (overlaps(position - deltaPosition, position + deltaPosition)) {
       _isUpToDate = true;
       return _cache = Interval.random.nextInRange(
-        max(position - dPosition, start),
-        min(position + dPosition, end),
-        inverseCdf,
+        max(position - deltaPosition, start),
+        min(position + deltaPosition, end),
+        inverseCdf: inverseCdf,
+        nGrid: nGrid,
       );
     } else {
       _isUpToDate = false;
@@ -139,7 +174,7 @@ class FixedInterval extends Interval {
 
   /// Returns the length of the interval.
   @override
-  num get _size => (end - start).abs();
+  num get size => _size;
 }
 
 /// A numerical interval defined by
@@ -162,6 +197,13 @@ class ParametricInterval extends Interval {
   /// and smaller than `pEnd()`, exclusive.
   /// * Returns a cached value if the cache is up-to-date.
   /// * To clear the cache call `clearCache()`.
+  /// ---
+  /// * `nGrid`: Number of grid points. If `nGrid > 1` the interval
+  ///   is divided into an equidistant grid
+  ///   with `nGrid` points: `[xMin + dx, xMin + 2 * dx, ..., xMax - dx]`
+  ///   where `dx = (xMax - xMin) / nGrid` and any random number returned
+  ///   coincides with a gridpoint.
+  /// ---
   /// * Result caching enables defining parameterized intervals where some
   ///   intervals depend on other intervals.
   ///   ```
@@ -170,14 +212,14 @@ class ParametricInterval extends Interval {
   ///   final r = 2.75;
   ///   final x = Interval(-r, r);
   ///   final y = ParametricInterval(
-  ///     () => -sqrt(r**2 - x.next()**2),
-  ///     () =>  sqrt(r**2 - x.next()**2),
+  ///     () => -sqrt(r**2 - pow(x.next(),2)),
+  ///     () =>  sqrt(r**2 - pow(x.next(),2)),
   ///   );
   ///
-  ///   final space = ParametricSpace([x,y]);
+  ///   final space = SearchSpace([x,y]);
   ///   ```
   @override
-  num next() {
+  num next({int nGrid = 0}) {
     if (_isUpToDate) {
       return _cache;
     } else {
@@ -185,25 +227,33 @@ class ParametricInterval extends Interval {
       return _cache = Interval.random.nextInRange(
         pStart(),
         pEnd(),
-        inverseCdf,
+        inverseCdf: inverseCdf,
+        nGrid: nGrid,
       );
     }
   }
 
   /// Returns the next random number sampled from the interval
   /// obtained by intersecting:
-  /// `(start, end)` and `(position - dPosition, position + dPosition)`.
+  /// `(start, end)` and `(position - deltaPosition, position + deltaPosition)`.
   /// * If the intersection is empty, `position` is returned unperturbed.
   /// * Returns a cached value if the cache is up-to-date.
   /// * If the cache is stale an new random number is returned and cached.
+  /// ---
+  /// * `nGrid`: Number of grid points. If `nGrid > 1` the interval
+  ///   is divided into an equidistant grid
+  ///   with `nGrid` points: `[xMin + dx, xMin + 2 * dx, ..., xMax - dx]`
+  ///   where `dx = (xMax - xMin) / nGrid` and any random number returned
+  ///   coincides with a gridpoint.
   @override
-  num perturb(num position, num dPosition) {
-    if (overlaps(position - dPosition, position + dPosition)) {
+  num perturb(num position, num deltaPosition, {int nGrid = 0}) {
+    if (overlaps(position - deltaPosition, position + deltaPosition)) {
       _isUpToDate = true;
       return _cache = Interval.random.nextInRange(
-        max(position - dPosition, pStart()),
-        min(position + dPosition, pEnd()),
-        inverseCdf,
+        max(position - deltaPosition, pStart()),
+        min(position + deltaPosition, pEnd()),
+        inverseCdf: inverseCdf,
+        nGrid: nGrid,
       );
     } else {
       _isUpToDate = false;
@@ -244,7 +294,7 @@ class ParametricInterval extends Interval {
   ///
   /// Note: For parametric intervals the length may not be constant.
   @override
-  num get _size => (pEnd() - pStart()).abs();
+  num get size => (pEnd() - pStart()).abs();
 }
 
 /// A search region with boundaries defined by
@@ -252,87 +302,104 @@ class ParametricInterval extends Interval {
 class SearchSpace {
   /// Constructs an object of type `SearchSpace`.
   /// * `intervals`: A list of intervals defining the search space.
-  ///    Note: Parametric intervals must be listed
-  ///    after the intervals they depend on.
-  /// * `dPositionMin`: The smallest perturbation magnitudes used with
-  ///    the method `perturb`. For a discrete search space
-  ///    it corresponds to the solution precision.
-  /// * `dPositionMax`: The largest perturbation magnitudes used with
-  ///    the method `perturb`. This parameter is optional. It
-  ///    defaults to the search space `size`.
-  SearchSpace(
-    List<Interval> intervals, {
-    required List<num> dPositionMin,
-    List<num>? dPositionMax,
-  })  : _intervals = List<Interval>.of(intervals),
-        dPositionMin = UnmodifiableListView<num>(dPositionMin),
-        dimension = intervals.length {
+  /// *  Note: Parametric intervals must be listed
+  ///    **after** all intervals they depend on.
+  SearchSpace(List<Interval> intervals)
+      : _intervals = List<Interval>.of(intervals),
+        dimension = intervals.length,
+        _nGrid0 = List<int>.filled(
+          intervals.length,
+          0,
+        ) {
     _size = Lazy<List<num>>(() => estimateSize());
-    this.dPositionMax = (dPositionMax == null)
-        ? UnmodifiableListView(size)
-        : UnmodifiableListView(dPositionMax);
   }
 
   /// Search space dimension.
   /// * Is equal to the length of the constructor parameter `intervals`.
   int dimension;
 
+  /// The default empty grid.
+  final List<int> _nGrid0;
+
   /// Intervals defining the boundary of the sampling space.
   /// * The list `_intervals` must not be empty.
   final List<Interval> _intervals;
 
-  // Maximum size of the search neighbourhood.
-  late final UnmodifiableListView<num> dPositionMax;
-
-  /// Minimum size of the search neighbourhood.
-  ///
-  /// For continuous problems this parameter determines the solution precision.
-  final UnmodifiableListView<num> dPositionMin;
-
   /// Returns a random vector of length `dimension`. Each vector coordinate
   /// is generated by drawing samples from the corresponding
   /// interval.
-  List<num> next() {
+  List<num> next({List<int> nGrid = const <int>[]}) {
+    if (nGrid.isNotEmpty && nGrid.length != dimension) {
+      throw ErrorOfType<IncompatibleVector>(
+          message: 'Could not generate random point using method next().',
+          invalidState: 'Dimension mismatch: $dimension != ${nGrid.length}.',
+          expectedState: 'The vector \'grid\' must have length $dimension.');
+    }
     _clearCache();
-    return List<num>.generate(
-      dimension,
-      (i) => _intervals[i].next(),
-    );
+    return nGrid.isEmpty
+        ? List<num>.generate(
+            dimension,
+            (i) => _intervals[i].next(),
+          )
+        : List<num>.generate(
+            dimension,
+            (i) => _intervals[i].next(nGrid: nGrid[i]),
+          );
   }
 
   /// Returns a random vector of length `dimension`
   /// sampled from the interval
   /// obtained by intersecting `this` with the generalized rectangle
   /// centred at `position` with edge lengths
-  /// `(position - dPosition, position + dPosition)`.
+  /// `(position - deltaPosition, position + deltaPosition)`.
   ///
   /// Note: If the intersection is empty, the input
   /// `position` is returned unperturbed.
   ///
   /// Throws an error of type `ErrorOfType<InCompatibleVector>` if the
-  /// length of the `position` or `dPosition` does not match `this.dimension`.
-  List<num> perturb(List<num> position, List<num> dPosition) {
+  /// length of the `position` or `deltaPosition` does not match `this.dimension`.
+  List<num> perturb(
+    List<num> position,
+    List<num> deltaPosition, {
+    List<int> nGrid = const <int>[],
+  }) {
     if (position.length != dimension) {
       throw ErrorOfType<IncompatibleVector>(
           message: 'Could not generate random point around $position.',
           invalidState: 'Dimension mismatch: $dimension != ${position.length}.',
           expectedState: 'The vector position must have length $dimension.');
     }
-    if (dPosition.length != dimension) {
+    if (deltaPosition.length != dimension) {
       throw ErrorOfType<IncompatibleVector>(
           message:
-              'Could not generate perturbation using magnitudes $dPosition.',
+              'Could not generate perturbation using magnitudes $deltaPosition.',
           invalidState:
-              'Dimension mismatch: $dimension != ${dPosition.length}.',
-          expectedState: 'The vector dPosition must have length $dimension.');
+              'Dimension mismatch: $dimension != ${deltaPosition.length}.',
+          expectedState:
+              'The vector deltaPosition must have length $dimension.');
+    }
+    if (nGrid.isNotEmpty && nGrid.length != dimension) {
+      throw ErrorOfType<IncompatibleVector>(
+          message: 'Could not generate random point around $position.',
+          invalidState: 'Dimension mismatch: $dimension != ${nGrid.length}.',
+          expectedState: 'The vector \'grid\' must have length $dimension.');
     }
     _clearCache();
     // Generating the random sample.
+    if (nGrid.isEmpty) {
+      nGrid = _nGrid0;
+    }
     final result = <num>[];
     num value = 0;
     for (var i = 0; i < dimension; ++i) {
-      value = _intervals[i].perturb(position[i], dPosition[i]);
+      value = _intervals[i].perturb(
+        position[i],
+        deltaPosition[i],
+        nGrid: nGrid[i],
+      );
       if (!_intervals[i]._isUpToDate && value == position[i]) {
+        /// Return early if any interval can not generate a new position
+        /// that is within bounds.
         return position;
       } else {
         result.add(value);
@@ -357,12 +424,12 @@ class SearchSpace {
   /// sizes are exact.
   List<num> estimateSize() {
     if (_intervals.every((interval) => interval is FixedInterval)) {
-      return List<num>.generate(dimension, (i) => _intervals[i]._size);
+      return List<num>.generate(dimension, (i) => _intervals[i].size);
     }
 
     final sizes = List<List<num>>.generate(50, (_) {
       _clearCache();
-      return List<num>.generate(dimension, (i) => _intervals[i]._size);
+      return List<num>.generate(dimension, (i) => _intervals[i].size);
     });
 
     return sizes.reduce((value, current) {
@@ -401,8 +468,6 @@ class SearchSpace {
     final b = StringBuffer();
     b.writeln('Search Space: ');
     b.writeln('  size: $size');
-    b.writeln('  dPositionMin: $dPositionMin');
-    b.writeln('  dPositionMax: $dPositionMax');
     b.writeln('  dimension: $dimension');
     for (var i = 0; i < dimension; ++i) {
       b.writeln('  ${_intervals[i]}'.replaceAll('\n', '\n  '));
