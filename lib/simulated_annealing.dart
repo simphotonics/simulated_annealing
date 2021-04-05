@@ -7,4 +7,4 @@ export 'src/framework/data_recorder.dart';
 export 'src/framework/logging_simulator.dart';
 export 'src/framework/search_space.dart';
 export 'src/framework/simulator.dart';
-export 'src/extensions/random_sample.dart';
+export 'src/extensions/random_in_range.dart';
