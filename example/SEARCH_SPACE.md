@@ -1,5 +1,5 @@
 #  Search Space - Example
-[![Build Status](https://travis-ci.com/simphotonics/simulated_annealing.svg?branch=main)](https://travis-ci.com/simphotonics/simulated_annealing)
+
 
 ## Usage
 
@@ -49,12 +49,12 @@ final space = SearchSpace([x, y, z]);
 
 void main() async {
   final xTest = [1.2, 1.0, 0.6];
-  final dPosition = [0.6, 0.6, 0.6];
+  final deltaPosition = [0.6, 0.6, 0.6];
 
   final sample = List<List<num>>.generate(2000, (_) => space.next());
 
   final perturbation = List<List<num>>.generate(
-      500, (_) => space.perturb(xTest, dPosition));
+      500, (_) => space.perturb(xTest, deltaPosition));
 
   await File('../data/spherical_search_space.dat').writeAsString(
     sample.export(),
@@ -79,12 +79,12 @@ void main() async {
 The figure below (left) shows 2000 random points generated using the method `next` provided by the class [`SearchSpace`][SearchSpace].
 
 The (red) test point **x**<sub>test</sub> has coordinates \[1.2, 1.0, 1.6\].
-The green dots represent points sampled for a neighbourhood **x**<sub>test</sub> &pm; **dPosition** around **x**<sub>test</sub>,
-where **dPosition**&nbsp;=&nbsp;\[0.6, 0.6, 0.6\] are the perturbation magnitudes along each dimension.
+The green dots represent points sampled for a neighbourhood **x**<sub>test</sub> &pm; **deltaPosition** around **x**<sub>test</sub>,
+where **deltaPosition**&nbsp;=&nbsp;\[0.6, 0.6, 0.6\] are the perturbation magnitudes along each dimension.
 These points were generated using the method `perturb`.
 
 Notice that the perturbation neighbourhood does not extend beyond the margins of the
-search space. If the search space does not intersect the region **x**<sub>test</sub> &pm; **dPosition**,
+search space. If the search space does not intersect the region **x**<sub>test</sub> &pm; **deltaPosition**,
 **x**<sub>test</sub> is returned **unperturbed**.
 
 ![Spherical Search Space](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/spherical_search_space.png)
@@ -115,7 +115,7 @@ final x = FixedInterval(0, 10);
 final y = ParametricInterval(
       () => gradient * x.next(), () => gradient * x.next());
 // Defining a spherical search space.
-final triangularSpace = SearchSpace([x, y], dPositionMin: [1e-6, 1e-6]);
+final triangularSpace = SearchSpace([x, y]);
 ```
 The left figure in the image below shows 2000 points randomly selected from the triangular search space (magenta coloured dots).
 There is an aggreggation of points towards the left side of the search space boundary indicating that the 2D PDF of the search_space `triangularSpace` is non-uniform.
@@ -172,7 +172,7 @@ final x = FixedInterval(0, 10, inverseCdf: inverseCdf);
 final y = ParametricInterval(
       () => gradient * x.next(), () => gradient * x.next());
 // Defining a spherical search space.
-final triangularSpace = SearchSpace([x, y], dPositionMin: [1e-6, 1e-6]);
+final triangularSpace = SearchSpace([x, y]);
 ```
 The left figure above shows 2000 points randomly selected using the function `triangularSpace.next()`.
 It is apparent that the random points are distributed uniformly across the search space.
@@ -223,7 +223,7 @@ final phi = FixedInterval(0, 2 * pi, inverseCdf: inverseCdf);
 final theta = FixedInterval(0, pi);
 
 // Defining a spherical search space.
-final space = SearchSpace([phi, theta], dPositionMin: [1e-6, 1e-6, 1e-6]);
+final space = SearchSpace([phi, theta]);
 ```
 
  The figure below shows 2000 points randomly selected from the search space with a uniform 2D PDF.
