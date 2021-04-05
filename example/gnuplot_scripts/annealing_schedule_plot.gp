@@ -28,4 +28,4 @@ set term qt size 500, 500 font "Sans,12"
 set logscale y
 
 plot '../data/log.dat' using ($10) w l  lw 3 lc "#00cc4433" t 'Temperature', \
-     '../data/log.dat' using ($4)  w l lw 3 t "Perturbation magnitude: dPosition", \
+     '../data/log.dat' using ($4)  w l lw 3 t "Perturbation magnitude: deltaPosition", \
