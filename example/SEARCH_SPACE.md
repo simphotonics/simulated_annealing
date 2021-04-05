@@ -135,7 +135,7 @@ interval boundaries and the inverse cummulative distribution function (iCDF) is 
 
 cdf<sup>-1</sup>(p,&nbsp;x<sub>min</sub>,&nbsp;x<sub>max</sub>) = x<sub>min</sub> + (x<sub>max</sub> - x<sub>min</sub>)&middot;p &nbsp;&nbsp;&nbsp;where p &in; \[0, 1\].
 
-The function iCDF maps a random number in the interval \[0, 1\) to a random number in the interval \[x<sub>min</sub>, x<sub>max</sub>\).
+The function iCDF maps a number in the interval \[0, 1\) to a number in the interval \[x<sub>min</sub>, x<sub>max</sub>\).
 The graph on the right above shows the *implicit* iCDF of the interval `x` for different interval
 boundaries.
 
@@ -162,7 +162,7 @@ cdf<sup>-1</sup>(p, x<sub>min</sub>, x<sub>max</sub>) = x<sub>min</sub> + (x<sub
 The iCDF for the x-coordinate is shown on the right in the image above. It ensures that values of `x` that are
 closer to zero are less likely to be selected.
 
-The triangular space can be instantiated with the following lines of code:
+A triangular space with uniformly distributed points can be instantiated with the following lines of code:
 ```Dart
 /// The inverse CDF of the interval x.
 double inverseCDF(num p, num xMin, num xMax) => xMin + (xMax - xMin) * sqrt(p);
