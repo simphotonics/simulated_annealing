@@ -1,6 +1,4 @@
 # Simulated Annealing For Dart
-[![Build Status](https://travis-ci.com/simphotonics/simulated_annealing.svg?branch=main)](https://travis-ci.com/simphotonics/simulated_annealing)
-
 
 ## Introduction
 [Simulated annealing][SA-Wiki] (SA) is an algorithm aimed at finding the *global* minimum
@@ -10,26 +8,31 @@ The function to be minimized can be interpreted as the
 **system energy**. In that case, the global minimum represents
 the **ground state** of the system.
 
-
-The algorithm name was coined by Kirkpatrick et al. [\[1\]][kirkpatrick1983] and was
+<details><summary> The algorithm name was coined by Kirkpatrick ... click to show details.</summary>
+The algorithm name was coined by [Kirkpatrick et al.][kirkpatrick1983] and was
 derived from the process of annealing a metal alloy or glass.
 The first step of the annealing process consists of heating a
 solid material above a critical temperature. This allows its atoms to gain
 sufficient kinetic energy to be able to rearrange themselves.
 Then the temperature is decreased sufficiently slowly
 in order to minimize atomic lattice defects as the material solidifies.
+</details><br/>
 
-*Simulated* annealing works by randomly selecting a new point in the neighbourhood of the
-current solution,
-evaluating the energy function, and deciding if the new solution is accepted or rejected.
+Simulated annealing works by randomly selecting a new point in the neighbourhood of the
+current solution, evaluating the energy function, and deciding if the new solution is accepted or rejected. If for a newly selected point the energy E is lower that the previous minimum energy
+E<sub>min</sub>, the new solution is accepted. Crucially, if &Delta;E > 0, the algorithm still accepts the new solution with probability:
+P(&Delta;E > 0, T) = e<sup>-&Delta;E/(k<sub>B</sub>&middot;T)</sup> where &Delta;E = E - E<sub>min</sub>. Accepting up-hill moves provides a method of escaping from local energy minima.
 
-If for a newly selected point the energy E is lower that the previous minimum energy
-E<sub>min</sub>, the new solution is accepted: P(&Delta;E&nbsp;<&nbsp;0,&nbsp;T)&nbsp;=&nbsp;1,
+The [Boltzmann constant][Boltzmann] k<sub>B</sub> relates the system
+temperature with the kinetic energy of particles in a gas. In the context of SA, it is customary to set k<sub>B</sub>&nbsp;&equiv;&nbsp;1.
+With this convention, the probability of accepting a new solution is given by:
+
+P(&Delta;E > 0, T) = e<sup>-&Delta;E/T</sup>&nbsp;&nbsp;and&nbsp;&nbsp;P(&Delta;E <0, T) = 1.0,
 where &Delta;E = E - E<sub>min</sub>.
 
- Crucially, if &Delta;E > 0, the algorithm still accepts the
- new solution with probability: P(&Delta;E > 0, T) = e<sup>-&Delta;E/(k<sub>B</sub>&middot;T)</sup>.
- Accepting up-hill moves provides a method of escaping from local energy minima.
+The expression above ensures
+that the acceptance probability decreases with decreasing temperature (for &Delta;E > 0).
+As such, the temperature is a parameter that controls the probability of up-hill moves.
 
 ![Energy Simulated Annealing](https://github.com/simphotonics/simulated_annealing/raw/main/example/plots/energy_composite.gif)
 
@@ -49,11 +52,10 @@ as a `dependency` in your `pubspec.yaml` file.
 
 The following steps are required to set up the SA algorithm.
 1. Specify the [search space][search space] &omega;.
-2. Define an [annealing schedule][annealing schedule].
-3. Define the system [energy field][energy_field].
-4. Extend the class [`Simulator`][SimulatorClass] implementing the methods `prepareLog()`
+2. Define the system [energy field][energy_field].
+3. Extend the class [`Simulator`][SimulatorClass] implementing the methods `prepareLog()`
 and  `recordLog()` or create an instance of [`LoggingSimulator`][LoggingSimulator].
-5. Start the [simulated annealing][simulator] process.
+4. Start the [simulated annealing][simulator] process.
 
 <details><summary> Click to show source code.</summary>
 
@@ -94,10 +96,17 @@ void main() async {
     energy,
     space,
   );
+
+  // Construct a simulator instance.
+  final simulator = LoggingSimulator(field);
+
   print(simulator);
   print(await simulator.info);
 
+  // Running the simulated annealing process.
   final xSol = await simulator.anneal((_) => 1, isRecursive: true, ratio: 0.5);
+
+  // Storing simulator log data.
   await File('example/data/log.dat').writeAsString(simulator.export());
 
   print('Solution: $xSol');
@@ -105,49 +114,34 @@ void main() async {
 }
 
 ```
-</details>
+</details><br/>
 
-## Annealing Schedule
+## Algorithm Tuning
 
-The [Boltzmann constant][Boltzmann] k<sub>B</sub> relates the system
-temperature with the kinetic energy of particles in a gas.
+It can be shown that by selecting a sufficiently high initial
+temperature the algorithm converges to the global minimum if the temperature
+decreases on a logarithmic scale (slow cooling schedule) and
+the number of inner iterations (Markov chain length)
+is sufficiently high [\[2\]][nikolaev2010].
 
-In the context of SA, it is customary to set k<sub>B</sub> &equiv; 1.
-With this convention, the probability of accepting a new solution is given by:
+Practical implementations of the SA algorithm aim to generate
+an acceptable solution with *minimal* computational effort.
+For such *fast cooling* schedules, algorithm convergence to the global minimum is not
+strictly guaranteed. In that sense, SA is a heuristic approach and some
+degree of trial and error is required to determine which annealing schedule
+works best for a given problem.
 
-P(&Delta;E > 0, T) = e<sup>-&Delta;E/T</sup>&nbsp;&nbsp;and&nbsp;&nbsp;P(&Delta;E <0, T) = 1.0,
-where &Delta;E = E - E<sub>min</sub>.
 
-The expression above ensures
-that the acceptance probability decreases with decreasing temperature (for &Delta;E > 0).
-As such, the temperature is a parameter that controls the probability of up-hill moves.
+The behaviour of the annealing simulator can be tuned using the following **optional** parameters of the [`Simulator`][SimulatorClass] constructor:
+* `gammaStart`: Initial acceptance probability with default value 0.7. Useful values for &gamma;<sub>start</sub>
+are in the range of (0.7, 0.9). If &gamma;<sub>start</sub> is too low, up-hill moves are unlikely (potentially) preventing the SA algorithm from
+escaping a local miniumum. If &gamma;<sub>start</sub> is set close to 1.0 the algorithm will accept
+too many up-hill moves at high temperatures wasting computational time and delaying convergence.
+* `gammaEnd`: Final acceptance probability. Towards the end of the annealing process one assumes
+   that the solution has converged towards the global minimum and up-hill moves should be restricted. For this reason &gamma;<sub>end</sub> has default value 0.05.
+* `iterations`: Determines the number of temperature steps in the annealing schedule.
 
-An estimate for the average scale of the variation of the energy
-function &Delta;E<sub>start</sub>
-can be obtained by sampling the energy function E
-at random points in the search space &omega;
-and calculating the sample standard deviation &sigma;<sub>E</sub> [\[3\]][ledesma2008].
-The initial temperature is set such that the initial acceptance probability is:
-
-P(&Delta;E<sub>start</sub>,T<sub>start</sub>) =  e<sup>-&Delta;E<sub>start</sub>/T<sub>start</sub></sup>
-= &gamma;<sub>start</sub>, where &gamma;<sub>start</sub> is a simulator parameter with default value 0.7.
-
-For continuous problems, the size of the search region around the current
-solution is gradually contracted
-to &omega;<sub>end</sub> in order to generate a solution with the required precision.
-An estimate of &Delta;E<sub>end</sub> can be obtained by sampling the energy at
-points in the neighbourhood around the current minimizing solution and
-calculating the standard deviation. The final annealing temperature T<sub>end</sub> is set such that:
-
-P(&Delta;E<sub>end</sub>, T<sub>end</sub>) =  e<sup>-&Delta;E<sub>end</sub>/T<sub>end</sub></sup> = &gamma;<sub>end</sub>,
-where &gamma;<sub>end</sub> is a simulator parameter with default value 0.05.
-
-The following parameters are required to define an annealing schedule:
-* T<sub>start</sub>, the initial temperature,
-* T<sub>end</sub>, the final temperature,
-* the number of (outer) iterations,
-* a function of type [`TemperatureSequence`][TemperatureSequence]
-  that is used to determine the temperature at each (outer) iteration step.
+Additionally, it is possible to set the class variable `temperatureSequence` to function of type [`TemperatureSequence`][TemperatureSequence]  that is used to determine the temperature at each (outer) iteration step.
 
 It is recommended to start with a higher number of
 outer iterations (number of entries in the sequence of temperatures) and log
@@ -166,31 +160,39 @@ see method [`anneal`][anneal].
 For fast cooling schedules convergence to an acceptable solution can be improved by
 increasing the number of inner iterations.
 
+## Annealing Schedule
 
-## Algorithm Tuning
+The following information is required to define an annealing schedule:
+* T<sub>start</sub>, the initial temperature,
+* T<sub>end</sub>, the final temperature,
+* the number of (outer) iterations,
+* a function of type [`TemperatureSequence`][TemperatureSequence]
+  that is used to determine the temperature at each (outer) iteration step.
 
-For discrete problems it can be shown that by selecting a sufficiently high initial
-temperature the algorithm converges to the global minimum if the temperature
-decreases on a logarithmic scale (slow cooling schedule) and
-the number of inner iterations (Markov chain length)
-is sufficiently high [\[2\]][nikolaev2010].
+An estimate for the average scale of the variation of the energy
+function &Delta;E<sub>start</sub>
+can be obtained by sampling the energy function E
+at random points in the search space &omega;
+and calculating the sample standard deviation &sigma;<sub>E</sub> [\[3\]][ledesma2008].
+The initial temperature is set such that the initial acceptance probability is:
 
-Practical implementations of the SA algorithm aim to generate
-an acceptable solution with *minimal* computational effort.
-For such *fast cooling* schedules, algorithm convergence to the global minimum is not
-strictly guaranteed. In that sense, SA is a heuristic approach and some
-degree of trial and error is required to determine which annealing schedule
-works best for a given problem.
+P(&Delta;E<sub>start</sub>,T<sub>start</sub>) =  e<sup>-&Delta;E<sub>start</sub>/T<sub>start</sub></sup>
+= &gamma;<sub>start</sub>, where &gamma;<sub>start</sub> is a simulator parameter with default value 0.7.
 
+For continuous problems, the size of the search region around the current
+solution is gradually contracted to
+&omega;<sub>end</sub> in order to generate a solution with the required precision.
+An estimate of &Delta;E<sub>end</sub> can be obtained by sampling the energy at
+points in the neighbourhood around the current minimizing solution and
+calculating the standard deviation. The final annealing temperature T<sub>end</sub> is set such that:
 
-The behaviour of the annealing simulator can be tuned using the following **optional** parameters of the class [`Simulator`][SimulatorClass]:
-* `gammaStart`: Initial acceptance probability with default value 0.7. Useful values for &gamma;<sub>start</sub>
-are in the range of (0.7, 0.9). If &gamma;<sub>start</sub> is too low, up-hill moves are unlikely (potentially) preventing the SA algorithm from
-escaping a local miniumum. If &gamma;<sub>start</sub> is set close to 1.0 the algorithm will accept
-too many up-hill moves at high temperatures wasting computational time and delaying convergence.
-* `gammaEnd`: Final acceptance probability. Towards the end of the annealing process one assumes
-   that the solution has converged towards the global minimum and up-hill moves should be restricted. For this reason &gamma;<sub>end</sub> has default value 0.05.
-* `iterations`: Determines the number of temperature steps in the annealing schedule.
+P(&Delta;E<sub>end</sub>, T<sub>end</sub>) =  e<sup>-&Delta;E<sub>end</sub>/T<sub>end</sub></sup> = &gamma;<sub>end</sub>,
+where &gamma;<sub>end</sub> is a simulator parameter with default value 0.05.
+
+The class [`EnergyField`][EnergyField] provides the methods `start` and `tend`. These use
+the algorithm introduced by [Bem-Ameur][ben-ameur2004] to calculate the
+initial and final annealing temperature.
+
 
 ## Examples
 
@@ -207,7 +209,7 @@ Please file feature requests and bugs at the [issue tracker][tracker].
 
 [tracker]: https://github.com/simphotonics/simulated_annealing/issues
 
-[example]: example
+[example]: https://github.com/simphotonics/simulated_annealing/tree/main/example
 
 [anneal]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/Simulator/anneal.html
 
@@ -217,7 +219,7 @@ Please file feature requests and bugs at the [issue tracker][tracker].
 
 [energy_field]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/EnergyField-class.html
 
-[here]: example/SIMULATOR.md
+[here]: https://github.com/simphotonics/simulated_annealing/tree/main/example/SIMULATOR.md
 
 [kirkpatrick1983]: https://doi.org/10.1126%2Fscience.220.4598.671
 
@@ -235,8 +237,10 @@ Please file feature requests and bugs at the [issue tracker][tracker].
 
 [SA-Wiki]: https://en.wikipedia.org/wiki/Simulated_annealing
 
-[search space]: example/SEARCH_SPACE.md
+[search space]: https://github.com/simphotonics/simulated_annealing/tree/main/example/SEARCH_SPACE.md
 
-[simulator]: example/SIMULATOR.md
+[simulator]: https://github.com/simphotonics/simulated_annealing/tree/main/example/SIMULATOR.md
 
 [TemperatureSequence]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/TemperatureSequence.html
+
+[ben-ameur2004]: https://www.researchgate.net/publication/227061666_Computing_the_Initial_Temperature_of_Simulated_Annealing
