@@ -9,7 +9,7 @@ The function to be minimized can be interpreted as the
 the **ground state** of the system.
 
 <details><summary> The algorithm name was coined by Kirkpatrick ... click to show details.</summary>
-The algorithm name was coined by [Kirkpatrick et al.][kirkpatrick1983] and was
+The algorithm name was coined by Kirkpatrick et al. and was
 derived from the process of annealing a metal alloy or glass.
 The first step of the annealing process consists of heating a
 solid material above a critical temperature. This allows its atoms to gain
@@ -122,7 +122,7 @@ It can be shown that by selecting a sufficiently high initial
 temperature the algorithm converges to the global minimum if the temperature
 decreases on a logarithmic scale (slow cooling schedule) and
 the number of inner iterations (Markov chain length)
-is sufficiently high [\[2\]][nikolaev2010].
+is sufficiently high [\[1\]][nikolaev2010].
 
 Practical implementations of the SA algorithm aim to generate
 an acceptable solution with *minimal* computational effort.
@@ -173,7 +173,7 @@ An estimate for the average scale of the variation of the energy
 function &Delta;E<sub>start</sub>
 can be obtained by sampling the energy function E
 at random points in the search space &omega;
-and calculating the sample standard deviation &sigma;<sub>E</sub> [\[3\]][ledesma2008].
+and calculating the sample standard deviation &sigma;<sub>E</sub> [\[2\]][ledesma2008].
 The initial temperature is set such that the initial acceptance probability is:
 
 P(&Delta;E<sub>start</sub>,T<sub>start</sub>) =  e<sup>-&Delta;E<sub>start</sub>/T<sub>start</sub></sup>
@@ -190,8 +190,8 @@ P(&Delta;E<sub>end</sub>, T<sub>end</sub>) =  e<sup>-&Delta;E<sub>end</sub>/T<su
 where &gamma;<sub>end</sub> is a simulator parameter with default value 0.05.
 
 The class [`EnergyField`][EnergyField] provides the methods `start` and `tend`. These use
-the algorithm introduced by [Bem-Ameur][ben-ameur2004] to calculate the
-initial and final annealing temperature.
+the algorithm introduced by Bem-Ameur to calculate the
+initial and final annealing temperature [\[3\]][ben-ameur2004].
 
 
 ## Examples
