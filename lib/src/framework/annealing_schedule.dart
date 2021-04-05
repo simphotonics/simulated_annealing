@@ -1,14 +1,63 @@
-/// Provides functions of typedef `TemperatureSequence` for generating
-/// *linear*, *geometric*, *normal*, and *exponential* sequences.
-library annealing_schedule;
-
 import 'dart:math';
+
+import 'package:list_operators/list_operators.dart';
 
 typedef TemperatureSequence = List<num> Function(
   num tStart,
   num tEnd, {
   int iterations,
 });
+
+/// Function returning an integer representing a Markov
+/// chain length (the number of simulated annealing iterations
+/// performed at constant temperature).
+typedef MarkovChainLength = int Function(num temperature);
+
+/// Function returning a sequence of pertubation
+/// magnitude vectors.
+typedef PerturbationSequence = List<List<num>> Function(
+  List<num> temperatures,
+  List<num> deltaPositionMax,
+  List<num> deltaPositionMin,
+);
+
+/// Returns a sequence of vectors
+/// by interpolating between
+/// `start` and `end`.
+///
+/// The resulting sequence is linearly related to `temperatures`.
+List<List<T>> interpolate<T extends num>(
+  List<num> temperatures,
+  List<T> start,
+  List<T> end,
+) {
+  final a = (start - end) / (temperatures.first - temperatures.last);
+  final b = start -
+      (start - end) *
+          (temperatures.first / (temperatures.first - temperatures.last));
+  return List<List<T>>.generate(
+      temperatures.length,
+      (i) => T == int
+          ? (a * temperatures[i]).plus(b).toInt() as List<T>
+          : (a * temperatures[i]).plus(b) as List<T>);
+}
+
+/// Returns an integer between `chainLengthStart` and `chainLengthEnd`.
+/// * `markovChainlength(tStart) = mStart`,
+/// * `markovChainlength(tEnd) = mEnd`.
+///
+/// Note: The following must hold: `tStart <= temperature <= tEnd`.
+int markovChainLength(
+  num temperature, {
+  required num tStart,
+  required num tEnd,
+  int chainLengthStart = 5,
+  int chainLengthEnd = 20,
+}) {
+  return (chainLengthStart - chainLengthEnd) * temperature ~/ (tStart - tEnd) +
+      chainLengthStart -
+      (chainLengthStart - chainLengthEnd) * tStart ~/ (tStart - tEnd);
+}
 
 /// Linear temperature sequence with entries:
 ///
