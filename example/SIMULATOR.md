@@ -1,5 +1,5 @@
 ##  Simulated Annealing - Example
-[![Build Status](https://travis-ci.com/simphotonics/simulated_annealing.svg?branch=main)](https://travis-ci.com/simphotonics/simulated_annealing)
+
 
 Simulated annealing (SA) is typically used to solve discrete optimisation problems. But the algorithm can be adapted to minimize continuous functions. The example below demonstrates how
 to find the global minimum of the function:
@@ -40,8 +40,8 @@ final z = ParametricInterval(
   () => -sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
   () => sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2)),
 );
-final dPositionMin = <num>[1e-6, 1e-6, 1e-6];
-final space = SearchSpace([x, y, z], dPositionMin: [1e-6, 1e-6, 1e-6]);
+final deltaPositionMin = <num>[1e-6, 1e-6, 1e-6];
+final space = SearchSpace([x, y, z]);
 
 // Defining an energy function.
 // The energy function has a minimum at xMin.
@@ -104,7 +104,7 @@ process. The energy is represented as a colour and varies between a maximum at 4
 
 As the energy decreases the solution approaches **x**<sub>glob</sub> = \[0.5, 0.7, 0.8\] asymptotically (blue dots).
 A typical solution is **x**<sub>min</sub> = \[0.5000000457219432, 0.6999999722831786, 0.800000105007227\].
-The solution precision is determined by the minimum value of the perturbation magnitude **dPositionMin** (see [annealing schedule]).
+The solution precision is determined by the minimum value of the perturbation magnitude **deltaPositionMin** (see [annealing schedule]).
 
 The figure on the right show the temperature during the annealing process. At high temperatures the
 algorithm selects potential solutions from the entire search space. As the temperature decreases
