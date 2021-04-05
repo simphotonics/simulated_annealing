@@ -1,4 +1,3 @@
-import 'annealing_schedule.dart';
 import 'data_recorder.dart';
 import 'energy_field.dart';
 import 'simulator.dart';
@@ -9,10 +8,6 @@ class LoggingSimulator extends Simulator {
   /// Constructs an object of type `LoggingSimulator`.
   /// * field: An object of type `EnergyField` encapsulating the
   ///   energy function (cost function)  and search space.
-  /// * temperatureSequence: A function with typedef `TemperatureSequence`. It
-  ///   specifies the annealing temperature schedule.
-  /// * perturbationSequence: A function with typedef `PerturbationSequence`.
-  ///   It specifies the perturbation magnitudes for each annealing temperature.
   /// ----
   /// Optional parameters:
   /// * gammaStart: Probability of solution acceptance if `dE == dEnergyStart`
@@ -20,38 +15,16 @@ class LoggingSimulator extends Simulator {
   /// * gammaEnd: Probability of solution acceptance if `dE == dEnergyEnd`
   ///   and the temperature is the final temperatures of the annealing process.
   /// * iterations: Number of iterations when cooling
-  ///   the system from the initial annealing
-  ///   temperature to the final temperature `tEnd`.
-  /// * startPosition: Defaults to `field.minPosition`. Can be used to specify the
-  ///   starting point of the simulated annealing process.
-  /// * dEnergyStart: Defaults to `field.dEnergyStart`. Can be used for testing
-  ///   purposes. It is an estimate of the typical variation of
-  ///   the energy function when perturbing the current position randomly with
-  ///   magnitude `dPositionMax`.
-  /// * dEnergyEnd: Defaults to `field.dEnergyEnd`. Can be used for testing
-  ///   purposes. It is an estimate of the typical variation of
-  ///   the system energy function when perturbing the current position
-  ///   randomly with magnitude `dPositionMin`.
   LoggingSimulator(
-    EnergyField field,
-    TemperatureSequence temperatureSequence,
-    PertubationSequence perturbationSequence, {
+    EnergyField field, {
     num gammaStart = 0.8,
     num gammaEnd = 0.1,
     int iterations = 750,
-    List<num>? startPosition,
-    num? dEnergyStart,
-    num? dEnergyEnd,
   }) : super(
           field,
-          temperatureSequence,
-          perturbationSequence,
           gammaStart: gammaStart,
           gammaEnd: gammaEnd,
           iterations: iterations,
-          startPosition: startPosition,
-          dEnergyStart: dEnergyStart,
-          dEnergyEnd: dEnergyEnd,
         );
 
   /// Records the simulator log.
@@ -88,7 +61,7 @@ class LoggingSimulator extends Simulator {
   List<List<num>> get currentPositionLog => _rec.getVector('x');
 
   /// Returns the current perturbation magnitude log.
-  List<List<num>> get dPositionLog => _rec.getVector('dPosition');
+  List<List<num>> get deltaPositionLog => _rec.getVector('deltaPosition');
 
   /// Returns the current energy log.
   List<num> get currentEnergyLog => _rec.getScalar('Energy');
@@ -114,7 +87,7 @@ class LoggingSimulator extends Simulator {
   @override
   void recordLog() {
     _rec.addVector('x', currentPosition);
-    _rec.addVector('dPosition', dPosition);
+    _rec.addVector('deltaPosition', deltaPosition);
     _rec.addScalar('Energy', currentEnergy);
     _rec.addScalar('Energy Min', currentMinEnergy);
     _rec.addScalar('P(dE > 0)', acceptanceProbability);

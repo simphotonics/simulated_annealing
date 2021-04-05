@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'dart:math';
 
 import 'package:lazy_memo/lazy_memo.dart';
@@ -9,162 +8,228 @@ import 'energy_field.dart';
 
 import 'search_space.dart';
 
-/// Function returning an integer representing a Markov
-/// chain length (the number of simulated annealing iterations
-/// performed at constant temperature).
-typedef MarkovChainLength = int Function(num temperature);
-
-/// Function returning a sequence of pertubation
-/// magnitude vectors.
-typedef PertubationSequence = List<List<num>> Function(
-  List<num> temperatures,
-  List<num> dPositionMax,
-  List<num> dPositionMin,
-);
-
-/// Returns a sequence of pertubation magnitude vectors
-/// by interpolating between
-/// `dPositionMax` and `dPositionMin`.
-/// * `temperatures`: A sequence of temperatures.
-/// * `dPositionMax`: The initial perturbation magnitude vector.
-/// * `dPositionMin`: The final perturbation magnitude vector.
-List<List<num>> perturbationSequence(
-  List<num> temperatures,
-  List<num> dPositionMax,
-  List<num> dPositionMin,
-) {
-  final a =
-      (dPositionMax - dPositionMin) / (temperatures.first - temperatures.last);
-  final b = dPositionMax -
-      (dPositionMax - dPositionMin) *
-          (temperatures.first / (temperatures.first - temperatures.last));
-  return List<List<num>>.generate(
-      temperatures.length, (i) => (a * temperatures[i]).plus(b));
-}
-
-/// Returns an integer between `chainLengthStart` and `chainLengthEnd`.
-/// * `markovChainlength(tStart) = mStart`,
-/// * `markovChainlength(tEnd) = mEnd`.
+/// Returns a sequence of perturbation magnitude vectors by
+/// interpolating between `deltPositionMax` and  `deltaPositionMin`.
 ///
-/// Note: The following must hold: `tStart <= temperature <= tEnd`.
-int markovChainLength(
-  num temperature, {
-  required num tStart,
-  required num tEnd,
-  int chainLengthStart = 5,
-  int chainLengthEnd = 20,
-}) {
-  return (chainLengthStart - chainLengthEnd) * temperature ~/ (tStart - tEnd) +
-      chainLengthStart -
-      (chainLengthStart - chainLengthEnd) * tStart ~/ (tStart - tEnd);
-}
+/// The resulting sequence is linearly related to `temperatures`.
+List<List<num>> defaultPerturbationSequence(
+  List<num> temperatures,
+  List<num> deltaPositionMax,
+  List<num> deltaPositionMin,
+) =>
+    interpolate(
+      temperatures,
+      deltaPositionMax,
+      deltaPositionMin,
+    );
 
 /// Annealing simulator
 abstract class Simulator {
   /// Simulator constructor.
-  /// * field: An object of type `EnergyField` encapsulating the
+  /// * `field`: An object of type `EnergyField` encapsulating the
   ///   energy function (cost function)  and search space.
-  /// * temperatureSequence: A function with typedef `TemperatureSequence`. It
-  ///   specifies the simulated annealing temperature schedule.
-  ///
   /// ----
-  ///
   /// Optional parameters:
-  /// * gammaStart: Probability of solution acceptance if `dE == dEnergyStart`
-  ///   and the temperature is the initial temperature of the annealing process.
-  /// * gammaEnd: Probability of solution acceptance if `dE == dEnergyEnd`
-  ///   and the temperature is the final temperatures of the annealing process.
+  /// * gammaStart: Expectation value of the solution acceptance at the
+  //    initial temperature of the annealing process.
+  /// * gammaEnd: Expectation value of the solution acceptance at the
+  //    final temperatures of the annealing process.
   /// * iterations: Number of iterations when cooling
-  ///   the system from the initial annealing
-  ///   temperature to the final temperature `tEnd`.
-  /// * startPosition: Defaults to `field.minPosition`. Can be used to specify the
-  ///   starting point of the simulated annealing process.
-  /// * dEnergyStart: Defaults to `field.dEnergyStart`. Can be used for testing
-  ///   purposes. It is an estimate of the typical variation of
-  ///   the energy function when perturbing the current position randomly with
-  ///   magnitude `dPositionMax`.
-  /// * dEnergyEnd: Defaults to `field.dEnergyEnd`. Can be used for testing
-  ///   purposes. It is an estimate of the typical variation of
-  ///   the system energy function when perturbing the current position
-  ///   randomly with magnitude `dPositionMin`.
   Simulator(
-    EnergyField field,
-    TemperatureSequence temperatureSequence,
-    PertubationSequence perturbationSequence, {
+    EnergyField field, {
     this.gammaStart = 0.7,
-    this.gammaEnd = 0.05,
+    this.gammaEnd = 0.5,
     this.iterations = 750,
-    List<num>? startPosition,
-    num? dEnergyStart,
-    num? dEnergyEnd,
-  }) : _field = EnergyField.from(field) {
-    // Initializing late variables:
-    _dEnergyStart = Lazy<Future<num>>(
-      () => (dEnergyStart == null)
-          ? _field.dEnergyStart
-          : Future<num>.value(dEnergyStart),
-    );
-    _dEnergyEnd = Lazy<Future<num>>(
-      () => (dEnergyEnd == null)
-          ? _field.dEnergyEnd
-          : Future<num>.value(dEnergyEnd),
-    );
+  })  : _field = EnergyField.of(field),
+        _deltaPositionStart = field.size,
+        _deltaPositionEnd = List<num>.filled(field.dimension, 1e-6),
+        _gridStart = List<int>.filled(field.dimension, 40, growable: true),
+        _gridEnd = List<int>.filled(field.dimension, 40, growable: true),
+        _temperatureSequence = exponentialSequence,
+        _perturbationSequence = defaultPerturbationSequence {
+    _tStart = Lazy<Future<num>>(() => _field.tStart(gammaStart,
+        grid: gridStart, deltaPosition: deltaPositionStart, kB: 1));
 
-    _tEnd = Lazy<Future<num>>(
-      () => this.dEnergyEnd.then(
-            (dE) => -dE / math.log(gammaEnd),
-          ),
-    );
-
-    _tStart = Lazy<Future<num>>(
-      () => this.dEnergyStart.then((dE) => -dE / math.log(gammaStart)),
-    );
+    _tEnd = Lazy<Future<num>>(() => _field.tStart(gammaEnd,
+        grid: gridEnd, deltaPosition: deltaPositionEnd, kB: 1));
 
     _temperatures = Lazy<Future<List<num>>>(
-      () => Future.wait([tStart, tEnd])
-          .then((t) => temperatureSequence(t[0], t[1], iterations: iterations)),
+      () => Future.wait([tStart, tEnd]).then((t) => temperatureSequence(
+            t[0],
+            t[1],
+            iterations: iterations,
+          )),
     );
-
     _perturbationMagnitudes = Lazy<Future<List<List<num>>>>(
-      () => _temperatures()
-          .then<List<List<num>>>((temperatures) => perturbationSequence(
-                temperatures,
-                _field.dPositionMax,
-                _field.dPositionMin * 0.5,
-              )),
+      () => _temperatures().then<List<List<num>>>((temperatures) => interpolate(
+            temperatures,
+            deltaPositionStart,
+            deltaPositionEnd,
+          )),
     );
 
-    /// Set initial position:
-    if (startPosition != null) {
-      _field.perturb(startPosition, _field.dPositionMin * 0.0);
-    } else {
-      _field.perturb(_field.minPosition, _field.dPositionMin * 0.0);
-    }
+    _grid = Lazy<Future<List<List<int>>>>(() => _temperatures()
+        .then<List<List<int>>>((temperatures) => interpolate<int>(
+              temperatures,
+              gridStart,
+              gridEnd,
+            )));
+
     _currentMinEnergy = _field.value;
     _currentMinPosition = _field.position;
     _acceptanceProbability = 1.0;
+    _startPosition = _field.position;
   }
 
   /// Energy field.
   final EnergyField _field;
 
-  /// Acceptance probability at temperature `tStart` and
-  /// `dE = dEnergyStart`.
+  /// Acceptance probability at temperature `tStart`.
   final num gammaStart;
 
-  /// Acceptance probability at temperature `tEnd` and
-  /// `dE = dEnergyEnd`.
+  /// Acceptance probability at temperature `tEnd`.
   final num gammaEnd;
 
-  /// Number of outer simulated annealing iterations. Iterations at
-  /// decreasing temperature.
-  int iterations;
+  /// Number of outer simulated annealing iterations.
+  final int iterations;
+
+  /// Triggers an update of the lazy variables
+  /// `_tStart`,`_tEnd`,`_temperatures`, and `_perturbationMagnitudes`.
+  void _updateLazyVariables() {
+    _tStart.updateCache();
+    _tEnd.updateCache();
+    _temperatures.updateCache();
+    _perturbationMagnitudes.updateCache();
+  }
+
+  /// Function used to calculate the temperature sequence.
+  TemperatureSequence _temperatureSequence;
+
+  /// Function used to calculate the temperature sequence.
+  TemperatureSequence get temperatureSequence => _temperatureSequence;
+
+  /// Sets the function used to calculate the temperature sequence.
+  ///
+  /// * The default `temperatureSequence` is [exponentialSequence].
+  set temperatureSequence(TemperatureSequence value) {
+    _temperatureSequence = value;
+    _temperatures.updateCache();
+    _perturbationMagnitudes.updateCache();
+  }
+
+  /// The function used to calculate the sequence of perturbation
+  /// magnitudes.
+  PerturbationSequence _perturbationSequence;
+
+  /// Function used to calculate the sequence of pertubation
+  /// magnitudes.
+  PerturbationSequence get perturbationSequence => _perturbationSequence;
+
+  /// Sets the function used to calculate the sequence of perturbation
+  /// magnitudes.
+  set perturbationSequence(PerturbationSequence value) {
+    _perturbationSequence = value;
+    _perturbationMagnitudes.updateCache();
+  }
+
+  /// The initial perturbation magnitudes.
+  late final List<num> _deltaPositionStart;
+
+  /// Returns the initial perturbation magnitudes.
+  List<num> get deltaPositionStart => List.of(_deltaPositionStart);
+
+  /// Sets the initial perturbation magnitudes.
+  set deltaPositionStart(List<num> value) {
+    _deltaPositionStart
+      ..clear()
+      ..addAll(value);
+    _updateLazyVariables();
+  }
+
+  /// The perturbation magnitudes at the end of the annealing cycle.
+  late final List<num> _deltaPositionEnd;
+
+  /// Returns the perturbation magnitudes at the end of the annealing cycle.
+  List<num> get deltaPositionEnd => List.of(_deltaPositionEnd);
+
+  /// Sets the perturbation magnitudes at the end of the annealing cycle.
+  set deltaPositionEnd(List<num> value) {
+    _deltaPositionEnd
+      ..clear()
+      ..addAll(value);
+    _updateLazyVariables();
+  }
+
+  /// Specifies the number of grid points at
+  /// the beginning of the annealing process.
+  late final List<int> _gridStart;
+
+  /// Returns the grid sizes at the beginning of the annealing process.
+  List<int> get gridStart => List.of(_gridStart);
+
+  /// Sets the number of grid points at the beginning of the annealing process.
+  ///
+  /// Default value: 40 grid points along each dimension.
+  set gridStart(List<int> value) {
+    _gridStart
+      ..clear()
+      ..addAll(value);
+    _updateLazyVariables();
+  }
+
+  /// Grid sizes along each dimension at the end of the annealing process.
+  late final List<int> _gridEnd;
+
+  /// Returns the number of grid points along each dimension
+  ///  at the end of the annealing process.
+  List<int> get gridEnd => List.of(_gridEnd);
+
+  /// Sets the grid sizes at the end of the annealing process.
+  ///
+  /// Default value: 40 grid points along each dimension.
+  set gridEnd(List<int> value) {
+    _gridEnd
+      ..clear()
+      ..addAll(value);
+    _updateLazyVariables();
+  }
+
+  /// A sequence of grid vectors.
+  late final Lazy<Future<List<List<int>>>> _grid;
+
+  /// Returns the currently used sequence of grid vectors.
+  Future<List<List<int>>> get grid => _grid().then<List<List<int>>>((grid) =>
+      List<List<int>>.generate(grid.length, (i) => List<int>.of(grid[i])));
+
+  /// The starting position.
+  late final List<num> _startPosition;
+
+  /// Returns the starting position of the annealing process.
+  List<num> get startPosition => List.of(_startPosition);
+
+  /// Sets the starting position of the annealing process.
+  set startPosition(List<num> value) {
+    _startPosition
+      ..clear()
+      ..addAll(value);
+    _field.perturb(_startPosition, deltaPositionStart * 0.0);
+  }
 
   /// Annealing temperatures.
   late final Lazy<Future<List<num>>> _temperatures;
 
+  /// The annealing temperatures (annealing schedule).
+  Future<List<num>> get temperatures =>
+      _temperatures().then((temperatures) => List<num>.of(temperatures));
+
   /// Perturbation magnitudes.
   late final Lazy<Future<List<List<num>>>> _perturbationMagnitudes;
+
+  /// Returns the sequence of perturbation magnitudes.
+  Future<List<List<num>>> get perturbationMagnitudes =>
+      _perturbationMagnitudes().then<List<List<num>>>((pertubationMagnitudes) =>
+          List<List<num>>.generate(pertubationMagnitudes.length,
+              (i) => List<num>.of(pertubationMagnitudes[i])));
 
   /// Initial annealing temperature.
   late final Lazy<Future<num>> _tStart;
@@ -178,22 +243,6 @@ abstract class Simulator {
   /// Final annealing temperature.
   Future<num> get tEnd => _tEnd();
 
-  /// Estimated energy difference when perturbing the current position
-  /// randomly with magnitude `dPositionMax`.
-  late final Lazy<Future<num>> _dEnergyStart;
-
-  /// Estimated energy difference when perturbing the current position
-  /// randomly with magnitude `dPositionMax`.
-  Future<num> get dEnergyStart => _dEnergyStart();
-
-  /// Estimated energy difference when perturbing the current position
-  /// randomly with magnitude `dPositionMin`.
-  late final Lazy<Future<num>> _dEnergyEnd;
-
-  /// Estimated energy difference when perturbing the current position
-  /// randomly with magnitude `dPositionMin`.
-  Future<num> get dEnergyEnd => _dEnergyEnd();
-
   /// Current field position.
   List<num> get currentPosition => _field.position;
 
@@ -203,8 +252,7 @@ abstract class Simulator {
   /// Current energy minimizing field position.
   late List<num> _currentMinPosition;
 
-  /// Current energy minimizing solution. If the argument `startPosition` is not
-  /// specified in the constructor it is initialized as `field.minPosition`.
+  /// Current energy minimizing solution.
   List<num> get currentMinPosition => List<num>.from(_currentMinPosition);
 
   /// Current energy minimum.
@@ -225,11 +273,17 @@ abstract class Simulator {
   /// Current temperature.
   num get t => _t;
 
-  /// Current perturbation magnitude.
-  late List<num> _dPosition;
+  /// Holds the grid used in the current iteration step.
+  late List<int> _currentGrid;
+
+  /// Returns the grid used in the current iteration step.
+  List<int> get currentGrid => _currentGrid;
 
   /// Current perturbation magnitude.
-  List<num> get dPosition => List.from(_dPosition);
+  late List<num> _deltaPosition;
+
+  /// Current perturbation magnitude.
+  List<num> get deltaPosition => List.of(_deltaPosition);
 
   /// Acceptance probability of current solution.
   late num _acceptanceProbability;
@@ -251,6 +305,8 @@ abstract class Simulator {
   /// Can be used to add entries to a log.
   void recordLog();
 
+  // Initializing late variables:
+
   /// Starts the simulated annealing process and
   /// returns the best solution found.
   /// * isRecursive: Flag used to call the method recursively if the algorithm
@@ -267,13 +323,15 @@ abstract class Simulator {
     bool isVerbose = false,
   }) async {
     /// Initialize parameters:
-    final temperatures = await _temperatures();
-    final perturbationMagnitudes = await _perturbationMagnitudes();
+    final temperatures = await this.temperatures;
+    final perturbationMagnitudes = await this.perturbationMagnitudes;
+    final grid = await this.grid;
     num dE = 0;
 
     if (_recursionCounter == 0) {
       _t = temperatures.first;
-      _dPosition = perturbationMagnitudes.first;
+      _deltaPosition = perturbationMagnitudes.first;
+      _currentGrid = grid.first;
       prepareLog();
       recordLog();
     }
@@ -293,20 +351,25 @@ abstract class Simulator {
     // Outer iteration loop.
     for (i; i < temperatures.length; i++) {
       _t = temperatures[i];
-      _dPosition = perturbationMagnitudes[i];
+      _deltaPosition = perturbationMagnitudes[i];
+      _currentGrid = grid[i];
 
       // Inner iteration loop.
       for (var j = 0; j < markov(_t); j++) {
         // Choose next random point and calculate energy difference.
-        dE =
-            _field.perturb(_currentMinPosition, _dPosition) - _currentMinEnergy;
+        dE = _field.perturb(
+              _currentMinPosition,
+              _deltaPosition,
+              grid: _currentGrid,
+            ) -
+            _currentMinEnergy;
 
         if (dE < 0) {
           _currentMinEnergy = _field.value;
           _currentMinPosition = _field.position;
           _acceptanceProbability = 1.0;
         } else {
-          _acceptanceProbability = math.exp(-dE / _t);
+          _acceptanceProbability = exp(-dE / _t);
           if (_acceptanceProbability > Interval.random.nextDouble()) {
             _currentMinEnergy = _field.value;
             _currentMinPosition = _field.position;
@@ -337,7 +400,16 @@ abstract class Simulator {
   }
 
   @override
-  String toString() => runtimeType.toString();
+  String toString() {
+    final b = StringBuffer();
+    b.writeln('Simulator: ');
+    b.writeln('  iterations: $iterations');
+    b.writeln('  startPosition: $_startPosition');
+    b.writeln('  gridStart: $gridStart');
+    b.writeln('  gridEnd: $gridEnd');
+    b.writeln('  Field: $_field'.replaceAll('\n', '\n  '));
+    return b.toString();
+  }
 
   /// Returns a `String` containing object info.
   ///
@@ -346,12 +418,12 @@ abstract class Simulator {
     final b = StringBuffer();
     b.writeln('Simulator: ');
     b.writeln('  iterations: $iterations');
-    b.writeln('  dEnergyStart: ${await dEnergyStart}');
-    b.writeln('  dEnergyEnd: ${await dEnergyEnd}');
-    b.writeln('  xMin: ${_field.minPosition}');
+    b.writeln('  startPosition: $_startPosition');
+    b.writeln('  gridStart: $gridStart');
+    b.writeln('  gridEnd: $gridEnd');
     b.writeln('  tStart: ${await tStart}');
     b.writeln('  tEnd: ${await tEnd}');
-    b.writeln('  Field: ${await _field.info}'.replaceAll('\n', '\n  '));
+    b.writeln('  Field: $_field'.replaceAll('\n', '\n  '));
     return b.toString();
   }
 }
