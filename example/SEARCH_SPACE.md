@@ -1,5 +1,5 @@
 #  Search Space - Example
-
+[![Dart](https://github.com/simphotonics/simulated_annealing/actions/workflows/dart.yml/badge.svg)](https://github.com/simphotonics/simulated_annealing/actions/workflows/dart.yml)
 
 ## Usage
 

@@ -1,5 +1,5 @@
 ##  Annealing Schedule - Example
-
+[![Dart](https://github.com/simphotonics/simulated_annealing/actions/workflows/dart.yml/badge.svg)](https://github.com/simphotonics/simulated_annealing/actions/workflows/dart.yml)
 
 The library `annealing_schedule` includes functions with signature
 [`TemperatureSequence`][TemperatureSequence] for generating
