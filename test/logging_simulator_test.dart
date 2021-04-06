@@ -57,7 +57,7 @@ void main() async {
 
   group('Simulator:', () {
     test('Convergence', () {
-      expect(result, orderedCloseTo(globalMin, deltaPositionMin*10));
+      expect(result, orderedCloseTo(globalMin, deltaPositionMin * 10));
     });
   });
   group('Perturbation Magnitudes:', () {
