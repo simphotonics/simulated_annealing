@@ -1,3 +1,7 @@
+## 0.2.2
+
+Migrated to null-safety.
+
 ## 0.2.2-nullsafety
 
 - Renamed variables in class [`SearchSpace`][SearchSpace].
