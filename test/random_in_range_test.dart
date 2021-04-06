@@ -47,30 +47,18 @@ void main() {
     final xMax = 4.0;
     final nGrid = 5;
     test('next <= xMax', () {
-      final next = r.nextInRange(
-        xMin,
-        xMax,
-        nGrid: nGrid,
-        inverseCdf: inverseCdf,
-      );
+      final next =
+          r.nextInRange(xMin, xMax, nGrid: nGrid, inverseCdf: inverseCdf);
       expect(next, lessThanOrEqualTo(xMax));
     });
-    test('next <= xMax', () {
-      expect(
-        r.nextInRange(xMax, xMin, nGrid: nGrid, inverseCdf: inverseCdf),
-        lessThanOrEqualTo(xMax),
-      );
-    });
+
     test(' xMin <= next ', () {
       expect(
         r.nextInRange(xMin, xMax, nGrid: nGrid, inverseCdf: inverseCdf),
         greaterThanOrEqualTo(xMin),
       );
     });
-    test(' xMin <= next', () {
-      expect(r.nextInRange(xMax, xMin, nGrid: nGrid, inverseCdf: inverseCdf),
-          greaterThanOrEqualTo(xMin));
-    });
+
     test('Value coincides with grid point', () {
       expect(
           r.gridPoints(xMin, xMax, nGrid),
