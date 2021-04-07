@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:math';
 
 import 'package:exception_templates/exception_templates.dart';
@@ -445,7 +444,7 @@ class SearchSpace {
   /// Note: For parametric intervals the size is estimated by sampling the
   /// interval 50 times and returning the difference between the sample
   /// maximum and the sample minimum.
-  UnmodifiableListView<num> get size => UnmodifiableListView(_size());
+  List<num> get size => List.of(_size());
 
   /// Returns true if the point `position` belongs to the search space `this`.
   bool contains(List<num> position) {
