@@ -120,11 +120,25 @@ void main() {
     test('Interpolated value', () {
       expect(
           markovChainLength(
-            (tStart - tEnd) / 2,[],
+            (tStart - tEnd) / 2,
+            [],
             tStart: tStart,
             tEnd: tEnd,
           ),
           13);
+    });
+    test('Initial value, grid: [40, 40, 40]', () {
+      expect(
+        markovChainLength(tStart, [40, 40, 40], tStart: tStart, tEnd: tEnd),
+        30,
+      );
+    });
+    test('Final value, grid: [40, 40, 40,]', () {
+      expect(
+        markovChainLength(tEnd, [40, 40, 40], tStart: tStart, tEnd: tEnd),
+        120,
+
+      );
     });
   });
 }
