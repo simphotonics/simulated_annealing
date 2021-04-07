@@ -1,6 +1,7 @@
 # Simulated Annealing For Dart
 [![Dart](https://github.com/simphotonics/simulated_annealing/actions/workflows/dart.yml/badge.svg)](https://github.com/simphotonics/simulated_annealing/actions/workflows/dart.yml)
 
+
 ## Introduction
 [Simulated annealing][SA-Wiki] (SA) is an algorithm aimed at finding the *global* minimum
 of a function E(x<sub>0</sub>,&nbsp;x<sub>1</sub>,&nbsp;...,&nbsp;x<sub>n</sub>)
@@ -53,9 +54,10 @@ as a `dependency` in your `pubspec.yaml` file.
 
 The following steps are required to set up the SA algorithm.
 1. Specify the [search space][search space] &omega;.
-2. Define the system [energy field][energy_field].
-3. Extend the class [`Simulator`][SimulatorClass] implementing the methods `prepareLog()`
-and  `recordLog()` or create an instance of [`LoggingSimulator`][LoggingSimulator].
+2. Define the system [EnergyField][EnergyField], an object encapsulating
+   the energy function (cost function) and its domain (the search space).
+3. Create an instance of [`LoggingSimulator`][LoggingSimulator] or
+   alternatively extend the abstract class [`Simulator`][SimulatorClass].
 4. Start the [simulated annealing][simulator] process.
 
 <details><summary> Click to show source code.</summary>
@@ -142,7 +144,8 @@ too many up-hill moves at high temperatures wasting computational time and delay
    that the solution has converged towards the global minimum and up-hill moves should be restricted. For this reason &gamma;<sub>end</sub> has default value 0.05.
 * `iterations`: Determines the number of temperature steps in the annealing schedule.
 
-Additionally, it is possible to set the class variable `temperatureSequence` to function of type [`TemperatureSequence`][TemperatureSequence]  that is used to determine the temperature at each (outer) iteration step.
+Additionally, it is possible to set the class variable `temperatureSequence`
+to function of type [`TemperatureSequence`][TemperatureSequence]  that is used to determine the temperature at each (outer) iteration step.
 
 It is recommended to start with a higher number of
 outer iterations (number of entries in the sequence of temperatures) and log
@@ -171,7 +174,7 @@ In general, the following information is required to define an annealing schedul
   that is used to determine the temperature at each (outer) iteration step.
 
 The class [`EnergyField`][EnergyField] provides the methods `tStart` and `tEnd`. These use
-the algorithm introduced by Bem-Ameur to calculate the
+the algorithm introduced by Ben-Ameur to calculate the
 initial and final annealing temperature [\[2\]][ben-ameur2004].
 
 
@@ -194,11 +197,11 @@ Please file feature requests and bugs at the [issue tracker][tracker].
 
 [anneal]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/Simulator/anneal.html
 
-[annealing schedule]: example/ANNEALING_SCHEDULE.md
+[annealing schedule]: https://github.com/simphotonics/simulated_annealing/tree/main/example/ANNEALING_SCHEDULE.md
 
 [Boltzmann]: https://en.wikipedia.org/wiki/Boltzmann_constant
 
-[energy_field]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/EnergyField-class.html
+[EnergyField]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/EnergyField-class.html
 
 [here]: https://github.com/simphotonics/simulated_annealing/tree/main/example/SIMULATOR.md
 
