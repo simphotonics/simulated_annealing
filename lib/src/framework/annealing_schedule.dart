@@ -11,7 +11,10 @@ typedef TemperatureSequence = List<num> Function(
 /// Function returning an integer representing a Markov
 /// chain length (the number of simulated annealing iterations
 /// performed at constant temperature).
-typedef MarkovChainLength = int Function(num temperature);
+/// * temparture: The current system temperature.
+/// * grid: The currently used grid. (A numerical grid can be used to
+/// transform a continuous problem into a discrete one.)
+typedef MarkovChainLength = int Function(num temperature, List<int> grid);
 
 /// Function returning a sequence of pertubation
 /// magnitude vectors.
@@ -48,15 +51,18 @@ List<List<T>> interpolate<T extends num>(
 ///
 /// Note: The following must hold: `tStart <= temperature <= tEnd`.
 int markovChainLength(
-  num temperature, {
+  num temperature,
+  List<int> grid, {
   required num tStart,
   required num tEnd,
   int chainLengthStart = 5,
   int chainLengthEnd = 20,
 }) {
-  return (chainLengthStart - chainLengthEnd) * temperature ~/ (tStart - tEnd) +
-      chainLengthStart -
-      (chainLengthStart - chainLengthEnd) * tStart ~/ (tStart - tEnd);
+  final cardinality = grid.isEmpty ? 1 : grid.prod();
+  return pow(cardinality, 1 / (grid.length * 2)).toInt() *
+      ((chainLengthStart - chainLengthEnd) * temperature ~/ (tStart - tEnd) +
+          chainLengthStart -
+          (chainLengthStart - chainLengthEnd) * tStart ~/ (tStart - tEnd));
 }
 
 /// Linear temperature sequence with entries:

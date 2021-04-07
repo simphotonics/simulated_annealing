@@ -112,15 +112,15 @@ void main() {
     final tStart = 1000.0;
     final tEnd = 1e-2;
     test('Initial value', () {
-      expect(markovChainLength(tStart, tStart: tStart, tEnd: tEnd), 5);
+      expect(markovChainLength(tStart, [], tStart: tStart, tEnd: tEnd), 5);
     });
     test('Final value', () {
-      expect(markovChainLength(tEnd, tStart: tStart, tEnd: tEnd), 20);
+      expect(markovChainLength(tEnd, [], tStart: tStart, tEnd: tEnd), 20);
     });
     test('Interpolated value', () {
       expect(
           markovChainLength(
-            (tStart - tEnd) / 2,
+            (tStart - tEnd) / 2,[],
             tStart: tStart,
             tEnd: tEnd,
           ),

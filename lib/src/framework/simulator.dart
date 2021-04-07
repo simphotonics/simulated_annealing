@@ -5,7 +5,6 @@ import 'package:list_operators/list_operators.dart';
 
 import 'annealing_schedule.dart';
 import 'energy_field.dart';
-
 import 'search_space.dart';
 
 /// Returns a sequence of perturbation magnitude vectors by
@@ -42,7 +41,8 @@ abstract class Simulator {
     this.iterations = 750,
   })  : _field = EnergyField.of(field),
         _deltaPositionStart = field.size,
-        _deltaPositionEnd = List<num>.filled(field.dimension, 1e-6),
+        _deltaPositionEnd =
+            List<num>.filled(field.dimension, 1e-6, growable: true),
         _gridStart = List<int>.filled(field.dimension, 40, growable: true),
         _gridEnd = List<int>.filled(field.dimension, 40, growable: true),
         _temperatureSequence = exponentialSequence,
@@ -355,7 +355,7 @@ abstract class Simulator {
       _currentGrid = grid[i];
 
       // Inner iteration loop.
-      for (var j = 0; j < markov(_t); j++) {
+      for (var j = 0; j < markov(_t, _currentGrid); j++) {
         // Choose next random point and calculate energy difference.
         dE = _field.perturb(
               _currentMinPosition,
@@ -377,6 +377,7 @@ abstract class Simulator {
         }
         recordLog();
       }
+
     }
     if (globalMinEnergy < _currentMinEnergy) {
       if (isVerbose) {

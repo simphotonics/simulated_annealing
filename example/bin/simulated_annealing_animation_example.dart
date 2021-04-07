@@ -19,7 +19,10 @@ void main() async {
 
   print(await simulator.info);
 
-  final xSol = await simulator.anneal((_) => 1, isRecursive: true);
+  final xSol = await simulator.anneal(
+    (num temperature, List<int> grid) => 1,
+    isRecursive: true,
+  );
 
   print('Solution: $xSol');
 }
