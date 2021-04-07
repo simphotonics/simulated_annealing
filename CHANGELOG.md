@@ -1,6 +1,11 @@
 ## 0.2.2
 
-Migrated to null-safety.
+- Migrated to null-safety.
+- The function [`nextInRange`][nextInRange] now has signature:
+   num `nextInRange`(num xMin, num xMax, {InverseCdf? inverseCdf,
+   int nGrid = 0}). The optional parameter `ngrid` enables
+   returning discrete random numbers positioned along an
+   equidistant grid.
 
 ## 0.2.2-nullsafety
 
@@ -66,6 +71,9 @@ Migrated to null-safety.
 ## 0.0.1-nullsafety
 
 - Initial version
+
+
+[nextInRange]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/RandomInRange/nextInRange.html
 
 
 [SearchSpace]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/SearchSpace-class.html
