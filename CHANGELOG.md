@@ -1,4 +1,4 @@
-## 0.2.2
+## 0.3.0
 
 - Migrated to null-safety.
 - The function [`nextInRange`][nextInRange] now has signature:
