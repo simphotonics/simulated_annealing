@@ -21,7 +21,8 @@ in order to minimize atomic lattice defects as the material solidifies.
 </details>
 
 Simulated annealing works by randomly selecting a new point in the neighbourhood of the
-current solution, evaluating the energy function, and deciding if the new solution is accepted or rejected. If for a newly selected point the energy E is lower that the previous minimum energy
+current solution, evaluating the energy function, and deciding if the new solution is accepted or rejected.
+If for a newly selected point the energy E is lower that the previous minimum energy
 E<sub>min</sub>, the new solution is accepted. Crucially, if &Delta;E > 0, the algorithm still accepts the new solution with probability:
 P(&Delta;E > 0, T) = e<sup>-&Delta;E/(k<sub>B</sub>&middot;T)</sup> where &Delta;E = E - E<sub>min</sub>. Accepting up-hill moves provides a method of escaping from local energy minima.
 
@@ -174,7 +175,7 @@ In general, the following information is required to define an annealing schedul
   that is used to determine the temperature at each (outer) iteration step.
 
 The class [`EnergyField`][EnergyField] provides the methods `tStart` and `tEnd`. These use
-the algorithm introduced by Ben-Ameur to calculate the
+an algorithm introduced by Ben-Ameur to calculate the
 initial and final annealing temperature [\[2\]][ben-ameur2004].
 
 
