@@ -18,7 +18,7 @@ solid material above a critical temperature. This allows its atoms to gain
 sufficient kinetic energy to be able to rearrange themselves.
 Then the temperature is decreased sufficiently slowly
 in order to minimize atomic lattice defects as the material solidifies.
-</details><br/>
+</details>
 
 Simulated annealing works by randomly selecting a new point in the neighbourhood of the
 current solution, evaluating the energy function, and deciding if the new solution is accepted or rejected. If for a newly selected point the energy E is lower that the previous minimum energy
