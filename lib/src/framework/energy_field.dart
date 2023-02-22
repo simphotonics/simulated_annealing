@@ -92,7 +92,8 @@ class EnergyField {
   ///
   /// `grid`: The grid sizes along each dimension.
   /// The grid is used to turn a continuous search space into a discret
-  /// search space. The default value is an empty list (i.e. a continuous search space).
+  /// search space. The default value is an empty list
+  /// (i.e. a continuous search space).
   ///
   /// Note: The new position can be accessed via the getter
   /// `this.position`. The return value of `next()` can
@@ -119,6 +120,50 @@ class EnergyField {
         ),
       );
 
+  /// Returns a list containing the energy values at two
+  /// positions separated at most by `deltaPosition`.
+  /// * The lower energy state is listed first.
+  /// * Throws an exception of type `ExceptionOf<EnergyField>` if
+  /// no transition could be generated in `maxTrials` trials.
+  List<List<num>> transitions(
+    List<num> deltaPosition,
+    List<int> grid, {
+    int sampleSize = 100,
+    int maxTrials = 10,
+  }) {
+    maxTrials = maxTrials < 1 ? 10 : maxTrials;
+
+    final result = <List<num>>[[], []];
+    var count = 0;
+    num state0 = 0;
+    num state1 = 0;
+
+    for (var i = 0; i < sampleSize; i++) {
+      do {
+        state0 = next(grid: grid);
+        state1 = perturb(position, deltaPosition, grid: grid);
+        ++count;
+      } while (state0 == state1 && count < maxTrials);
+      if (count >= maxTrials) {
+        throw ExceptionOf<EnergyField>(
+            message: 'Error in function \'transitions().\'',
+            invalidState: 'Could not generate an uphill transition. '
+                'in $maxTrials trials.',
+            expectedState: 'A non-constant energy function.');
+      } else {
+        if (state0 < state1) {
+          result.first.add(state0);
+          result.last.add(state1);
+        } else {
+          result.first.add(state1);
+          result.last.add(state0);
+        }
+        count = 0;
+      }
+    }
+    return result;
+  }
+
   /// Returns a list of energy values sampled from a neighbourhood
   /// around `position` using perturbation
   /// magnitudes `deltaPosition`.
@@ -137,14 +182,23 @@ class EnergyField {
   }) async {
     if (selectUphillMoves) {
       var i = 0;
+      var counter = 0;
       var eMin = energy(position);
       final result = <num>[];
       do {
         if (eMin < perturb(position, deltaPosition, grid: grid)) {
           result.add(value);
           ++i;
+        } else {
+          ++counter;
         }
-      } while (i < sampleSize);
+      } while (i < sampleSize && counter < 50 * sampleSize);
+      if (result.length < sampleSize) {
+        throw ExceptionOf<EnergyField>(
+            message: 'Error in function \'sampleNeighbourhood()\'',
+            invalidState: 'Could not generate $sampleSize uphill transitions '
+                'with initial position $position and energy $eMin. ');
+      }
       return result;
     } else {
       return List<num>.generate(
@@ -165,12 +219,12 @@ class EnergyField {
   /// * To avoid a zero denominator it is advisable to rescale all
   //    energies by subtracting `e0.min()`.
   num _gammaStart(
-    List<num> e0,
-    List<num> e1,
+    List<List<num>> transitions,
     num temperature, [
     num kB = 1.0,
   ]) =>
-      e1.exp(-kB / temperature).sum() / e0.exp(-kB / temperature).sum();
+      transitions.last.exp(-kB / temperature).sum() /
+      transitions.first.exp(-kB / temperature).sum();
 
   /// Returns the expected value of gamma, the acceptance probability
   /// of a transition from a state with energy `e0`
@@ -179,12 +233,8 @@ class EnergyField {
   /// Note:
   /// * The transitions must be selected such that `e0[i] < e1[i]`.
   /// * The energies `e1[i]` have been rescaled such that `e0 = 0`.
-  num _gammaEnd(
-    List<num> e1,
-    num temperature, [
-    num kB = 1.0,
-  ]) =>
-      e1.exp(-kB / temperature).sum() / e1.length;
+  num _gammaEnd(List<num> e1, num temperature) =>
+      e1.exp(-1.0 / temperature).sum() / e1.length;
 
   /// Returns the temperature at which the expectation value
   /// of the acceptance probability of up-hill transitions
@@ -197,7 +247,6 @@ class EnergyField {
     required List<int> grid,
     required List<num> deltaPosition,
     int sampleSize = 200,
-    num kB = 1.0,
   }) async {
     if (gamma <= 0 || gamma >= 1) {
       throw ErrorOf<EnergyField>(
@@ -205,52 +254,28 @@ class EnergyField {
           invalidState: 'Found \'gamma\': $gamma.',
           expectedState: 'Expected: 0 < gamma < 1.');
     }
+    final transitions = this.transitions(
+      deltaPosition,
+      grid,
+      sampleSize: sampleSize,
+    );
 
-    // Initial transition values.
-    final e0 = <num>[];
-    // Final transition values.
-    final e1 = <num>[];
-    var initialValue = value;
-    var finalValue = value;
-    var initialPosition = position;
-    // Generating up-hill transitions e0[i] => e1[i];
-    for (var i = 0; i < sampleSize; ++i) {
-      initialValue = next(grid: grid);
-      initialPosition = position;
-      if (initialValue.isNaN) {
-        print('Warning: energy at $initialPosition is NaN.');
-        --i;
-        continue;
-      }
-      e0.add(initialValue);
-      do {
-        finalValue = perturb(
-          initialPosition,
-          deltaPosition,
-          grid: grid,
-        );
-        if (finalValue.isNaN) {
-          print('Warning: energy at $position is NaN.');
-        }
-      } while (finalValue < initialValue);
-      e1.add(finalValue);
-    }
+    final deltaE = transitions.last - transitions.first;
 
-    /// First estimate for the initial temperature.
-    var optTemperature = -e0.stdDev() / log(gamma);
+    /// First estimate of the initial temperature.
+    var optTemperature = deltaE.stdDev() / (-log(gamma));
     num gammaEstimate = 0;
 
     var counter = 0;
-    final e0Min = e0.min();
 
-    //Rescaling energy
-    for (var i = 0; i < e0.length; i++) {
-      e0[i] -= e0Min;
-      e1[i] -= e0Min;
+    // Rescaling transition energies
+    final transitionsGS = transitions.first.min();
+    for (var i = 0; i < sampleSize; ++i) {
+      transitions.first[i] -= transitionsGS;
+      transitions.last[i] -= transitionsGS;
     }
-
     do {
-      gammaEstimate = _gammaStart(e0, e1, optTemperature, kB);
+      gammaEstimate = _gammaStart(transitions, optTemperature);
       optTemperature = optTemperature *
           pow(
             log(gammaEstimate) / log(gamma),
@@ -258,7 +283,7 @@ class EnergyField {
           );
       ++counter;
       //print('gamma: $gammaEstimate temperature: $optTemperature');
-    } while ((gammaEstimate - gamma).abs() > 1e-4 && counter < 20);
+    } while ((gammaEstimate - gamma).abs() > gamma * 1e-3 && counter < 20);
     return optTemperature;
   }
 
@@ -273,11 +298,10 @@ class EnergyField {
     required List<int> grid,
     required List<num> deltaPosition,
     int sampleSize = 200,
-    num kB = 1.0,
   }) async {
     if (gamma <= 0 || gamma >= 1) {
       throw ErrorOf<EnergyField>(
-          message: 'Error in function optimalTemperature',
+          message: 'Error in function tEnd()',
           invalidState: 'Found \'gamma\': $gamma.',
           expectedState: 'Expected: 0 < gamma < 1.');
     }
@@ -301,7 +325,7 @@ class EnergyField {
       e1[i] -= e0;
     }
     do {
-      gammaEstimate = _gammaEnd(e1, optTemperature, kB);
+      gammaEstimate = _gammaEnd(e1, optTemperature);
       optTemperature = optTemperature *
           pow(
             log(gammaEstimate) / log(gamma),
@@ -309,7 +333,7 @@ class EnergyField {
           );
       ++counter;
       //print('gamma: $gammaEstimate temperature: $optTemperature');
-    } while ((gammaEstimate - gamma).abs() > 1e-4 && counter < 20);
+    } while ((gammaEstimate - gamma).abs() > gamma * 1e-3 && counter < 100);
     return optTemperature;
   }
 
