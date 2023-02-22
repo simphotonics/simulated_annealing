@@ -1,7 +1,6 @@
-import 'package:test/test.dart';
 import 'package:list_operators/list_operators.dart';
-
 import 'package:simulated_annealing/simulated_annealing.dart';
+import 'package:test/test.dart';
 
 import 'src/energy_field_instance.dart';
 
@@ -23,7 +22,7 @@ void main() async {
   final tStart = await simulator.tStart;
   final tEnd = await simulator.tEnd;
 
-  final result = await simulator.anneal((num temperature, List<int> grid) => 1);
+  final result = await simulator.anneal((num temperature) => 1);
   final temperatures = exponentialSequence(tStart, tEnd);
   final perturbationMagnitudes = defaultPerturbationSequence(
       temperatures, simulator.deltaPositionStart, simulator.deltaPositionEnd);
@@ -32,7 +31,7 @@ void main() async {
     test('deltaPositionStart', () {
       expect(
         simulator.deltaPositionStart,
-        orderedCloseTo(field.size, [0.25, 0.25, 0.25]),
+        closeToList(field.size, 0.25),
       );
     });
     test('deltaPositionEnd', () {
@@ -57,27 +56,21 @@ void main() async {
 
   group('Simulator:', () {
     test('Convergence', () {
-      expect(result, orderedCloseTo(globalMin, deltaPositionMin * 10));
+      expect(result, CloseToList(globalMin, deltaPositionMin.mean() * 10));
     });
   });
   group('Perturbation Magnitudes:', () {
     test('start', () {
-      expect(
-          perturbationMagnitudes.first,
-          orderedCloseTo(simulator.deltaPositionStart, [
-            1e-12,
-            1e-12,
-            1e-12,
-          ]));
+      expect(perturbationMagnitudes.first,
+          closeToList(simulator.deltaPositionStart, 1e-12));
     });
     test('end', () {
       expect(
           perturbationMagnitudes.last,
-          orderedCloseTo(simulator.deltaPositionEnd, [
+          closeToList(
+            simulator.deltaPositionEnd,
             1e-12,
-            1e-12,
-            1e-12,
-          ]));
+          ));
     });
   });
   group('Simulator With Presets', () {

@@ -1,6 +1,5 @@
-import 'package:matcher/matcher.dart';
-import 'package:test/test.dart';
 import 'package:list_operators/list_operators.dart';
+import 'package:test/test.dart';
 
 import 'src/energy_field_instance.dart';
 

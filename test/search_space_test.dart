@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:list_operators/list_operators.dart';
-import 'package:test/test.dart';
 import 'package:simulated_annealing/simulated_annealing.dart';
+import 'package:test/test.dart';
 
 void main() {
   final rand = Random();
@@ -123,7 +123,7 @@ void main() {
     });
   });
   // Testing class: Space
-  group('SearchSpace: Fixed', () {
+  group('SearchSpace Fixed:', () {
     final space = SearchSpace([FixedInterval(0, 2), FixedInterval(10, 100)]);
     test('limits', () {
       final point = space.next();
@@ -138,7 +138,9 @@ void main() {
               point < position.plus(deltaPosition),
           true);
       expect(space.contains(point), true);
-      expect(point, orderedCloseTo(position, deltaPosition));
+      for (var i = 0; i < position.length; i++) {
+        expect(point[i], closeTo(position[i], deltaPosition[i]));
+      }
     });
     test('perturbation with grid', () {
       final position = <num>[1, 20];
@@ -149,7 +151,9 @@ void main() {
               point <= position.plus(deltaPosition),
           true);
       expect(space.contains(point), true);
-      expect(point, orderedCloseTo(position, deltaPosition));
+      for (var i = 0; i < position.length; i++) {
+        expect(point[i], closeTo(position[i], deltaPosition[i]));
+      }
     });
     test('size', () {
       expect(space.size, [2, 90]);
@@ -178,13 +182,13 @@ void main() {
       expect(space.contains(space.next(nGrid: [10, 10, 10])), true);
       final point = space.perturb(position, deltaPositionMin);
       expect(space.contains(point), isTrue);
-      expect(point, orderedCloseTo(position, deltaPositionMin));
+      expect(point, CloseToList(position, deltaPositionMin.mean()));
     });
 
     test('size', () {
       expect(
         space.size,
-        orderedCloseTo([4.0, 4.0, 4.0], [0.25, 0.25, 0.25]),
+        CloseToList([4.0, 4.0, 4.0], 0.25),
       );
     });
   });

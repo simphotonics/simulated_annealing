@@ -4,7 +4,7 @@ import 'package:simulated_annealing/simulated_annealing.dart';
 
 void main() {
   // Testing class: Interval.
-  group('Initial temperature', () {
+  group('Initial temperature:', () {
     final tStart = 100.0;
     final tEnd = 1e-3;
     final delta = 1e-12;
@@ -39,7 +39,7 @@ void main() {
       );
     });
   });
-  group('Final temperature', () {
+  group('Final temperature:', () {
     final tStart = 100.0;
     final tEnd = 1e-3;
     final delta = 1e-12;
@@ -75,24 +75,24 @@ void main() {
     });
   });
 
-  group('Perturbation magnitudes', () {
+  group('Perturbation magnitudes:', () {
     final deltaPositionMax = [10.0, 10.0];
     final deltaPositionMin = [1e-4, 1e-4];
     final tStart = 1000.0;
     final tEnd = 1e-2;
     final temperaturesLinear = linearSequence(tStart, tEnd, iterations: 100);
-    final delta = [1e-12, 1e-12];
+    final delta = 1e-12;
 
     test('linearSchedule', () {
       final deltaPositionLinear = defaultPerturbationSequence(
           temperaturesLinear, deltaPositionMax, deltaPositionMin);
       expect(
         deltaPositionLinear[0],
-        orderedCloseTo(deltaPositionMax, delta),
+        closeToList(deltaPositionMax, delta),
       );
       expect(
         deltaPositionLinear[99],
-        orderedCloseTo(deltaPositionMin, delta),
+        closeToList(deltaPositionMin, delta),
       );
     });
     test('exponentialSchedule', () {
@@ -100,45 +100,31 @@ void main() {
           temperaturesLinear, deltaPositionMax, deltaPositionMin);
       expect(
         deltaPositionExponential[0],
-        orderedCloseTo(deltaPositionMax, delta),
+        closeToList(deltaPositionMax, delta),
       );
       expect(
         deltaPositionExponential[99],
-        orderedCloseTo(deltaPositionMin, delta),
+        closeToList(deltaPositionMin, delta),
       );
     });
   });
-  group('Markov Chain length', () {
+  group('Markov Chain Length:', () {
     final tStart = 1000.0;
     final tEnd = 1e-2;
     test('Initial value', () {
-      expect(markovChainLength(tStart, [], tStart: tStart, tEnd: tEnd), 5);
+      expect(markovChainLength(tStart, tStart: tStart, tEnd: tEnd), 5);
     });
     test('Final value', () {
-      expect(markovChainLength(tEnd, [], tStart: tStart, tEnd: tEnd), 20);
+      expect(markovChainLength(tEnd, tStart: tStart, tEnd: tEnd), 20);
     });
     test('Interpolated value', () {
       expect(
           markovChainLength(
             (tStart - tEnd) / 2,
-            [],
             tStart: tStart,
             tEnd: tEnd,
           ),
-          13);
-    });
-    test('Initial value, grid: [40, 40, 40]', () {
-      expect(
-        markovChainLength(tStart, [40, 40, 40], tStart: tStart, tEnd: tEnd),
-        30,
-      );
-    });
-    test('Final value, grid: [40, 40, 40,]', () {
-      expect(
-        markovChainLength(tEnd, [40, 40, 40], tStart: tStart, tEnd: tEnd),
-        120,
-
-      );
+          12);
     });
   });
 }
