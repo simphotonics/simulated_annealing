@@ -30,8 +30,8 @@ void main() async {
   final sampleSize = 2000;
   final perturbationSampelSize = 600;
 
-  final sampleSC = List<List<num>>.generate(
-      sampleSize, (_) => space.next(nGrid: [30, 30]));
+  final sampleSC =
+      List<List<num>>.generate(sampleSize, (_) => space.next(nGrid: [30, 30]));
 
   final sampleCC = List<List<num>>.generate(
     sampleSC.length,
