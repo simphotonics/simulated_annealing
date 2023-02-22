@@ -12,9 +12,9 @@ void main() async {
   // Construct a simulator instance.
   final simulator = LoggingSimulator(
     field,
-    gammaStart: 0.7,
+    gammaStart: 0.8,
     gammaEnd: 0.05,
-    iterations: 30,
+    iterations: 50,
   );
 
   simulator.gridEnd = [20, 20, 20];
@@ -27,16 +27,16 @@ void main() async {
   final tEnd = await simulator.tEnd;
 
   final xSol = await simulator.anneal(
-    (num temperature, List<int> grid) => markovChainLength(
+    (num temperature) => markovChainLength(
       temperature,
-      grid,
       tStart: tStart,
       tEnd: tEnd,
       chainLengthStart: 2,
-      chainLengthEnd: 10,
+      chainLengthEnd: 20,
     ),
     isRecursive: true,
     ratio: 0.5,
+    scaleMarkovChain: true,
   );
   await File('example/data/log.dat').writeAsString(simulator.export());
 

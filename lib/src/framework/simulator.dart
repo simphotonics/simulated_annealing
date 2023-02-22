@@ -34,11 +34,14 @@ abstract class Simulator {
   /// * gammaEnd: Expectation value of the solution acceptance at the
   //    final temperatures of the annealing process.
   /// * iterations: Number of iterations when cooling
+  /// * sampleSize: Size of sample used to estimate the start temperature
+  ///   and the final temperature of the annealing process.
   Simulator(
     EnergyField field, {
     this.gammaStart = 0.7,
     this.gammaEnd = 0.5,
     this.iterations = 750,
+    this.sampleSize = 500,
   })  : _field = EnergyField.of(field),
         _deltaPositionStart = field.size,
         _deltaPositionEnd =
@@ -47,11 +50,19 @@ abstract class Simulator {
         _gridEnd = List<int>.filled(field.dimension, 40, growable: true),
         _temperatureSequence = exponentialSequence,
         _perturbationSequence = defaultPerturbationSequence {
-    _tStart = Lazy<Future<num>>(() => _field.tStart(gammaStart,
-        grid: gridStart, deltaPosition: deltaPositionStart, kB: 1));
+    _tStart = Lazy<Future<num>>(() => _field.tStart(
+          gammaStart,
+          grid: gridStart,
+          deltaPosition: deltaPositionStart,
+          sampleSize: sampleSize,
+        ));
 
-    _tEnd = Lazy<Future<num>>(() => _field.tStart(gammaEnd,
-        grid: gridEnd, deltaPosition: deltaPositionEnd, kB: 1));
+    _tEnd = Lazy<Future<num>>(() => _field.tStart(
+          gammaEnd,
+          grid: gridEnd,
+          deltaPosition: deltaPositionEnd,
+          sampleSize: sampleSize,
+        ));
 
     _temperatures = Lazy<Future<List<num>>>(
       () => Future.wait([tStart, tEnd]).then((t) => temperatureSequence(
@@ -92,6 +103,10 @@ abstract class Simulator {
 
   /// Number of outer simulated annealing iterations.
   final int iterations;
+
+  /// Size of the sample used to estimate the initial and final
+  /// annealing temperature.
+  final int sampleSize;
 
   /// Triggers an update of the lazy variables
   /// `_tStart`,`_tEnd`,`_temperatures`, and `_perturbationMagnitudes`.
@@ -316,16 +331,24 @@ abstract class Simulator {
   /// temperature sequence during recursive calls. The parameter is used
   /// to model repeated annealing cycles with decreasing initial temperature.
   /// * Note: `0.0 < ratio < 1.0`.
+  /// * scaleMarkovChain: Set to `true` to increase the Markov chain length by
+  ///   a factor of `pow(currentGrid.prod(), 1.0 /
+  ///   (currentGrid.length * 3)).toInt()`.
+  ///   This increases the probability of convergence since the chain length
+  ///   is scaled with the number of grid points.
+  ///
   Future<List<num>> anneal(
     MarkovChainLength markov, {
     bool isRecursive = false,
     num ratio = 0.5,
     bool isVerbose = false,
+    bool scaleMarkovChain = false,
   }) async {
     /// Initialize parameters:
     final temperatures = await this.temperatures;
     final perturbationMagnitudes = await this.perturbationMagnitudes;
     final grid = await this.grid;
+
     num dE = 0;
 
     if (_recursionCounter == 0) {
@@ -336,9 +359,10 @@ abstract class Simulator {
       recordLog();
     }
 
-    // During the first iteration _ratio = 1.0 and i = 0.
-    final _ratio = pow(ratio.abs(), _recursionCounter);
-    var i = (temperatures.length * (1.0 - _ratio)).toInt();
+    // During the first iteration pow(ratio.abs(), _recursionCounter) = 1.0
+    // and therefore i = 0.
+    var i = (temperatures.length * (1.0 - pow(ratio.abs(), _recursionCounter)))
+        .toInt();
 
     if (_recursionCounter > 0 && isVerbose) {
       print('Restarted annealing at:');
@@ -354,8 +378,12 @@ abstract class Simulator {
       _deltaPosition = perturbationMagnitudes[i];
       _currentGrid = grid[i];
 
+      int scalingFactor = scaleMarkovChain
+          ? pow(_currentGrid.prod(), 1.0 / (_currentGrid.length * 3)).toInt()
+          : 1;
+
       // Inner iteration loop.
-      for (var j = 0; j < markov(_t, _currentGrid); j++) {
+      for (var j = 0; j < markov(_t) * scalingFactor; j++) {
         // Choose next random point and calculate energy difference.
         dE = _field.perturb(
               _currentMinPosition,
@@ -377,7 +405,6 @@ abstract class Simulator {
         }
         recordLog();
       }
-
     }
     if (globalMinEnergy < _currentMinEnergy) {
       if (isVerbose) {

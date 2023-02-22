@@ -20,8 +20,10 @@ void main() async {
   print(await simulator.info);
 
   final xSol = await simulator.anneal(
-    (num temperature, List<int> grid) => 1,
+    (num temperature) => 1,
     isRecursive: true,
+    scaleMarkovChain: true,
+    isVerbose: true,
   );
 
   print('Solution: $xSol');
