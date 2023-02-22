@@ -1,3 +1,11 @@
+## 0.3.1
+
+- Updated dependencies.
+- Fixed potentially infinite loop condition in [`EnergyField`][EnergyField] methods
+  * `perturb`,
+  * `tStart`,
+  * `tEnd`.
+
 ## 0.3.0
 
 - Migrated to null-safety.
@@ -72,6 +80,8 @@
 
 - Initial version
 
+
+[EnergyField]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/EnergyField-class.html
 
 [nextInRange]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/RandomInRange/nextInRange.html
 
