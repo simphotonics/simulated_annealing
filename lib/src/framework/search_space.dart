@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:exception_templates/exception_templates.dart';
 import 'package:lazy_memo/lazy_memo.dart';
 
-import '../extensions/random_in_range.dart';
 import '../exceptions/incompatible_vectors.dart';
+import '../extensions/random_in_range.dart';
 
 /// Function defining an interval start/end point.
 typedef ParametricPoint = num Function();
@@ -13,6 +13,7 @@ typedef ParametricPoint = num Function();
 abstract class Interval {
   Interval({this.inverseCdf});
 
+  /// Inverse cummulative distribution function.
   final InverseCdf? inverseCdf;
 
   /// Returns the next random number in the interval.
@@ -25,6 +26,11 @@ abstract class Interval {
   /// `(start, end)` and `(position - deltaPosition, position + deltaPosition)`.
   /// Returns `position` if the intersection is the empty interval.
   num perturb(num position, num deltaPosition, {int nGrid = 0});
+
+  /// Returns the grid points associated with an interval.
+  ///
+  /// Returns an empty list if `nGrid < 2`.
+  List<num> gridPoints(int nGrid);
 
   /// Returns true if `point` belongs to the interval.
   bool contains(num point);
@@ -59,7 +65,7 @@ abstract class Interval {
 class FixedInterval extends Interval {
   /// Constructs a fixed interval (`start`, `end`).
   FixedInterval(this.start, this.end, {InverseCdf? inverseCdf})
-      : _size = (end - start).abs(),
+      : size = (end - start).abs(),
         super(
           inverseCdf: inverseCdf,
         );
@@ -71,7 +77,7 @@ class FixedInterval extends Interval {
   FixedInterval.of(FixedInterval interval)
       : start = interval.start,
         end = interval.end,
-        _size = interval._size,
+        size = interval.size,
         super(inverseCdf: interval.inverseCdf);
 
   /// Start point of the numerical interval.
@@ -81,7 +87,8 @@ class FixedInterval extends Interval {
   final num end;
 
   /// Size
-  final _size;
+  @override
+  final num size;
 
   /// Returns the next random number sampled from
   /// the interval `(start, end)`.
@@ -172,8 +179,13 @@ class FixedInterval extends Interval {
   }
 
   /// Returns the length of the interval.
+  // @override
+  // num get size => _size;
+
   @override
-  num get size => _size;
+  List<num> gridPoints(int nGrid) {
+    return Interval.random.gridPoints(start, end, nGrid);
+  }
 }
 
 /// A numerical interval defined by
@@ -294,6 +306,11 @@ class ParametricInterval extends Interval {
   /// Note: For parametric intervals the length may not be constant.
   @override
   num get size => (pEnd() - pStart()).abs();
+
+  @override
+  List<num> gridPoints(int nGrid) {
+    return Interval.random.gridPoints(pStart(), pEnd(), nGrid);
+  }
 }
 
 /// A search region with boundaries defined by
@@ -409,9 +426,9 @@ class SearchSpace {
 
   /// Clears the cached random numbers for each interval.
   void _clearCache() {
-    _intervals.forEach((interval) {
+    for (final interval in _intervals) {
       interval.clearCache();
-    });
+    }
   }
 
   /// Lazy variable storing the search space size.
