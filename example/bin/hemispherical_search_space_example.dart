@@ -6,14 +6,14 @@ import 'package:simulated_annealing/simulated_annealing.dart';
 
 // Define intervals.
 final r = 2;
-final hemisphere = () => Random().nextIntFromList([-1, 1]);
+int hemisphere() => Random().nextIntFromList([-1, 1]);
 var x = FixedInterval(-r, r);
 final y = ParametricInterval(
   () => -sqrt(pow(r, 2) - pow(x.next(), 2)),
   () => sqrt(pow(r, 2) - pow(x.next(), 2)),
 );
 
-final zRange = () => sqrt(pow(r, 2) - pow(y.next(), 2) - pow(x.next(), 2));
+double zRange() => sqrt(pow(r, 2) - pow(y.next(), 2) - pow(x.next(), 2));
 final z = ParametricInterval(
   () => zRange(),
   () => zRange(),

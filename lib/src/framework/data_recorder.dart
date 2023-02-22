@@ -24,7 +24,7 @@ class DataRecorder<T> {
   /// Adds `dimension` entries to _vectors with keys `label0, label1, ...`.
   /// Each value is an empty list.
   ///
-  /// /// Note: Does not overwrite existing entries.
+  /// Note: Does not overwrite existing entries.
   void _registerVector(String label, int dimension) {
     if (dimension < 1) {
       throw ErrorOf<DataRecorder>(
@@ -104,7 +104,7 @@ class DataRecorder<T> {
   List<List<T>> getVector(String label) {
     final result = <List<T>>[];
     for (var i = 0; i < getDimension(label); ++i) {
-      result.add(_vectors[label + '$i']!);
+      result.add(_vectors['$label$i']!);
     }
     return result;
   }
@@ -177,7 +177,7 @@ class NumericalDataRecorder extends DataRecorder<num> {
     final firstKey = _dimensions.keys.first;
     final length = (_dimensions[firstKey] == 0)
         ? _scalars[firstKey]!.length
-        : _vectors[firstKey + '0']!.length;
+        : _vectors['${firstKey}0']!.length;
 
     final data = <num>[];
     final b = StringBuffer();
