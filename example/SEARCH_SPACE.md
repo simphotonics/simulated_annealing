@@ -130,7 +130,7 @@ the left leading to an clustering of points as x approaches 0.
 
 ---
 
-NOTE: Whenever, an `Interval` is constructed without providing an argument for the parameter: `inverseCdf`, it is implicitly assumed that the values are distributed **uniformly** between the left and right
+NOTE: When an `Interval` is constructed without providing an argument for the parameter: `inverseCdf`, it is implicitly assumed that the values are distributed **uniformly** between the left and right
 interval boundaries and the inverse cummulative distribution function (iCDF) is of the form:
 
 cdf<sup>-1</sup>(p,&nbsp;x<sub>min</sub>,&nbsp;x<sub>max</sub>) = x<sub>min</sub> + (x<sub>max</sub> - x<sub>min</sub>)&middot;p &nbsp;&nbsp;&nbsp;where p &in; \[0, 1\].
