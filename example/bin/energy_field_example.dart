@@ -39,13 +39,13 @@ void main(List<String> args) async {
     0.01,
     grid: [50, 50, 50],
     deltaPosition: [1e-8, 1e-8, 1e-8],
-    sampleSize: 600,
+    sampleSize: 10,
   ));
 
   print(await field.tEnd(
     0.01,
     grid: [50, 50, 50],
     deltaPosition: [1e-8, 1e-8, 1e-8],
-    sampleSize: 600,
+    sampleSize: 10,
   ));
 }

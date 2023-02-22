@@ -14,17 +14,19 @@ class LoggingSimulator extends Simulator {
   ///   and the temperature is the initial temperature of the annealing process.
   /// * gammaEnd: Probability of solution acceptance if `dE == dEnergyEnd`
   ///   and the temperature is the final temperatures of the annealing process.
-  /// * iterations: Number of iterations when cooling
+  /// * iterations: Number of iterations when cooling.
   LoggingSimulator(
     EnergyField field, {
     num gammaStart = 0.8,
     num gammaEnd = 0.1,
     int iterations = 750,
+    int sampleSize = 500,
   }) : super(
           field,
           gammaStart: gammaStart,
           gammaEnd: gammaEnd,
           iterations: iterations,
+          sampleSize: sampleSize,
         );
 
   /// Records the simulator log.
