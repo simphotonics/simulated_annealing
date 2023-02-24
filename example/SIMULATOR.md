@@ -70,7 +70,7 @@ void main() async {
 
   print(await simulator.info);
 
-  final xSol = await simulator.anneal((_) => 1, isRecursive: true);
+  final xSol = await simulator.anneal(isRecursive: true);
   await File('../data/log.dat').writeAsString(simulator.rec.export());
 
   print('Solution: $xSol');

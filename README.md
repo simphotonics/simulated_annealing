@@ -10,7 +10,8 @@ The function to be minimized can be interpreted as the
 **system energy**. In that case, the global minimum represents
 the **ground state** of the system.
 
-<details><summary> The algorithm name was coined by Kirkpatrick ... click to show details.</summary>
+<details><summary> The algorithm name was coined by Kirkpatrick... click to show details.
+</summary>
 The algorithm name was coined by Kirkpatrick et al. and was
 derived from the process of annealing a metal alloy or glass.
 The first step of the annealing process consists of heating a
@@ -108,7 +109,7 @@ void main() async {
   print(await simulator.info);
 
   // Running the simulated annealing process.
-  final xSol = await simulator.anneal((_) => 1, isRecursive: true, ratio: 0.5);
+  final xSol = await simulator.anneal(isRecursive: true, ratio: 0.5);
 
   // Storing simulator log data.
   await File('example/data/log.dat').writeAsString(simulator.export());
@@ -159,8 +160,11 @@ The graph is discussed in more detail [here].
 ![Convergence Graph](https://github.com/simphotonics/simulated_annealing/raw/main/example/plots/convergence.gif)
 
 The number of inner iterations (performed while the temperature is kept constant)
-is also referred to as Markov chain length and is determined by a function with typedef [`MarkovChainLength`][MarkovChainLength]
-see method [`anneal`][anneal].
+is also referred to as Markov chain length and is determined by a function with typedef [`MarkovChainLength`][MarkovChainLength]. It can be adjusted by setting the
+simulator arguments `innerIterationsSTart` and `innerIterationsEnd`. In general,
+it is advisable to increase the number of inner Iterations towards the end of
+the annealing process in order to increase the algorithm precision.
+
 
 For fast cooling schedules convergence to an acceptable solution can be improved by
 increasing the number of inner iterations.
