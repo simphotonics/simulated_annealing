@@ -1,5 +1,5 @@
 import 'energy_field_example.dart';
-import 'snapshot_logging_simulator.dart';
+import '../../test/src/snapshot_logging_simulator.dart';
 
 /// To run this program please navigate to the package root folder
 /// and use the command:
@@ -20,9 +20,7 @@ void main() async {
   print(await simulator.info);
 
   final xSol = await simulator.anneal(
-    (num temperature) => 1,
     isRecursive: true,
-    scaleMarkovChain: true,
     isVerbose: true,
   );
 
