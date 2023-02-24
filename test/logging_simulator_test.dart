@@ -22,7 +22,7 @@ void main() async {
   final tStart = await simulator.tStart;
   final tEnd = await simulator.tEnd;
 
-  final result = await simulator.anneal((num temperature) => 1);
+  final result = await simulator.anneal();
   final temperatures = exponentialSequence(tStart, tEnd);
   final perturbationMagnitudes = defaultPerturbationSequence(
       temperatures, simulator.deltaPositionStart, simulator.deltaPositionEnd);

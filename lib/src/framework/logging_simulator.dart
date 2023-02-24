@@ -8,18 +8,26 @@ class LoggingSimulator extends Simulator {
   /// Constructs an object of type `LoggingSimulator`.
   /// * field: An object of type `EnergyField` encapsulating the
   ///   energy function (cost function)  and search space.
-  /// ----
-  /// Optional parameters:
+  /// ---
+  /// &nbsp;&nbsp;&nbsp;&nbsp;  *Optional parameters*:
   /// * gammaStart: Probability of solution acceptance if `dE == dEnergyStart`
   ///   and the temperature is the initial temperature of the annealing process.
   /// * gammaEnd: Probability of solution acceptance if `dE == dEnergyEnd`
   ///   and the temperature is the final temperatures of the annealing process.
   /// * iterations: Number of iterations when cooling.
+  ///  * innerIterationsStart: Number of iterations at constant temperature
+  ///   at the start of the annealing process.
+  /// * innerIterationsEnd: Number of iterations at constant temperature
+  ///   at the end of the annealing process.
+  /// * sampleSize: Size of sample used to estimate the start temperature
+  ///   and the final temperature of the annealing process.
   LoggingSimulator(
     EnergyField field, {
     num gammaStart = 0.8,
     num gammaEnd = 0.1,
     int iterations = 750,
+    int innerIterationsStart = 5,
+    int innerIterationsEnd = 20,
     int sampleSize = 500,
   }) : super(
           field,
@@ -27,11 +35,14 @@ class LoggingSimulator extends Simulator {
           gammaEnd: gammaEnd,
           iterations: iterations,
           sampleSize: sampleSize,
+          innerIterationsStart: innerIterationsStart,
+          innerIterationsEnd: innerIterationsEnd,
         );
 
   /// Records the simulator log.
   final _rec = NumericalDataRecorder();
 
+  /// Exports all records.
   String export({
     int precision = 10,
     String delimiter = '   ',
@@ -41,7 +52,8 @@ class LoggingSimulator extends Simulator {
         delimiter: delimiter,
       );
 
-  String exportLast({
+  /// Exports the first record.
+  String exportFirst({
     int precision = 10,
     String delimiter = '   ',
   }) =>
@@ -50,7 +62,8 @@ class LoggingSimulator extends Simulator {
         delimiter: delimiter,
       );
 
-  String exportFirst({
+  /// Exports the last record.
+  String exportLast({
     int precision = 10,
     String delimiter = '   ',
   }) =>

@@ -7,6 +7,58 @@ import 'annealing_schedule.dart';
 import 'energy_field.dart';
 import 'search_space.dart';
 
+/// Function returning an integer representing a Markov
+/// chain length (the number of simulated annealing iterations
+/// performed at constant temperature).
+/// * temperature: The current system temperature.
+typedef MarkovChainLength = int Function(num temperature);
+
+/// Returns an integer linearly interpolated
+/// between `chainLengthStart` and `chainLengthEnd`.
+/// * `markovChainlength(tStart) = mStart`,
+/// * `markovChainlength(tEnd) = mEnd`.
+/// *  The following must hold: `tStart <= temperature <= tEnd`.
+int markovChainLength(
+  num temperature, {
+  required num tStart,
+  required num tEnd,
+  int chainLengthStart = 5,
+  int chainLengthEnd = 20,
+}) =>
+    ((chainLengthStart - chainLengthEnd) *
+            (temperature - tStart) ~/
+            (tStart - tEnd) +
+        chainLengthStart);
+
+/// Function returning a sequence of pertubation
+/// magnitude vectors.
+typedef PerturbationSequence = List<List<num>> Function(
+  List<num> temperatures,
+  List<num> deltaPositionMax,
+  List<num> deltaPositionMin,
+);
+
+/// Returns a sequence of vectors
+/// by interpolating between
+/// `start` and `end`.
+///
+/// The resulting sequence is linearly related to `temperatures`.
+List<List<T>> interpolate<T extends num>(
+  List<num> temperatures,
+  List<T> start,
+  List<T> end,
+) {
+  final a = (start - end) / (temperatures.first - temperatures.last);
+  final b = start -
+      (start - end) *
+          (temperatures.first / (temperatures.first - temperatures.last));
+  return List<List<T>>.generate(
+      temperatures.length,
+      (i) => T == int
+          ? (a * temperatures[i]).plus(b).toInt() as List<T>
+          : (a * temperatures[i]).plus(b) as List<T>);
+}
+
 /// Returns a sequence of perturbation magnitude vectors by
 /// interpolating between `deltPositionMax` and  `deltaPositionMin`.
 ///
@@ -33,7 +85,11 @@ abstract class Simulator {
   //    initial temperature of the annealing process.
   /// * gammaEnd: Expectation value of the solution acceptance at the
   //    final temperatures of the annealing process.
-  /// * iterations: Number of iterations when cooling
+  /// * iterations: Number of iterations when cooling.
+  /// * innerIterationsStart: Number of iterations at constant temperature
+  ///   at the start of the annealing process.
+  /// * innerIterationsEnd: Number of iterations at constant temperature
+  ///   at the end of the annealing process.
   /// * sampleSize: Size of sample used to estimate the start temperature
   ///   and the final temperature of the annealing process.
   Simulator(
@@ -41,6 +97,8 @@ abstract class Simulator {
     this.gammaStart = 0.7,
     this.gammaEnd = 0.5,
     this.iterations = 750,
+    this.innerIterationsStart = 5,
+    this.innerIterationsEnd = 20,
     this.sampleSize = 500,
   })  : _field = EnergyField.of(field),
         _deltaPositionStart = field.size,
@@ -103,6 +161,14 @@ abstract class Simulator {
 
   /// Number of outer simulated annealing iterations.
   final int iterations;
+
+  /// Number of iterations at constant temperature
+  /// at the start of the annealing process.
+  final int innerIterationsStart;
+
+  /// Number of iterations at constant temperature
+  /// at the end of the annealing process.
+  final int innerIterationsEnd;
 
   /// Size of the sample used to estimate the initial and final
   /// annealing temperature.
@@ -337,17 +403,21 @@ abstract class Simulator {
   ///   This increases the probability of convergence since the chain length
   ///   is scaled with the number of grid points.
   ///
-  Future<List<num>> anneal(
-    MarkovChainLength markov, {
+  Future<List<num>> anneal({
     bool isRecursive = false,
     num ratio = 0.5,
     bool isVerbose = false,
-    bool scaleMarkovChain = false,
   }) async {
     /// Initialize parameters:
     final temperatures = await this.temperatures;
     final perturbationMagnitudes = await this.perturbationMagnitudes;
     final grid = await this.grid;
+
+    int nInner(num t) => markovChainLength(t,
+        tStart: temperatures.first,
+        tEnd: temperatures.last,
+        chainLengthStart: innerIterationsStart,
+        chainLengthEnd: innerIterationsEnd);
 
     num dE = 0;
 
@@ -378,12 +448,11 @@ abstract class Simulator {
       _deltaPosition = perturbationMagnitudes[i];
       _currentGrid = grid[i];
 
-      int scalingFactor = scaleMarkovChain
-          ? pow(_currentGrid.prod(), 1.0 / (_currentGrid.length * 3)).toInt()
-          : 1;
+      int scalingFactor =
+          pow(_currentGrid.prod(), 1.0 / (_currentGrid.length * 3)).toInt();
 
       // Inner iteration loop.
-      for (var j = 0; j < markov(_t) * scalingFactor; j++) {
+      for (var j = 0; j < nInner(_t) * scalingFactor; j++) {
         // Choose next random point and calculate energy difference.
         dE = _field.perturb(
               _currentMinPosition,
@@ -418,7 +487,6 @@ abstract class Simulator {
       _currentMinEnergy = globalMinEnergy;
       if (isRecursive) {
         _currentMinPosition = await anneal(
-          markov,
           isRecursive: isRecursive,
           ratio: ratio,
         );
