@@ -1,3 +1,9 @@
+## 0.3.2
+
+- Amended input arguments of method `anneal` in class `Simulator` by removing
+  the option to specify a certani Markov chain length function.
+- Updated dependencies.
+
 ## 0.3.1
 
 - Updated dependencies.
