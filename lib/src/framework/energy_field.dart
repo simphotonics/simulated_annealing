@@ -25,6 +25,7 @@ class EnergyField {
     next();
   }
 
+  /// Copy constructor.
   factory EnergyField.of(EnergyField energyField) => EnergyField(
         energyField.energy,
         energyField._searchSpace,
