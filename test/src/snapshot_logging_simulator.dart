@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:simulated_annealing/simulated_annealing.dart';
 
 /// Annealing simulator class that writes intermediate snapshots of the
-/// log to a file.
+/// log to a sequence of files.
 class SnapshotLoggingSimulator extends LoggingSimulator {
   /// Constructs an object of type `SnapshotLoggingSimulator`.
   /// * field: An object of type `EnergyField` encapsulating the
@@ -16,7 +16,13 @@ class SnapshotLoggingSimulator extends LoggingSimulator {
   ///   and the temperature is the initial temperature of the annealing process.
   /// * gammaEnd: Probability of solution acceptance if `dE == dEnergyEnd`
   ///   and the temperature is the final temperatures of the annealing process.
-  /// * iterations: Number of iterations when cooling
+  /// * iterations: Number of iterations when cooling.
+  /// * innerIterationsStart: Number of iterations at constant temperature
+  ///   at the start of the annealing process.
+  /// * innerIterationsEnd: Number of iterations at constant temperature
+  ///   at the end of the annealing process.
+  /// * sampleSize: Size of sample used to estimate the start temperature
+  ///   and the final temperature of the annealing process.
   /// Not included with the framework because the class uses dart:io.
   SnapshotLoggingSimulator(
     EnergyField field, {
@@ -25,11 +31,17 @@ class SnapshotLoggingSimulator extends LoggingSimulator {
     num gammaStart = 0.8,
     num gammaEnd = 0.1,
     int iterations = 750,
+    int innerIterationsStart = 5,
+    int innerIterationsEnd = 20,
+    int sampleSize = 500,
   }) : super(
           field,
           gammaStart: gammaStart,
           gammaEnd: gammaEnd,
           iterations: iterations,
+          innerIterationsStart: innerIterationsStart,
+          innerIterationsEnd: innerIterationsEnd,
+          sampleSize: sampleSize,
         );
 
   int _frameCounter = -1;
