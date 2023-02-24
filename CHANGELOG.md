@@ -1,3 +1,7 @@
+## 0.3.3
+
+- Upgraded to `list_operators` 0.3.5.
+
 ## 0.3.2
 
 - Amended input arguments of method `anneal` in class `Simulator` by removing

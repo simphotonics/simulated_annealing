@@ -55,7 +55,7 @@ List<List<T>> interpolate<T extends num>(
   return List<List<T>>.generate(
       temperatures.length,
       (i) => T == int
-          ? (a * temperatures[i]).plus(b).toInt() as List<T>
+          ? (a * temperatures[i]).plus(b).toListOfInt() as List<T>
           : (a * temperatures[i]).plus(b) as List<T>);
 }
 
