@@ -48,7 +48,7 @@ class SearchSpace {
               dimensions,
               (i) => _intervals[i].next(nGrid: nGrid[i]),
             );
-    } on RangeError catch (e) {
+    } on RangeError catch (_) {
       throw ErrorOf<SearchSpace>(
           message: 'Could not generate random '
               'point using method next().',

@@ -33,7 +33,8 @@ void main() async {
   await File('example/data/triangular_search_space.dat').writeAsString(
     sample.export(),
   );
-  await File('example/data/triangular_search_space_perturbation.dat').writeAsString(
+  await File('example/data/triangular_search_space_perturbation.dat')
+      .writeAsString(
     perturbation.export(),
   );
 

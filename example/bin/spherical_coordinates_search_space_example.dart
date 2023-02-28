@@ -20,12 +20,11 @@ void main() async {
 
   final sample = space.sample(size: sampleSize).sphericalToCartesian;
 
-  final perturbations = space
-      .sampleVicinityOf(
-        position,
-        deltaPosition,
-        size: perturbationSampleSize,
-      );
+  final perturbations = space.sampleVicinityOf(
+    position,
+    deltaPosition,
+    size: perturbationSampleSize,
+  );
 
   await File('example/data/spherical_search_space2D.dat').writeAsString(
     sample.export(label: '#Spherical Search Space: x, y, z'),
@@ -36,7 +35,8 @@ void main() async {
   );
   await File('example/data/spherical_search_space2D_perturbation.dat')
       .writeAsString(
-    perturbations.sphericalToCartesian.export(label: '#Spherical Perturbations: x, y, z'),
+    perturbations.sphericalToCartesian
+        .export(label: '#Spherical Perturbations: x, y, z'),
   );
 
   await File('example/data/spherical_search_space2D_test_point.dat')

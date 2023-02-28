@@ -7,7 +7,6 @@ import 'package:list_operators/list_operators.dart';
 import 'annealing_schedule.dart';
 import 'energy_field.dart';
 import 'interval.dart';
-import 'search_space.dart';
 
 /// Function returning an integer representing a Markov
 /// chain length (the number of simulated annealing iterations
