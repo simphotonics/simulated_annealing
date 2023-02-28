@@ -6,14 +6,14 @@ import 'src/energy_field_instance.dart';
 
 final simulator = LoggingSimulator(
   field,
-  iterations: 1200,
+  outerIterations: 1200,
   gammaStart: 0.7,
   gammaEnd: 0.05,
 );
 
 final simulatorWithPresets = LoggingSimulator(
   field,
-  iterations: 750,
+  outerIterations: 750,
   gammaStart: 0.7,
   gammaEnd: 0.05,
 )..startPosition = [0, 0, 0];

@@ -10,7 +10,7 @@ void main() async {
     field,
     outputPath: 'example/data/animation/log_',
     nth: 50,
-    iterations: 750,
+    outerIterations: 750,
     gammaStart: 0.7,
     gammaEnd: 0.05,
   );

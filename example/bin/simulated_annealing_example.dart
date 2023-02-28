@@ -14,7 +14,7 @@ void main() async {
     field, // Defined in file `energy_field_example.dart'
     gammaStart: 0.8,
     gammaEnd: 0.05,
-    iterations: 50,
+    outerIterations: 50,
   );
 
   simulator.gridStart = [];

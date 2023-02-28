@@ -16,7 +16,7 @@ class SnapshotLoggingSimulator extends LoggingSimulator {
   ///   and the temperature is the initial temperature of the annealing process.
   /// * gammaEnd: Probability of solution acceptance if `dE == dEnergyEnd`
   ///   and the temperature is the final temperatures of the annealing process.
-  /// * iterations: Number of iterations when cooling.
+  /// * outerIterations: Number of iterations when cooling.
   /// * innerIterationsStart: Number of iterations at constant temperature
   ///   at the start of the annealing process.
   /// * innerIterationsEnd: Number of iterations at constant temperature
@@ -30,7 +30,7 @@ class SnapshotLoggingSimulator extends LoggingSimulator {
     this.nth = 1,
     num gammaStart = 0.8,
     num gammaEnd = 0.1,
-    int iterations = 750,
+    int outerIterations = 750,
     int innerIterationsStart = 5,
     int innerIterationsEnd = 20,
     int sampleSize = 500,
@@ -38,7 +38,7 @@ class SnapshotLoggingSimulator extends LoggingSimulator {
           field,
           gammaStart: gammaStart,
           gammaEnd: gammaEnd,
-          iterations: iterations,
+          outerIterations: outerIterations,
           innerIterationsStart: innerIterationsStart,
           innerIterationsEnd: innerIterationsEnd,
           sampleSize: sampleSize,
