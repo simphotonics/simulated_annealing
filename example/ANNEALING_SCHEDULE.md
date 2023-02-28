@@ -8,7 +8,7 @@ temperature sequences.
 
 The annealing schedule show below (figure on the left, red line) consists of a monotonically decreasing exponential sequence with start value T<sub>start</sub> = 0.3673892633, end value T<sub>end</sub> = 0.0000017939, and with 750 steps.
 
-The simulated annealing temperature schedule can be specified via the [`Simulator`][SimulatorClass] parameter `iterations` and by setting the class variable `temperatureSequence`.
+The simulated annealing temperature schedule can be specified via the [`Simulator`][SimulatorClass] parameter `outerIterations` and by setting the class variable `temperatureSequence`.
 
 The green curve represents the first component of the perturbation magnitudes **deltaPosition**
 calculated by interpolated between **deltaPositionMax**&nbsp;=&nbsp;\[2.0,&nbsp;2.0,&nbsp;2.0\]

@@ -144,14 +144,23 @@ escaping a local miniumum. If &gamma;<sub>start</sub> is set close to 1.0 the al
 too many up-hill moves at high temperatures wasting computational time and delaying convergence.
 * `gammaEnd`: Final acceptance probability. Towards the end of the annealing process one assumes
    that the solution has converged towards the global minimum and up-hill moves should be restricted. For this reason &gamma;<sub>end</sub> has default value 0.05.
-* `iterations`: Determines the number of temperature steps in the annealing schedule.
+* `outerIterations`: Determines the number of temperature steps in the annealing schedule.
+   It is recommended to start with a higher number of
+   outer iterations (number of entries in the sequence of temperatures) and log
+   quantities like the current system energy, temperature, and the intermediate solutions.
+* `innerIterationsStart`: The number of inner iterations (at constant temperature)
+   at the start of the annealing process.
+* `innerIterationsEnd`: The number of inner iterations (at constant temperature)
+   at the end of the annealing process.
+* `sampleSize`: The size of the sample used to determine the initial and final
+   annealing temperature.
+
 
 Additionally, it is possible to set the class variable `temperatureSequence`
-to function of type [`TemperatureSequence`][TemperatureSequence]  that is used to determine the temperature at each (outer) iteration step.
+to function of type [`TemperatureSequence`][TemperatureSequence]
+that is used to determine the temperature at each outer iteration step.
 
-It is recommended to start with a higher number of
-outer iterations (number of entries in the sequence of temperatures) and log
-quantities like the current system energy, temperature, and the intermediate solutions.
+
 
 The figure below shows a typical SA log where the x-coordinate of the solution (green dots)
 converges asymptotically to 0.5.
@@ -174,7 +183,7 @@ increasing the number of inner iterations.
 In general, the following information is required to define an annealing schedule:
 * T<sub>start</sub>, the initial temperature,
 * T<sub>end</sub>, the final temperature,
-* the number of (outer) iterations,
+* the number of outer iterations (temperature steps),
 * a function of type [`TemperatureSequence`][TemperatureSequence]
   that is used to determine the temperature at each (outer) iteration step.
 

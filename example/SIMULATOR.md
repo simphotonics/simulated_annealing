@@ -66,7 +66,7 @@ void main() async {
   // Construct a simulator instance.
   final simulator = LoggingSimulator(energyField, exponentialSequence,
       perturbationSequence,
-      iterations: 750, gammaStart: 0.7, gammaEnd: 0.05);
+      outerIterations: 750, gammaStart: 0.7, gammaEnd: 0.05);
 
   print(await simulator.info);
 

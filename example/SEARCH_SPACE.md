@@ -93,6 +93,10 @@ search space. If the search space does not intersect the region **x**<sub>test</
 The figure above (right) shows 2000 random points sampled from a hemispheric search space. The
 program used to generate the points is listed in the file [hemispherical_search_space_example.dart][hemispherical_search_space_example.dart].
 
+As of version 0.3.4 the class [`SearchSpace`][SearchSpace] contains the static
+getters `sphere`, `box`, and `triangle` returning search spaces with these
+common geometries.
+
 
 ## Search Spaces With a Uniform Probability Distribution
 
