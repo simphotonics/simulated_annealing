@@ -339,7 +339,7 @@ class EnergyField {
   }
 
   /// Returns the search space dimension.
-  int get dimension => _searchSpace.dimension;
+  int get dimensions => _searchSpace.dimensions;
 
   /// Returns the size of the energy field domain (the search space).
   List<num> get size => List<num>.of(_searchSpace.size);
