@@ -1,3 +1,10 @@
+## 0.3.4
+- Extended the class `SeachSpace`. It now includes the static getters `sphere`, `box`,
+  and `triangle` returning instances with these common geometries.
+- Added the classes `SingularInterval` and `PeriodicInterval`.
+- Added tests. 
+
+
 ## 0.3.3
 
 - Upgraded to `list_operators` 0.3.5.
