@@ -68,17 +68,19 @@ void main() {
           )));
     });
   });
-  group('nextIntFromList():', () {
+  group('nextFromList():', () {
     final list = <int>[1, 3, 9, 11];
     test('Values', () {
-      expect(list.contains(r.nextIntFromList(list)), true);
+      expect(list.contains(r.nextFromList(list)), true);
     });
     test('Error if list is empty', () {
-      try {
-        r.nextIntFromList(<int>[]);
-      } on ErrorOf<Random> catch (e) {
-        expect(e.message, 'Could not generate next int from list.');
-      }
+      expect(
+          () => r.nextFromList(<String>[]),
+          throwsA(isA<ErrorOf<Random>>().having(
+            (e) => e.message,
+            'message',
+            'Could not generate next random value from list.',
+          )));
     });
   });
 }

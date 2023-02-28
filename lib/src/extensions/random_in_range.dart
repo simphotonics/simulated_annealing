@@ -10,6 +10,55 @@ import 'package:exception_templates/exception_templates.dart';
 /// * `end`: the upper limit.
 typedef InverseCdf = num Function(num p, num start, num end);
 
+abstract class InverseCdfs {
+  /// The inverse cummulative distribution of
+  /// a random variable that is uniformly distributed in the
+  /// interval `[start, end]`.
+  /// * Returns a value that lies in the interval `start`...`end`.
+  /// * p: A probability with value 0...1.
+  static InverseCdf get uniform => (num p, num start, num end) {
+        return start + p * (end - start);
+      };
+
+  /// Returns the inverse cummulative distribution of the
+  /// a random variable with probability distribution:
+  /// pdf(theta) = sin(theta)/delta.
+  /// ---
+  /// Derivation: Let delta = cos(thetaMin) - cos(thetaMax)
+  /// * pdf(theta) = sin(theta)/delta
+  /// * cdf(theta) = cos(thetaMin) - cos(theta)/delta
+  /// * inverseCdf(p) = acos(cos(thetaMin) - p*delta))
+  /// ---
+  /// Note: It is not defined for `cos(thetaMin) - cos(thetaMax) == 0`.
+  /// In this case, we use a uniform distribution.
+  static InverseCdf get polarAngle => (num p, num thetaMin, num thetaMax) {
+        final cosThetaMin = cos(thetaMin);
+        final cosThetaMax = cos(thetaMax);
+        return (cosThetaMin == cosThetaMax)
+            ? uniformInverseCdf(p, thetaMin, thetaMax)
+            : acos(cosThetaMin - p * (cosThetaMin - cosThetaMax));
+      };
+
+  /// Returns the inverse cummulative distribution of the coordinate `x` of
+  /// a two-dimensional search space with triangular geometry.
+  /// The search space:
+  /// * Extends from `xMin` to `xMax` along the horizontal axis.
+  /// * Has zero extent in y-direction if the first coordinate is `xMin`.
+  /// * Extends from `yMin` to `yMax` if the first corrdinate is `xMax`.
+  /// * p is a probability with value 0...1.
+  static InverseCdf get triangular =>
+      (num p, num xMin, num xMax) => xMin + (xMax - xMin) * sqrt(p);
+}
+
+/// The inverse cummulative distribution of
+/// a random variable that is uniformly distributed in the
+/// interval `[start, end]`.
+/// * Returns a value that lies in the interval `start`...`end`.
+/// * p: A probability with value 0...1.
+num uniformInverseCdf(num p, num start, num end) {
+  return start + p * (end - start);
+}
+
 /// Extension on [Random] providing the methods
 /// `nextInRange` and `nextIntFromList`.
 extension RandomInRange on Random {
@@ -83,15 +132,19 @@ extension RandomInRange on Random {
     return result;
   }
 
-  /// Generates a integer randomly picked from
+  /// Generates an integer randomly picked from
   /// a list of integers.
   /// The list must not be empty.
-  int nextIntFromList(List<int> list) {
-    if (list.isEmpty) {
-      throw ErrorOf<Random>(
-          message: 'Could not generate next int from list.',
-          invalidState: 'The provided list is empty.');
+  T nextFromList<T>(List<T> list) {
+    try {
+      return list[nextInt(list.length)];
+    } catch (e) {
+      if (list.isEmpty) {
+        throw ErrorOf<Random>(
+            message: 'Could not generate next random value from list.',
+            invalidState: 'The provided list is empty.');
+      }
+      rethrow;
     }
-    return list[nextInt(list.length)];
   }
 }
