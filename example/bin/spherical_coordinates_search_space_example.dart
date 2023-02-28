@@ -4,70 +4,46 @@ import 'dart:math';
 import 'package:list_operators/list_operators.dart';
 import 'package:simulated_annealing/simulated_annealing.dart';
 
-double inverseCdf(num p, num thetaMin, num thetaMax) {
-  final cosThetaMin = cos(thetaMin);
-  return acos(-p * (cosThetaMin - cos(thetaMax)) + cosThetaMin);
-}
-
-// Define intervals.
-final radius = 2;
-final theta = FixedInterval(0, pi); //, inverseCdf: inverseCdf);
-final phi = FixedInterval(0, 2 * pi);
-
-// Defining a spherical search space.
-final space = SearchSpace([phi, theta]);
-
 void main() async {
-  final testPointSC = [2 * pi - 0.5, pi / 4];
-  final magnitudesSC = [pi / 8, pi / 8];
+  final radius = 2;
 
-  final testPointCC = [
-    radius * sin(testPointSC[1]) * cos(testPointSC[0]),
-    radius * sin(testPointSC[1]) * sin(testPointSC[0]),
-    radius * cos(testPointSC[1]),
-  ];
+// Defining a spherical search space consisting of all points on
+// the surface of a sphere with radius 2.
+  final space = SearchSpace.sphere(rMin: radius, rMax: radius);
+  final position = [radius, 0.0, 0.0];
+  final deltaPosition = [0, 0.2, pi];
+
+  print(space.perturb(position, deltaPosition));
 
   final sampleSize = 2000;
-  final perturbationSampelSize = 600;
+  final perturbationSampleSize = 600;
 
-  final sampleSC =
-      List<List<num>>.generate(sampleSize, (_) => space.next(nGrid: [30, 30]));
+  final sample = space.sample(size: sampleSize).sphericalToCartesian;
 
-  final sampleCC = List<List<num>>.generate(
-    sampleSC.length,
-    (i) => [
-      radius * sin(sampleSC[i][1]) * cos(sampleSC[i][0]),
-      radius * sin(sampleSC[i][1]) * sin(sampleSC[i][0]),
-      radius * cos(sampleSC[i][1]),
-    ],
+  final perturbations = space
+      .sampleVicinityOf(
+        position,
+        deltaPosition,
+        size: perturbationSampleSize,
+      );
+
+  await File('example/data/spherical_search_space2D.dat').writeAsString(
+    sample.export(label: '#Spherical Search Space: x, y, z'),
+  );
+  await File('example/data/spherical_search_space_perturbation.dat')
+      .writeAsString(
+    perturbations.export(label: '#Spherical Perturbations: r, theta, phi'),
+  );
+  await File('example/data/spherical_search_space2D_perturbation.dat')
+      .writeAsString(
+    perturbations.sphericalToCartesian.export(label: '#Spherical Perturbations: x, y, z'),
   );
 
-  final perturbationSC = List<List<num>>.generate(
-      perturbationSampelSize, (_) => space.perturb(testPointSC, magnitudesSC));
-
-  // Transform to Cartesian coordinates.
-  final perturbationCC = List<List<num>>.generate(
-    perturbationSC.length,
-    (i) => [
-      radius * sin(perturbationSC[i][1]) * cos(perturbationSC[i][0]),
-      radius * sin(perturbationSC[i][1]) * sin(perturbationSC[i][0]),
-      radius * cos(perturbationSC[i][1]),
-    ],
-  );
-
-  // await File('../data/sphereSCperturbation.dat')
-  //     .writeAsString(perturbationSC.export());
-  await File('../data/spherical_search_space2D.dat').writeAsString(
-    sampleCC.export(),
-  );
-  await File('../data/spherical_search_space2D_perturbation.dat').writeAsString(
-    perturbationCC.export(),
-  );
-
-  await File('../data/spherical_search_space2D_test_point.dat')
+  await File('example/data/spherical_search_space2D_test_point.dat')
       .writeAsString('''
-    # Perturbation Centerpoint
-    ${[testPointCC].export()}''');
+    ${[
+    position.sphericalToCartesian
+  ].export(label: '#Perturbation Centrepoint: x, y, z')}''');
 
   // The search space can be visualized by navigating to the folder
   // 'example/gnuplot_scripts' and running the commands:

@@ -33,12 +33,15 @@ set xtics ('-2' -2.0, '-1' -1.0, '0' 0.0, '1' 1.0, '2' 2.0);
 set ytics ('-2' -2.0, '-1' -1.0, '0' 0.0, '1' 1.0, '2' 2.0);
 set ztics ('-2' -2.0, '-1' -1.0, '0' 0.0, '1' 1.0, '2' 2.0);
 
-set term pngcairo size 500, 500 font "Sans,12"
+set term qt size 500, 500 font "Sans,12"
 
 set margin 10, 1,1 ,1
 
+#set mapping spherical
 
-set output '../plots/spherical_space_surface.png'
+
+
+#set output '../plots/spherical_space_surface_test.png'
 
 splot '../data/spherical_search_space2D.dat' lt 1 ps 0.4 pt 7 t "Points In Search Space", \
 '../data/spherical_search_space2D_perturbation.dat' ps 0.75 pt 7 lt 2 t "Random Points Around Test Point", \

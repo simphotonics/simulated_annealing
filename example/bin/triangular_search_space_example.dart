@@ -6,41 +6,38 @@ import 'package:simulated_annealing/simulated_annealing.dart';
 
 double invCDF(num p, num xMin, num xMax) => xMin + (xMax - xMin) * sqrt(p);
 
+/// To run the program navigate to main project folder and use the
+/// command:
+/// ```Terminal
+/// $ dart example/bin/triangular_search_space_example.dart
+/// ```
+
 void main() async {
-  // Define intervals.
-  final yMax = 0;
-  final yMin = -0;
+  final space = SearchSpace.triangle(
+    xMin: 0,
+    xMax: 6,
+    yMin: -100,
+    yMax: 150,
+  );
 
-  final x = FixedInterval((yMax - yMin) / 30, 10, inverseCdf: invCDF);
-  final y = ParametricInterval(
-      () => yMax - 15 * x.next(), () => yMin + 15 * x.next());
+  print('Space size: ${space.size}.');
 
-  // Defining a spherical search space.
-  // Intervals are listed in order of dependence.
-  final space = SearchSpace([x, y]);
+  final testPoint = [4.0, 25.0];
+  final magnitudes = [2.5, 25.0];
 
-  print('Space sizes: ${space.size}.');
-
-  final testPoint = [3.0, 25.0];
-  final magnitudes = [0.5, 25.0];
-
-  final sample = List<List<num>>.generate(
-      2000,
-      (_) => space.next(
-            nGrid: [50, 50],
-          ));
+  final sample = List<List<num>>.generate(2000, (_) => space.next());
 
   final perturbation = List<List<num>>.generate(
-      200, (_) => space.perturb(testPoint, magnitudes));
+      900, (_) => space.perturb(testPoint, magnitudes));
 
-  await File('../data/triangular_search_space.dat').writeAsString(
+  await File('example/data/triangular_search_space.dat').writeAsString(
     sample.export(),
   );
-  await File('../data/triangular_search_space_perturbation.dat').writeAsString(
+  await File('example/data/triangular_search_space_perturbation.dat').writeAsString(
     perturbation.export(),
   );
 
-  await File('../data/triangular_search_space_center_point.dat')
+  await File('example/data/triangular_search_space_center_point.dat')
       .writeAsString('''
     # Perturbation Centerpoint
     ${[testPoint].export()}''');
