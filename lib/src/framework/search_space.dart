@@ -252,9 +252,9 @@ class SearchSpace {
   static SearchSpace sphere({
     num rMin = 0,
     num rMax = 1,
-    num thetaMin = 1e-4,
+    num thetaMin = 0,
     num thetaMax = pi,
-    num phiMin = 1e-4,
+    num phiMin = 0,
     num phiMax = 2 * pi,
   }) {
     // Define intervals.
@@ -271,6 +271,37 @@ class SearchSpace {
     // Defining a spherical search space.
     return SearchSpace([r, theta, phi]);
   }
+
+  static SearchSpace cylinder({
+    num rhoMin = 0,
+    num rhoMax = 1,
+    num phiMin = 0,
+    num phiMax = 2 * pi,
+    num zMin = 0,
+    num zMax = 1,
+  }) {
+    // Define intervals.
+    final r = FixedInterval(rhoMin, rhoMax, inverseCdf: InverseCdfs.rho);
+    final phi = (phiMin == phiMax)
+        ? SingularInterval(phiMin)
+        : PeriodicInterval(phiMin, phiMax);
+    final z = FixedInterval(zMin, zMax);
+
+    // Defining a spherical search space.
+    return SearchSpace([r, phi, z]);
+  }
+
+  /// Returns a search space with rectangular geometry.
+  static SearchSpace rectangle({
+    num xMin = 0,
+    num xMax = 2,
+    num yMin = 0,
+    num yMax = 1,
+  }) =>
+      SearchSpace([
+        FixedInterval(xMin, xMax),
+        FixedInterval(yMin, yMax),
+      ]);
 
   /// Returns a search space with a box geometry.
   static SearchSpace box({
