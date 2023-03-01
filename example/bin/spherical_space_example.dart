@@ -13,8 +13,6 @@ void main() async {
   final position = [radius, 0.0, 0.0];
   final deltaPosition = [0, 0.2, pi];
 
-  print(space.perturb(position, deltaPosition));
-
   final sampleSize = 2000;
   final perturbationSampleSize = 600;
 

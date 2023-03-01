@@ -52,15 +52,14 @@ void main() async {
   final perturbation = List<List<num>>.generate(
       500, (_) => space.perturb(xTest, deltaPosition, nGrid: [50, 50, 50]));
 
-  await File('../data/spherical_search_space.dat').writeAsString(
+  await File('../data/spherical_space.dat').writeAsString(
     sample.export(),
   );
-  await File('../data/spherical_search_space_perturbation.dat').writeAsString(
+  await File('../data/spherical_space_perturbation.dat').writeAsString(
     perturbation.export(),
   );
 
-  await File('../data/spherical_search_space_center_point.dat')
-      .writeAsString('''
+  await File('../data/spherical_space_center_point.dat').writeAsString('''
     # Perturbation Centerpoint
     ${[xTest].export()}''');
 
