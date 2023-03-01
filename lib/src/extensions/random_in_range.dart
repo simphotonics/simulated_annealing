@@ -48,6 +48,14 @@ abstract class InverseCdfs {
   /// * p is a probability with value 0...1.
   static InverseCdf get triangular =>
       (num p, num xMin, num xMax) => xMin + (xMax - xMin) * sqrt(p);
+
+  /// Returns the inverse cummulative distribution of the radius `rho` of
+  /// a search space with cylindrical geometry specified by the coordinates
+  /// `[rho, phi, z]`. See [SearchSpace].
+  /// * `rho` >= 0.
+  /// * `phi` takes values in the range 0...2*pi.
+  static InverseCdf get rho =>
+      (num p, num rhoMin, num rhoMax) => rhoMin + (rhoMax - rhoMin) * sqrt(p);
 }
 
 /// The inverse cummulative distribution of
