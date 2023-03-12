@@ -10,6 +10,17 @@ The function to be minimized can be interpreted as the
 **system energy**. In that case, the global minimum represents
 the **ground state** of the system.
 
+Simulated annealing works by randomly
+selecting a new point in the neighbourhood of the
+current solution, evaluating the energy function E,
+and deciding if the new solution is accepted or rejected.
+If E < E<sub>min</sub> ,where E<sub>min</sub> is a previously found solution,
+the new solution is accepted. Crucially, if &Delta;E > 0,
+the algorithm still accepts the new solution with probability:
+P(&Delta;E > 0, T) = e<sup>-&Delta;E/(k<sub>B</sub>&middot;T)</sup>
+where &Delta;E = E - E<sub>min</sub>.
+Accepting up-hill moves provides a method of escaping from local energy minima.
+
 <details><summary> The algorithm name was coined by Kirkpatrick... click to show details.
 </summary>
 The algorithm name was coined by Kirkpatrick et al. and was
@@ -19,16 +30,10 @@ solid material above a critical temperature. This allows its atoms to gain
 sufficient kinetic energy to be able to rearrange themselves.
 Then the temperature is decreased sufficiently slowly
 in order to minimize atomic lattice defects as the material solidifies.
-</details>
 
-Simulated annealing works by randomly selecting a new point in the neighbourhood of the
-current solution, evaluating the energy function, and deciding if the new solution is accepted or rejected.
-If for a newly selected point the energy E is lower that the previous minimum energy
-E<sub>min</sub>, the new solution is accepted. Crucially, if &Delta;E > 0, the algorithm still accepts the new solution with probability:
-P(&Delta;E > 0, T) = e<sup>-&Delta;E/(k<sub>B</sub>&middot;T)</sup> where &Delta;E = E - E<sub>min</sub>. Accepting up-hill moves provides a method of escaping from local energy minima.
-
-The [Boltzmann constant][Boltzmann] k<sub>B</sub> relates the system
-temperature with the kinetic energy of particles in a gas. In the context of SA, it is customary to set k<sub>B</sub>&nbsp;&equiv;&nbsp;1.
+The [Boltzmann constant][Boltzmann] k<sub>B</sub>  relates the system
+temperature with the kinetic energy of particles in a gas.
+In the context of SA, it is customary to set k<sub>B</sub>&nbsp;&equiv;&nbsp;1.
 With this convention, the probability of accepting a new solution is given by:
 
 P(&Delta;E > 0, T) = e<sup>-&Delta;E/T</sup>&nbsp;&nbsp;and&nbsp;&nbsp;P(&Delta;E <0, T) = 1.0,
@@ -37,6 +42,7 @@ where &Delta;E = E - E<sub>min</sub>.
 The expression above ensures
 that the acceptance probability decreases with decreasing temperature (for &Delta;E > 0).
 As such, the temperature is a parameter that controls the probability of up-hill moves.
+</details>
 
 ![Energy Simulated Annealing](https://github.com/simphotonics/simulated_annealing/raw/main/example/plots/energy_composite.gif)
 
@@ -47,7 +53,8 @@ x-y plane. Initially, random points are chosen
 from a large region encompasing the entire spherical search space.
  In the simulation shown above, intermediate solutions
 near the local minimum are followed by up-hill moves.
-As the temperature drops the search neighourhood is contracted and the solution converges to the
+As the temperature drops the search neighourhood
+is contracted and the solution converges to the
 global minimum.
 
 ## Usage
@@ -56,7 +63,11 @@ as a `dependency` in your `pubspec.yaml` file.
 
 The following steps are required to set up the SA algorithm.
 1. Specify the [search space][search space] &omega;.
-2. Define the system [EnergyField][EnergyField], an object encapsulating
+   Common 2d and 3d search spaces
+   (circle, sphere, rectangle, box, disk, cone, triangle)
+   are predefined as static functions of the
+   class [`SearchSpace`][SearchSpace].
+2. Define the system [`EnergyField`][EnergyField], an object encapsulating
    the energy function (cost function) and its domain (the search space).
 3. Create an instance of [`LoggingSimulator`][LoggingSimulator] or
    alternatively extend the abstract class [`Simulator`][SimulatorClass].
@@ -67,55 +78,69 @@ The following steps are required to set up the SA algorithm.
 ```Dart
 
 import 'dart:io';
-import 'dart:math';
 
 import 'package:list_operators/list_operators.dart';
 import 'package:simulated_annealing/simulated_annealing.dart';
 
+// A predefined search space.
+final space = SearchSpace.sphere(rMin: 0, rMax: 2);
+
+final globalMin = [0.5, 0.7, 0.8];
+final localMin = [-1.0, -1.0, -0.5];
+
+// Defining an energy function.
+num energy(List<num> position) {
+  return 4.0 -
+      4.0 *
+          exp(-4 *
+              globalMin.distance(
+                position,
+                coordinates: Coordinates.spherical,
+              )) -
+      2.0 *
+          exp(-6 *
+              localMin.distance(
+                position,
+                coordinates: Coordinates.spherical,
+              ));
+}
+
+final field = EnergyField(
+  energy,
+  space,
+);
+
+/// To run this program navigate to the root folder in your local
+/// copy of the package `simulated_annealing` and use the command:
+/// $ dart example/bin/simulated_annealing_example.dart
 void main() async {
-  // Defining a spherical space.
-  final radius = 2;
-  final x = FixedInterval(-radius, radius);
-
-  num yLimit() => sqrt(pow(radius, 2) - pow(x.next(), 2));
-  final y = ParametricInterval(() => -yLimit(), yLimit);
-
-  num zLimit() => sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2));
-  final z = ParametricInterval(() => -zLimit(), zLimit);
-
-  // Parameteric intervals must be listed in order of dependence.
-  // Example: y depends on x, z depends on x and y => list order: [x, y, z].
-  final space = SearchSpace([x, y, z]);
-
-  // Defining an energy function.
-  final xGlobalMin = [0.5, 0.7, 0.8];
-  final xLocalMin = [-1.0, -1.0, -0.5];
-  num energy(List<num> x) {
-    return 4.0 -
-        4.0 * exp(-4 * xGlobalMin.distance(x)) -
-        2.0 * exp(-6 * xLocalMin.distance(x));
-  }
-
-  // Constructing an instance of `EnergyField`.
-  final energyField = EnergyField(
-    energy,
-    space,
+  // Construct a simulator instance.
+  final simulator = LoggingSimulator(
+    field, // Defined in file `energy_field_example.dart'
+    gammaStart: 0.8,
+    gammaEnd: 0.05,
+    outerIterations: 150,
+    innerIterationsStart: 5,
+    innerIterationsEnd: 10,
   );
 
-  // Construct a simulator instance.
-  final simulator = LoggingSimulator(field);
+  simulator.gridStart = [];
+  simulator.gridEnd = [];
+  simulator.deltaPositionEnd = [1e-9, 1e-9, 1e-9];
 
-  print(simulator);
   print(await simulator.info);
 
-  // Running the simulated annealing process.
-  final xSol = await simulator.anneal(isRecursive: true, ratio: 0.5);
-
-  // Storing simulator log data.
+  print('Start annealing process ...');
+  final xSol = await simulator.anneal(
+    isRecursive: true,
+  );
+  print('Annealing ended.');
+  print('Writing log to file: example/data/log.dat');
   await File('example/data/log.dat').writeAsString(simulator.export());
+  print('Finished writing. ');
 
   print('Solution: $xSol');
-
+  print('xSol - globalMin: ${xSol - globalMin}.');
 }
 
 ```
@@ -131,7 +156,8 @@ is sufficiently high [\[1\]][nikolaev2010].
 
 Practical implementations of the SA algorithm aim to generate
 an acceptable solution with *minimal* computational effort.
-For such *fast cooling* schedules, algorithm convergence to the global minimum is not
+For such *fast cooling* schedules, algorithm convergence to the
+global minimum is not
 strictly guaranteed. In that sense, SA is a heuristic approach and some
 degree of trial and error is required to determine which annealing schedule
 works best for a given problem.
@@ -161,7 +187,6 @@ to function of type [`TemperatureSequence`][TemperatureSequence]
 that is used to determine the temperature at each outer iteration step.
 
 
-
 The figure below shows a typical SA log where the x-coordinate of the solution (green dots)
 converges asymptotically to 0.5.
 The graph is discussed in more detail [here].
@@ -175,9 +200,6 @@ it is advisable to increase the number of inner Iterations towards the end of
 the annealing process in order to increase the algorithm precision.
 
 
-For fast cooling schedules convergence to an acceptable solution can be improved by
-increasing the number of inner iterations.
-
 ## Annealing Schedule
 
 In general, the following information is required to define an annealing schedule:
@@ -187,8 +209,8 @@ In general, the following information is required to define an annealing schedul
 * a function of type [`TemperatureSequence`][TemperatureSequence]
   that is used to determine the temperature at each (outer) iteration step.
 
-The class [`EnergyField`][EnergyField] provides the methods `tStart` and `tEnd`. These use
-an algorithm introduced by Ben-Ameur to calculate the
+The class [`EnergyField`][EnergyField] provides the methods `tStart` and `tEnd`.
+These use an algorithm introduced by Ben-Ameur to calculate the
 initial and final annealing temperature [\[2\]][ben-ameur2004].
 
 
