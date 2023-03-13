@@ -136,7 +136,6 @@ abstract class Simulator {
   /// Initial annealing temperature.
   late final Lazy<Future<num>> _tStart = Lazy<Future<num>>(() => _field.tStart(
         gammaStart,
-        grid: gridStart,
         deltaPosition: deltaPositionStart,
         sampleSize: sampleSize,
       ));
@@ -145,9 +144,8 @@ abstract class Simulator {
   Future<num> get tStart => _tStart();
 
   /// Final annealing temperature.
-  late final Lazy<Future<num>> _tEnd = Lazy<Future<num>>(() => _field.tStart(
+  late final Lazy<Future<num>> _tEnd = Lazy<Future<num>>(() => _field.tEnd(
         gammaEnd,
-        grid: gridEnd,
         deltaPosition: deltaPositionEnd,
         sampleSize: sampleSize,
       ));
@@ -391,7 +389,42 @@ abstract class Simulator {
   /// Can be used to add entries to a log.
   void recordLog();
 
-  // Initializing late variables:
+  /// Returns map containing the number of inner iterations for
+  /// each outer iteration step.
+  Future<Map<int, int>> iterationMap({
+    bool isRecursive = false,
+    num ratio = 0.5,
+  }) async {
+    /// Initialize parameters:
+    final temperatures = await this.temperatures;
+
+    final result = <int, int>{};
+
+    int nInner(num t) => markovChainLength(t,
+        tStart: temperatures.first,
+        tEnd: temperatures.last,
+        chainLengthStart: innerIterationsStart,
+        chainLengthEnd: innerIterationsEnd);
+
+    if (_recursionCounter == 0) {
+      _t = temperatures.first;
+    }
+
+    // During the first iteration pow(ratio.abs(), _recursionCounter) = 1.0
+    // and therefore i = 0.
+    var i = (temperatures.length * (1.0 - pow(ratio.abs(), _recursionCounter)))
+        .toInt();
+
+    ++_recursionCounter;
+
+    // Outer iteration loop.
+    for (i; i < temperatures.length; i++) {
+      _t = temperatures[i];
+      // Store number of iterations at constant temperature.
+      result[i] = nInner(_t);
+    }
+    return result;
+  }
 
   /// Starts the simulated annealing process and
   /// returns the best solution found.
@@ -402,12 +435,6 @@ abstract class Simulator {
   /// temperature sequence during recursive calls. The parameter is used
   /// to model repeated annealing cycles with decreasing initial temperature.
   /// * Note: `0.0 < ratio < 1.0`.
-  /// * scaleMarkovChain: Set to `true` to increase the Markov chain length by
-  ///   a factor of `pow(currentGrid.prod(), 1.0 /
-  ///   (currentGrid.length * 3)).toInt()`.
-  ///   This increases the probability of convergence since the chain length
-  ///   is scaled with the number of grid points.
-  ///
   Future<List<num>> anneal({
     bool isRecursive = false,
     num ratio = 0.5,

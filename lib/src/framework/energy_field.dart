@@ -78,7 +78,6 @@ class EnergyField {
     _position = _searchSpace.perturb(
       position,
       deltaPosition,
-      nGrid: grid,
     );
     _value = energy(_position);
     if (_value < _minValue) {
@@ -100,7 +99,7 @@ class EnergyField {
   /// `this.position`. The return value of `next()` can
   /// also be accessed via `this.value`.
   num next({List<int> grid = const []}) {
-    _position = _searchSpace.next(nGrid: grid);
+    _position = _searchSpace.next();
     _value = energy(_position);
     if (_value < _minValue) {
       _minValue = _value;
@@ -110,16 +109,24 @@ class EnergyField {
   }
 
   /// Returns a list of energy values sampled from the entire search space.
-  Future<List<num>> sample({
+  Future<List<num>> sampleEnergy({
     int sampleSize = 100,
-    List<int> grid = const [],
+    List<int> grid = const <int>[],
   }) async =>
       List<num>.generate(
         sampleSize,
-        (_) => next(
-          grid: grid,
-        ),
+        (_) => next(),
       );
+
+  /// Returns an object of type [List<List<num>>] with length [sampleSize].
+  /// Each entry is obtained by listing the current position and energy.
+  Future<List<List<num>>> sample({
+    int sampleSize = 100,
+  }) async =>
+      List<List<num>>.generate(sampleSize, (_) {
+        next();
+        return [..._position.sphericalToCartesian, _value];
+      });
 
   /// Returns a list containing the energy values at two
   /// positions separated at most by `deltaPosition`.
@@ -127,10 +134,9 @@ class EnergyField {
   /// * Throws an exception of type `ExceptionOf<EnergyField>` if
   /// no transition could be generated in `maxTrials` trials.
   List<List<num>> transitions(
-    List<num> deltaPosition,
-    List<int> grid, {
+    List<num> deltaPosition, {
     int sampleSize = 100,
-    int maxTrials = 10,
+    int maxTrials = 20,
   }) {
     maxTrials = maxTrials < 1 ? 10 : maxTrials;
 
@@ -140,12 +146,13 @@ class EnergyField {
     num state1 = 0;
 
     for (var i = 0; i < sampleSize; i++) {
+      count = 0;
       do {
-        state0 = next(grid: grid);
-        state1 = perturb(position, deltaPosition, grid: grid);
         ++count;
+        state0 = next();
+        state1 = perturb(position, deltaPosition);
       } while (state0 == state1 && count < maxTrials);
-      if (count >= maxTrials) {
+      if (count > maxTrials) {
         throw ExceptionOf<EnergyField>(
             message: 'Error in function \'transitions().\'',
             invalidState: 'Could not generate an uphill transition. '
@@ -159,7 +166,6 @@ class EnergyField {
           result.first.add(state1);
           result.last.add(state0);
         }
-        count = 0;
       }
     }
     return result;
@@ -174,10 +180,9 @@ class EnergyField {
   /// * `selectUphillMoves`: Set to `true` to filter out down-hill transitions (
   /// where the new energy value is lower than the energy at `position`).
   /// * `sampleSize`: The length of the returned list containing the sample.
-  Future<List<num>> sampleNeighbourhood(
+  Future<List<num>> sampleEnergyCloseTo(
     List<num> position,
     List<num> deltaPosition, {
-    List<int> grid = const [],
     int sampleSize = 100,
     bool selectUphillMoves = false,
   }) async {
@@ -187,7 +192,7 @@ class EnergyField {
       var eMin = energy(position);
       final result = <num>[];
       do {
-        if (eMin < perturb(position, deltaPosition, grid: grid)) {
+        if (eMin < perturb(position, deltaPosition)) {
           result.add(value);
           ++i;
         } else {
@@ -196,9 +201,9 @@ class EnergyField {
       } while (i < sampleSize && counter < 50 * sampleSize);
       if (result.length < sampleSize) {
         throw ExceptionOf<EnergyField>(
-            message: 'Error in function \'sampleNeighbourhood()\'',
+            message: 'Error in function \'sampleCloseTo\'',
             invalidState: 'Could not generate $sampleSize uphill transitions '
-                'with initial position $position and energy $eMin. ');
+                'with initial position: $position and energy: $eMin. ');
       }
       return result;
     } else {
@@ -207,7 +212,6 @@ class EnergyField {
           (_) => perturb(
                 position,
                 deltaPosition,
-                grid: grid,
               ));
     }
   }
@@ -245,8 +249,7 @@ class EnergyField {
   /// the range: `0 < gamma < 1`.
   Future<num> tStart(
     num gamma, {
-    required List<int> grid,
-    required List<num> deltaPosition,
+    List<num> deltaPosition = const <num>[],
     int sampleSize = 200,
   }) async {
     if (gamma <= 0 || gamma >= 1) {
@@ -255,9 +258,11 @@ class EnergyField {
           invalidState: 'Found \'gamma\': $gamma.',
           expectedState: 'Expected: 0 < gamma < 1.');
     }
+    if (deltaPosition.isEmpty) {
+      deltaPosition = size / 4;
+    }
     final transitions = this.transitions(
       deltaPosition,
-      grid,
       sampleSize: sampleSize,
     );
 
@@ -296,8 +301,7 @@ class EnergyField {
   /// the range: `0 < gamma < 1`.
   Future<num> tEnd(
     num gamma, {
-    required List<int> grid,
-    required List<num> deltaPosition,
+    deltaPosition = const <num>[],
     int sampleSize = 200,
   }) async {
     if (gamma <= 0 || gamma >= 1) {
@@ -308,11 +312,14 @@ class EnergyField {
     }
     // Initial transition values.
     final e0 = _minValue;
+    if (deltaPosition.isEmpty) {
+      deltaPosition = size * 1e-6;
+    }
+
     // Final transition values.
-    final e1 = await sampleNeighbourhood(
+    final e1 = await sampleEnergyCloseTo(
       _minPosition,
       deltaPosition,
-      grid: grid,
       sampleSize: sampleSize,
       selectUphillMoves: true,
     );
