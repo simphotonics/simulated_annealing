@@ -6,7 +6,14 @@ void main() {
   group('FixedInterval:', () {
     num left = 0;
     num right = 3;
-    final interval = FixedInterval(left, right);
+    final interval = FixedInterval(
+      left,
+      right,
+      name: 'Test',
+    );
+    test('name', () {
+      expect(interval.name, 'Test');
+    });
     test('start, end', () {
       expect(interval.start, left);
       expect(interval.end, right);

@@ -6,7 +6,14 @@ void main() {
   group('PeriodicInterval:', () {
     num left = 0;
     num right = 3;
-    final interval = PeriodicInterval(left, right);
+    final interval = PeriodicInterval(
+      left,
+      right,
+      name: 'Periodic Interval',
+    );
+    test('name', () {
+      expect(interval.name, 'Periodic Interval');
+    });
     test('start, end', () {
       expect(interval.start, left);
       expect(interval.end, right);

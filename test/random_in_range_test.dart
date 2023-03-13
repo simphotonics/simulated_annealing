@@ -25,17 +25,7 @@ void main() {
       expect(r.nextInRange(xMax, xMin) > xMin, true);
     });
   });
-  group('nextInRange(xMin, xMax, gridPoints: 5):', () {
-    final xMin = 0;
-    final xMax = 4.0;
-    test('next <= xMax', () {
-      final next = r.nextInRange(xMin, xMax);
-      expect(next, lessThanOrEqualTo(xMax));
-    });
-    test(' xMin <= next ', () {
-      expect(r.nextInRange(xMin, xMax), greaterThanOrEqualTo(xMin));
-    });
-  });
+  
   group('nextInRange(xMin, xMax, inverseCdf: inverseCdf):', () {
     final xMin = 0;
     final xMax = 4.0;

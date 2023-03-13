@@ -8,8 +8,13 @@ import 'package:test/test.dart';
 void main() {
   // Testing class: Space
   group('Fixed SearchSpace:', () {
-    final space =
-        SearchSpace.fixed([FixedInterval(0, 2), FixedInterval(10, 100)]);
+    final space = SearchSpace.fixed(
+      [FixedInterval(0, 2), FixedInterval(10, 100)],
+      name: '2D Test Interval',
+    );
+    test('name', () {
+      expect(space.name, '2D Test Interval');
+    });
     test('limits', () {
       final point = space.next();
       expect(<num>[0, 10] <= point && point < [2, 100], true);

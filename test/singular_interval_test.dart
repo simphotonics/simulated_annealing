@@ -4,7 +4,10 @@ import 'package:test/test.dart';
 void main() {
   // Testing class: Interval.
   group('SingularInterval:', () {
-    final s = SingularInterval(5);
+    final s = SingularInterval(5, name: 'Singular Interval');
+    test('name', () {
+      expect(s.name, 'Singular Interval');
+    });
     test('start == end', () {
       expect(s.start, 5);
       expect(s.end, 5);

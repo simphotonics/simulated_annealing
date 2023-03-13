@@ -196,7 +196,7 @@ abstract class Interval {
   String toString() {
     final b = StringBuffer();
     b.writeln('$runtimeType:');
-    b.writeln('   name: $name,');
+    b.writeln('   name: $name');
     b.writeln('   start: $start');
     b.writeln('   end: $end');
     if (_isUpToDate) {
