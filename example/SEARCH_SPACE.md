@@ -51,6 +51,10 @@ the class [`SearchSpace`][SearchSpace].
 <details><summary> Click to show source code.</summary>
 
 ```Dart
+import 'dart:math';
+
+import 'package:simulated_annealing/simulated_annealing.dart';
+
 SearchSpace sphere({
     num rMin = 0,
     num rMax = 1,
@@ -80,21 +84,27 @@ SearchSpace sphere({
 The figure below (left) shows 2000 random points generated using the
 method `next()` provided by the class [`SearchSpace`][SearchSpace].
 
-The (red) test point **x**<sub>test</sub> has coordinates \[1.2, 1.0, 1.6\].
+The red test point **x**<sub>test</sub> has coordinates \[1.9, pi /4, -pi / 2\].
 The green dots represent points sampled for a
 neighbourhood **x**<sub>test</sub> &pm; **deltaPosition** around **x**<sub>test</sub>,
-where **deltaPosition**&nbsp;=&nbsp;\[0.6, 0.6, 0.6\] are the perturbation magnitudes along each dimension.
-These points were generated using the method `perturb`.
-
-Notice that the perturbation neighbourhood does not extend beyond the margins of the
-search space. If the search space does not intersect the region **x**<sub>test</sub> &pm; **deltaPosition**,
-**x**<sub>test</sub> is returned **unperturbed**.
+where **deltaPosition**&nbsp;=&nbsp;\[0.4, 0.4, ,0.4\]
+are the perturbation magnitudes along each dimension.
+These points were generated using the method `perturb()`.
 
 ![Spherical Search Space](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/images/spherical_space.png)
 ![Hemispheric Search Space](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/images/hemispherical_space.png)
 
-The figure above (right) shows 2000 random points sampled from a hemispheric search space. The
-program used to generate the points is listed in the file [hemispherical_search_space_example.dart][hemispherical_search_space_example.dart].
+The figure above (on the right) shows 2000 random points sampled from a
+hemispheric search space. The search space includes all points on the
+hemisphere obtained by setting `rMin = rMax = 2.0` and restricting the
+polar angle theta to the range 0...pi/2.
+
+The program used to generate the points is listed in the file [hemispherical_space_example.dart][hemispherical_space_example.dart].
+Notice that the perturbation neighbourhood (green dots) does not extend beyond
+the margins of the search space.
+If the search space does not intersect the region
+**x**<sub>test</sub> &pm; **deltaPosition** along a certain interval then
+that respective coordinates is set to NaN.
 
 
 
@@ -102,8 +112,7 @@ program used to generate the points is listed in the file [hemispherical_search_
 
 In the context of simulated annealing, it is advisable to
 use a search space where each point is equally likely to be chosen.
-
-When constructing a search space using parametric intervals
+When constructing a search space using intervals
 the resulting multi-dimensional probability distribution
 function (PDF) might be **non-uniform** even if the
 intervals along each dimension have a uniform PDF.
@@ -212,7 +221,8 @@ In order to correct the 2-dimensional spherical PDF we have to explicitly specif
 
 cdf<sup>-1</sup>(p, theta<sub>min</sub>, theta<sub>max</sub>) = arccos( p &middot; ( cos(theta<sub>min</sub>) - cos(theta<sub>max</sub>) ) - cos(theta<sub>min</sub>) ).
 
-To derive the formula above one starts with the surface area: dA = d&phi; d&theta; sin(&theta;) of the sphere with unity radius to
+To derive the formula above one starts with the surface area:
+ dA = d&phi; d&theta; sin(&theta;) of the sphere with unity radius to
 construct the PDF then the CDF and finally the iCDF.
 
 The spherical search space can be constructed with the following lines of code:
