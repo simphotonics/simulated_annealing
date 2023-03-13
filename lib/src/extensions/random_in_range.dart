@@ -154,7 +154,7 @@ extension RandomInRange on Random {
     InverseCdf? inverseCdf,
   }) {
     inverseCdf ??= InverseCdfs.uniform;
-    final dx = (end - start) / --levels;
+    final dx = (end - start) / (levels - 1);
     final next = nextInRange(start, end, inverseCdf: inverseCdf);
     return start + dx * ((next - start) / dx).round();
   }
