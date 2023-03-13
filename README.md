@@ -87,8 +87,8 @@ import 'package:simulated_annealing/simulated_annealing.dart';
 // A predefined search space.
 final space = SearchSpace.sphere(rMin: 0, rMax: 2);
 
-final globalMin = [0.5, 0.7, 0.8];
-final localMin = [-1.0, -1.0, -0.5];
+final globalMin = [0.5, 0.7, 0.8].cartesianToSpherical;
+final localMin = [-1.0, -1.0, -0.5].cartesianToSpherical;
 
 // Defining an energy function.
 num energy(List<num> position) {
@@ -260,6 +260,8 @@ Please file feature requests and bugs at the [issue tracker][tracker].
 [SA-Wiki]: https://en.wikipedia.org/wiki/Simulated_annealing
 
 [search space]: https://github.com/simphotonics/simulated_annealing/tree/main/example/SEARCH_SPACE.md
+
+[SearchSpace]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/SearchSpace-class.html
 
 [simulator]: https://github.com/simphotonics/simulated_annealing/tree/main/example/SIMULATOR.md
 
