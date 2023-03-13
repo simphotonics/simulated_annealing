@@ -29,41 +29,34 @@ void main() {
     final xMin = 0;
     final xMax = 4.0;
     test('next <= xMax', () {
-      final next = r.nextInRange(xMin, xMax, nGrid: 5);
-      expect(next <= xMax, true);
-    });
-    test('next <= xMax', () {
-      expect(r.nextInRange(xMax, xMin, nGrid: 5) <= xMax, true);
+      final next = r.nextInRange(xMin, xMax);
+      expect(next, lessThanOrEqualTo(xMax));
     });
     test(' xMin <= next ', () {
-      expect(r.nextInRange(xMin, xMax, nGrid: 5) >= xMin, true);
-    });
-    test(' xMin <= next', () {
-      expect(r.nextInRange(xMax, xMin, nGrid: 5) >= xMin, true);
+      expect(r.nextInRange(xMin, xMax), greaterThanOrEqualTo(xMin));
     });
   });
-  group('nextInRange(xMin, xMax, gridPoints: 5, inverseCdf: inverseCdf):', () {
+  group('nextInRange(xMin, xMax, inverseCdf: inverseCdf):', () {
     final xMin = 0;
     final xMax = 4.0;
-    final nGrid = 5;
+
     test('next <= xMax', () {
-      final next =
-          r.nextInRange(xMin, xMax, nGrid: nGrid, inverseCdf: inverseCdf);
+      final next = r.nextInRange(xMin, xMax, inverseCdf: inverseCdf);
       expect(next, lessThanOrEqualTo(xMax));
     });
 
     test(' xMin <= next ', () {
       expect(
-        r.nextInRange(xMin, xMax, nGrid: nGrid, inverseCdf: inverseCdf),
+        r.nextInRange(xMin, xMax, inverseCdf: inverseCdf),
         greaterThanOrEqualTo(xMin),
       );
     });
 
     test('Value coincides with grid point', () {
       expect(
-          r.gridPoints(xMin, xMax, nGrid),
+          r.gridPoints(xMin, xMax, 10),
           contains(closeTo(
-            r.nextInRange(xMin, xMax, nGrid: nGrid, inverseCdf: inverseCdf),
+            r.nextLevelInRange(xMin, xMax, 10, inverseCdf: inverseCdf),
             1e-12,
           )));
     });
@@ -79,7 +72,8 @@ void main() {
           throwsA(isA<ErrorOf<Random>>().having(
             (e) => e.message,
             'message',
-            'Could not generate next random value from list.',
+            'Could not generate next value using the extension'
+                ' method `nextFromList`.',
           )));
     });
   });
