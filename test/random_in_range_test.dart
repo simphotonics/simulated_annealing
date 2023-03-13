@@ -41,6 +41,22 @@ void main() {
         greaterThanOrEqualTo(xMin),
       );
     });
+  });
+  group('nextLevelInRange(xMin, xMax, 10, inverseCdf: inverseCdf):', () {
+    final xMin = 0;
+    final xMax = 4.0;
+
+    test('next <= xMax', () {
+      final next = r.nextLevelInRange(xMin, xMax, 10, inverseCdf: inverseCdf);
+      expect(next, lessThanOrEqualTo(xMax));
+    });
+
+    test(' xMin <= next ', () {
+      expect(
+        r.nextLevelInRange(xMin, xMax, 10, inverseCdf: inverseCdf),
+        greaterThanOrEqualTo(xMin),
+      );
+    });
 
     test('Value coincides with grid point', () {
       expect(
@@ -51,6 +67,7 @@ void main() {
           )));
     });
   });
+
   group('nextFromList():', () {
     final list = <int>[1, 3, 9, 11];
     test('Values', () {

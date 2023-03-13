@@ -182,7 +182,7 @@ extension RandomInRange on Random {
   List<num> gridPoints(num start, num end, int levels) {
     final left = min(start, end);
     final right = max(start, end);
-    final dx = (right - left) / --levels;
+    final dx = (right - left) / (levels - 1);
     return List<num>.generate(levels, (index) => start + index * dx);
   }
 }
