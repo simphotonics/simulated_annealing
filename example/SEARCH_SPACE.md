@@ -2,21 +2,44 @@
 [![Dart](https://github.com/simphotonics/simulated_annealing/actions/workflows/dart.yml/badge.svg)](https://github.com/simphotonics/simulated_annealing/actions/workflows/dart.yml)
 
 
+## Introduction
+
+[Simulated annealing][SA-Wiki] (SA) is an algorithm aimed at finding
+the *global* minimum
+of a function E(x<sub>0</sub>,&nbsp;x<sub>1</sub>,&nbsp;...,&nbsp;x<sub>n</sub>)
+for a given region &omega;(x<sub>0</sub>,&nbsp;x<sub>1</sub>,&nbsp;...,&nbsp;x<sub>n</sub>).
+
+SA relies heavily on sampling random points from the region &omega;.
+In the sections below show how to construct objects of type
+[`SearchSpace`][SearchSpace].
+
 ## Terminology
 
-An **interval** is a numerical interval defined by a left boundary: *start* and
-a right boundary *end*. A *continuous* interval includes *start*, *end* and
-all points between the boundaries. A *discrete* interval includes *start*, *end*
+An **interval** is a numerical interval defined by a its boundaries.
+The base class of all intervals is ['Interval'][Interval].
+- **start**: The left boundary of an interval.
+- **end**: The right boundary of an interval.
+- **continuous** interval: An interval that includes *start*, *end*, and
+all points *between* the boundaries.
+- **discrete** interval: An interval that includes *start*, *end*,
 as well as a fixed number of points between the boundaries located along an
-equidistant grid. A *fixed* interval has numerical boundaries:
-see [`FixedInterval`][FixedInterval]. A *parametric* interval has boundaries that depend on other
-boundaries: see [`ParametricInterval`][ParametricInterval]. The base class of
-all intervals is ['Interval'][Interval].
+equidistant grid. To make an interval discrete one has to set the instance
+variable `levels` to an integer larger than two.
+- **fixed** interval: An interval with numerical boundaries,
+see [`FixedInterval`][FixedInterval].
+- **singular** interval: A fixed interval that includes a single point, see
+[`SingularInterval`][SingularInterval].
+- **periodic** interval: A fixed interval that wraps around itself. Periodic
+intervals are useful when defining intervals representing angles
+e.g. the polar angle of spherical
+coordinates or the azimuth of cylindrical coordinates.
+- **parametric** interval: An interval with boundaries that depend on other
+interval boundaries: see [`ParametricInterval`][ParametricInterval].
 
 A **search space** consists of one or several *intervals*. A *point* belonging
 to a search space is defined as a list of coordinates.
 The class [`SearchSpace`][SearchSpace] provides methods
-to sample random points from the entire space or
+for sampling random points from the entire space or
 from a region surrounding a given point.
 
 The example below demonstrates how to define a ball shaped 3D
@@ -58,7 +81,8 @@ The figure below (left) shows 2000 random points generated using the
 method `next()` provided by the class [`SearchSpace`][SearchSpace].
 
 The (red) test point **x**<sub>test</sub> has coordinates \[1.2, 1.0, 1.6\].
-The green dots represent points sampled for a neighbourhood **x**<sub>test</sub> &pm; **deltaPosition** around **x**<sub>test</sub>,
+The green dots represent points sampled for a
+neighbourhood **x**<sub>test</sub> &pm; **deltaPosition** around **x**<sub>test</sub>,
 where **deltaPosition**&nbsp;=&nbsp;\[0.6, 0.6, 0.6\] are the perturbation magnitudes along each dimension.
 These points were generated using the method `perturb`.
 
@@ -66,8 +90,8 @@ Notice that the perturbation neighbourhood does not extend beyond the margins of
 search space. If the search space does not intersect the region **x**<sub>test</sub> &pm; **deltaPosition**,
 **x**<sub>test</sub> is returned **unperturbed**.
 
-![Spherical Search Space](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/spherical_search_space.png)
-![Hemispheric Search Space](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/hemispherical_search_space.png)
+![Spherical Search Space](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/images/spherical_space.png)
+![Hemispheric Search Space](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/images/hemispherical_space.png)
 
 The figure above (right) shows 2000 random points sampled from a hemispheric search space. The
 program used to generate the points is listed in the file [hemispherical_search_space_example.dart][hemispherical_search_space_example.dart].
@@ -223,6 +247,11 @@ Please file feature requests and bugs at the [issue tracker].
 
 [FixedInterval]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/FixedInterval-class.html
 
+[SingularInterval]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/SingularInterval-class.html
+
+
 [ParametricInterval]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/ParametricInterval-class.html
 
 [hemispherical_search_space_example.dart]: bin/hemispherical_search_space_example.dart
+
+[SA-Wiki]: https://en.wikipedia.org/wiki/Simulated_annealing
