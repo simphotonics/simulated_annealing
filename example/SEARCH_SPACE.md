@@ -1,82 +1,61 @@
 #  Search Space - Example
 [![Dart](https://github.com/simphotonics/simulated_annealing/actions/workflows/dart.yml/badge.svg)](https://github.com/simphotonics/simulated_annealing/actions/workflows/dart.yml)
 
-## Usage
 
-The class [`SearchSpace`][SearchSpace] can be used to define multi-dimensional regions
-from which points are randomly sampled.
-A search space is defined in terms of intervals along each dimension.
+## Terminology
+
+An **interval** is a numerical interval defined by a left boundary: *start* and
+a right boundary *end*. A *continuous* interval includes *start*, *end* and
+all points between the boundaries. A *discrete* interval includes *start*, *end*
+as well as a fixed number of points between the boundaries located along an
+equidistant grid. A *fixed* interval has numerical boundaries:
+see [`FixedInterval`][FixedInterval]. A *parametric* interval has boundaries that depend on other
+boundaries: see [`ParametricInterval`][ParametricInterval]. The base class of
+all intervals is ['Interval'][Interval].
+
+A **search space** consists of one or several *intervals*. A *point* belonging
+to a search space is defined as a list of coordinates.
+The class [`SearchSpace`][SearchSpace] provides methods
+to sample random points from the entire space or
+from a region surrounding a given point.
 
 The example below demonstrates how to define a ball shaped 3D
-search space using cartesian coordinates. The search space includes the
+search space using spherical coordinates. The search space includes the
 points situated on the spherical surface as well as the inner points.
-
-The interval representing the first dimension, `x`,
-is an object of type [`FixedInterval`][FixedInterval] that is
-the left and right boundary are constant numbers.
-The intervals `y` and `z` are objects of type [`ParametricInterval`][ParametricInterval]
-and their boundaries are specified in terms of a numerical function that depends on other
-intervals.
-
-**Important**: When constructing an object of type [`SearchSpace`][SearchSpace]
-parameteric intervals must be listed in order of dependence. In the example shown
-below interval `x` is independent, while `y` depends on `x` and `z` depends on `x` and `y`.
-For this reason the variable `space` is initialized using the
-following line of source code:
-```Dart
-final space = SearchSpace([x, y, z]);
-```
+Note: The function shown below is available as a static function of
+the class [`SearchSpace`][SearchSpace].
 
 <details><summary> Click to show source code.</summary>
 
 ```Dart
-import 'dart:io';
-import 'dart:math';
-
-import 'package:list_operators/list_operators.dart';
-import 'package:simulated_annealing/simulated_annealing.dart';
-
-// Define intervals.
-final radius = 2;
-final x = FixedInterval(-radius, radius);
-
-num yLimit() => sqrt(pow(radius, 2) - pow(x.next(), 2));
-final y = ParametricInterval(() => -yLimit(), yLimit);
-
-num zLimit() => sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2));
-final z = ParametricInterval(() => -zLimit(), zLimit);
-final space = SearchSpace([x, y, z]);
-
-void main() async {
-  final xTest = [1.2, 1.0, 0.6];
-  final deltaPosition = [0.6, 0.6, 0.6];
-
-  final sample = List<List<num>>.generate(2000, (_) => space.next());
-
-  final perturbation = List<List<num>>.generate(
-      500, (_) => space.perturb(xTest, deltaPosition));
-
-  await File('../data/spherical_search_space.dat').writeAsString(
-    sample.export(),
+SearchSpace sphere({
+    num rMin = 0,
+    num rMax = 1,
+    num thetaMin = 0,
+    num thetaMax = pi,
+    num phiMin = 0,
+    num phiMax = 2 * pi,
+}) {
+  // Define intervals.
+  final r = FixedInterval(rMin, rMax, name: 'radius <r>');
+  final theta = FixedInterval(
+    thetaMin,
+    thetaMax,
+    inverseCdf: InverseCdfs.polarAngle,
+    name: 'polar angle <theta>',
   );
-  await File('../data/spherical_search_space_perturbation.dat').writeAsString(
-    perturbation.export(),
-  );
-
-  await File('../data/spherical_search_space_center_point.dat')
-      .writeAsString('''
-    # Perturbation Centerpoint
-    ${[xTest].export()}''');
-
-  // The search space can be visualized by navigating to the folder
-  // 'example/gnuplot_scripts' and running the commands:
-  // # gnuplot
-  // gnuplot> load 'spherical_search_space.gp'
+  final phi = (phiMin == phiMax)
+      ? SingularInterval(phiMin, name: 'azimuth <phi>')
+      : PeriodicInterval(phiMin, phiMax, name: 'azimuth <phi>');
+  // Defining a spherical search space.
+  return SearchSpace.fixed([r, theta, phi],name: 'sphere');
 }
+
 ```
 </details>
 
-The figure below (left) shows 2000 random points generated using the method `next` provided by the class [`SearchSpace`][SearchSpace].
+The figure below (left) shows 2000 random points generated using the
+method `next()` provided by the class [`SearchSpace`][SearchSpace].
 
 The (red) test point **x**<sub>test</sub> has coordinates \[1.2, 1.0, 1.6\].
 The green dots represent points sampled for a neighbourhood **x**<sub>test</sub> &pm; **deltaPosition** around **x**<sub>test</sub>,
@@ -93,9 +72,6 @@ search space. If the search space does not intersect the region **x**<sub>test</
 The figure above (right) shows 2000 random points sampled from a hemispheric search space. The
 program used to generate the points is listed in the file [hemispherical_search_space_example.dart][hemispherical_search_space_example.dart].
 
-As of version 0.3.4 the class [`SearchSpace`][SearchSpace] contains the static
-getters `sphere`, `box`, and `triangle` returning search spaces with these
-common geometries.
 
 
 ## Search Spaces With a Uniform Probability Distribution
