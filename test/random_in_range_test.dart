@@ -25,7 +25,7 @@ void main() {
       expect(r.nextInRange(xMax, xMin) > xMin, true);
     });
   });
-  
+
   group('nextInRange(xMin, xMax, inverseCdf: inverseCdf):', () {
     final xMin = 0;
     final xMax = 4.0;
