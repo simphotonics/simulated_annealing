@@ -30,15 +30,19 @@ void main(List<String> args) async {
   final deltaPosition = [0.5, 0.2, 0.5];
 
   /// Generate samples:
-  final sample = space.sample(size: 3000).cylindricalToCartesian;
+  final sample = space.sample(sampleSize: 3000).cylindricalToCartesian;
 
   final perturbations = space
-      .sampleVicinityOf(
+      .sampleCloseTo(
         position,
         deltaPosition,
-        size: 100,
+        sampleSize: 600,
       )
       .cylindricalToCartesian;
+  print(space);
+
+  print('');
+  print('Writing data ...');
 
   /// Write to file:
   await File('example/data/cylindrical_space.dat').writeAsString(
@@ -52,4 +56,10 @@ void main(List<String> args) async {
     ${[
     position.cylindricalToCartesian
   ].export(label: '#Perturbation Centrepoint: x, y, z')}''');
+
+  print('Data written successfully. \nGood bye.');
+  // The search space can be visualized by navigating to the folder
+  // 'example/gnuplot_scripts' and running the commands:
+  // # gnuplot
+  // gnuplot> load 'cylindrical_search_space.gp'
 }

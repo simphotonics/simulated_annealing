@@ -10,19 +10,21 @@ void main() async {
     field,
     outputPath: 'example/data/animation/log_',
     nth: 50,
-    outerIterations: 750,
-    gammaStart: 0.7,
+    outerIterations: 150,
+    gammaStart: 0.8,
     gammaEnd: 0.05,
   );
 
-  simulator.gridEnd = [10, 10, 10];
+  simulator.gridStart = [];
+  simulator.gridEnd = [];
 
   print(await simulator.info);
+  print('Start annealing process ...');
 
   final xSol = await simulator.anneal(
     isRecursive: true,
     isVerbose: true,
   );
-
+  print('Annealing ended.');
   print('Solution: $xSol');
 }

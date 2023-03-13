@@ -21,32 +21,35 @@ final z = ParametricInterval(
 
 // Defining a spherical search space.
 // Intervals are listed in order of dependence.
-final space = SearchSpace([x, y, z]);
+final space =
+    SearchSpace.sphere(rMin: r, rMax: r, thetaMin: 0, thetaMax: pi / 2);
 
 void main() async {
-  for (var i = 0; i < 10; i++) {
-    print(space.estimateSize());
-  }
+  final position = [1.9, pi / 4, -pi / 2];
+  final deltaPosition = [0.2, 0.4, 0.4];
+  // final position = [0.8, 0.2, 1.8];
+  // final deltaPosition = [0.6, 0.6, 0.6];
 
-  final xTest = [0.8, 0.2, 1.8];
-  final deltaPosition = [0.6, 0.6, 0.6];
+  final sample = space.sample(sampleSize: 2000).sphericalToCartesian;
 
-  final sample =
-      List<List<num>>.generate(1200, (_) => space.next(nGrid: [120, 120, 120]));
+  final perturbation = space
+      .sampleCloseTo(
+        position,
+        deltaPosition,
+        sampleSize: 400,
+      )
+      .sphericalToCartesian;
 
-  final perturbation =
-      List<List<num>>.generate(400, (_) => space.perturb(xTest, deltaPosition));
-
-  await File('../data/hemisphere.dat').writeAsString(
+  await File('example/data/hemisphere.dat').writeAsString(
     sample.export(),
   );
-  await File('../data/hemisphere_perturbation.dat').writeAsString(
+  await File('example/data/hemisphere_perturbation.dat').writeAsString(
     perturbation.export(),
   );
 
-  await File('../data/hemisphere_test_point.dat').writeAsString('''
+  await File('example/data/hemisphere_test_point.dat').writeAsString('''
     # Test Point
-    ${[xTest].export()}''');
+    ${[position.sphericalToCartesian].export()}''');
 
   // The search space can be visualized by navigating to the folder
   // 'example/gnuplot_scripts' and running the commands:

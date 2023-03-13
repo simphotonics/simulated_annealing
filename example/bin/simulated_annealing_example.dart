@@ -14,22 +14,26 @@ void main() async {
     field, // Defined in file `energy_field_example.dart'
     gammaStart: 0.8,
     gammaEnd: 0.05,
-    outerIterations: 50,
+    outerIterations: 150,
+    innerIterationsStart: 5,
+    innerIterationsEnd: 10,
   );
 
   simulator.gridStart = [];
   simulator.gridEnd = [];
-  simulator.deltaPositionEnd = [1e-12, 1e-12, 1e-12];
+  simulator.deltaPositionEnd = [1e-7, 1e-7, 1e-7];
 
-  print(simulator);
   print(await simulator.info);
 
+  print('Start annealing process ...');
   final xSol = await simulator.anneal(
     isRecursive: true,
   );
+  print('Annealing ended.');
+  print('Writing log to file: example/data/log.dat');
   await File('example/data/log.dat').writeAsString(simulator.export());
+  print('Finished writing. ');
 
   print('Solution: $xSol');
-  print(xSol - xGlobalMin);
-  print((xSol - xGlobalMin).abs() < simulator.deltaPositionEnd);
+  print('xSol - globalMin: ${xSol - globalMin}.');
 }

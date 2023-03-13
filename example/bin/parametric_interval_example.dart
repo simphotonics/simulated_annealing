@@ -36,21 +36,20 @@ final z = ParametricInterval(
 
 // Defining a spherical search space.
 // Intervals are listed in order of dependence.
-final space = SearchSpace([x, y, z]);
+final space = SearchSpace.parametric([x, y, z]);
 
 void main() async {
   for (var i = 0; i < 10; i++) {
-    print(space.estimateSize());
+    print(space.size);
   }
 
   final xTest = [1.2, 1.0, 0.6];
   final deltaPosition = [0.6, 0.6, 0.6];
 
-  final sample =
-      List<List<num>>.generate(2000, (_) => space.next(nGrid: [10, 10, 10]));
+  final sample = List<List<num>>.generate(2000, (_) => space.next());
 
-  final perturbation = List<List<num>>.generate(
-      500, (_) => space.perturb(xTest, deltaPosition, nGrid: [50, 50, 50]));
+  final perturbation =
+      List<List<num>>.generate(500, (_) => space.perturb(xTest, deltaPosition));
 
   await File('../data/spherical_space.dat').writeAsString(
     sample.export(),
