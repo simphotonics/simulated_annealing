@@ -84,7 +84,7 @@ do for [i=0:299] {
     set ztics ('-2' -2.0, '-1' -1.0, '0' 0.0, '1' 1.0, '2' 2.0);
     set palette defined (0 "#2233DD", 0.25 "blue",  2 "green", 3.5 "yellow",   4 "red" )
     set title "System Energy 3D" font ",14"
-    splot '../data/spherical_search_space2D.dat' using 1:2:3 ps 0.5 lt 1 pt 7 lc "#757575", \
+    splot '../data/spherical_space.dat' using 1:2:3 ps 0.5 lt 1 pt 7 lc "#757575", \
       sprintf('../data/animation/log_%i', i) using 1:2:3:7 ps 1.0 pt 7 pal
 
     set title "System Energy (X-Y Projection)" font ",14"

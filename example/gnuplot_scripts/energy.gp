@@ -64,5 +64,5 @@ set colorbox user origin .8,.4 size .02,.4
 
 set output '../plots/energy.png'
 
-splot '../data/spherical_search_space2D.dat' using 1:2:3 ps 0.5 lt 1 pt 7 lc "#44444455" t "Search Region", \
+splot '../data/spherical_search_space.dat' using 1:2:3 ps 0.5 lt 1 pt 7 lc "#44444455" t "Search Region", \
  '../data/log.dat' using 1:2:3:4 ps 1.5 pt 7 pal t "System energy"

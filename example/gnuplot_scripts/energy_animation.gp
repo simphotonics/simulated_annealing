@@ -77,6 +77,6 @@ set colorbox user origin .87,.4 size .01,.4
 do for [i=0:0] {
     #print(i);
     #set output sprintf('../plots/animation/frame_%i.png', i)
-    splot '../data/spherical_search_space2D.dat' using 1:2:3 ps 0.5 lt 1 pt 7 lc "#44444455", \
+    splot '../data/spherical_space.dat' using 1:2:3 ps 0.5 lt 1 pt 7 lc "#44444455", \
   #sprintf('../data/animation/log_%i', i) using 1:2:3:4 ps 1.5 pt 7 pal
 }

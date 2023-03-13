@@ -35,11 +35,18 @@ set ztics ('-2' -2.0, '-1' -1.0, '0' 0.0, '1' 1.0, '2' 2.0);
 
 set term pngcairo size 500, 500 font "Sans,12"
 
-set output '../plots/hemispherical_search_space.png'
+set lmargin 0.1;
+# set bmargin 0.0;
+# set tmargin at screen 0.8;
 
-splot '../data/hemisphere.dat' lt 1 ps 0.5 pt 4 t "Points In Search Space", \
-'../data/hemisphere_perturbation.dat' ps 0.75 pt 7 lt 2 t "Random Points Around Test Point", \
+set origin 0.05, 0
+show origin;
+
+set output '../../images/hemispherical_space.png'
+
+splot '../data/hemisphere.dat' lt 1 ps 0.25 pt 5 t "Points In Search Space", \
+'../data/hemisphere_perturbation.dat' ps 0.3 pt 7 lt 2 t "Random Points Around Test Point", \
 '../data/hemisphere_test_point.dat' ps 2 pt 7 lt 1 lc "red" t "Test Point", \
-"-" w p ps 3 pt 9 lt 9 lc "blue" t "Origin"
+"-" w p ps 2 pt 9 lt 9 lc "blue" t "Origin"
 0 0 0
 e

@@ -1,11 +1,11 @@
-# Visualizes a cylindrical search space by
-# plotting the points in ../data/cylindrical_space.dat
+# Visualizes a conical search space by
+# plotting the points in ../data/cone.dat
 
 reset
 
 set key font ", 12"  inside top right enhanced
 
-#set title "Spherical Search Space" font ",18"
+#set title "Conical Search Space" font ",18"
 
 set grid lw 2
 
@@ -42,9 +42,9 @@ set margin 10, 1,1 ,1
 
 #set output '../plots/spherical_space_surface_test.png'
 
-splot '../data/cylindrical_space.dat' lt 1 ps 0.4 pt 7 t "Points In Search Space", \
-'../data/cylindrical_space_perturbation.dat' ps 0.75 pt 7 lt 2 t "Random Points Around Test Point", \
-'../data/cylindrical_space_test_point.dat' ps 2 pt 7 lt 1 lc "red" t "Test Point", \
+splot '../data/cone.dat' lt 1 ps 0.4 pt 7 t "Points In Search Space", \
+'../data/cone_perturbation.dat' ps 0.75 pt 7 lt 2 t "Random Points Around Test Point", \
+'../data/cone_test_point.dat' ps 2 pt 7 lt 1 lc "red" t "Test Point", \
 "-" w p ps 3 pt 9 lt 9 lc "blue" t "Origin"
 0 0 0
 e
