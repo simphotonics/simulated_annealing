@@ -10,7 +10,7 @@ defined for a spherical search space centred around the origin.
 Hereby, |**x** - **y**| = &#8730; ( &sum;<sub> i = 1,..., 3</sub> (x<sub>i</sub> - y<sub>i</sub>)<sup>2</sup> ) is the distance between the vectors **x** and **y**.
 
 
-![Energy Simulated Annealing](https://github.com/simphotonics/simulated_annealing/blob/main/example/plots/energy_composite.gif)
+![Energy Simulated Annealing](https://github.com/simphotonics/simulated_annealing/blob/main/images/energy_composite.gif)
 
 The figure above (right) shows a projection of E onto the x-y plane. The global minimum of E(**x**)
 is situated at **x**<sub>glob</sub> = \[0.5, 0.7, 0.8\]. The function has a local minimum
@@ -80,7 +80,7 @@ void main() async {
 </details>
 
 
-![Convergence Graph](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/convergence.png)
+![Convergence Graph](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/images/convergence.png)
 
 The figure above shows the system energy, min. system energy, temperature, and acceptance probability during the SA process.
 
@@ -92,8 +92,8 @@ At high temperatures the algorithm explores the entire search space for the x-co
 and new solutions are accepted with high probability (red dots along the line y = 1).
 As the temperature decreases fewer solutions are accepted and the x-coordinate converges towards 0.5.
 
-![System Energy](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/energy.png)
-![Temperature 3D](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/temperature.png)
+![System Energy](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/images/energy.png)
+![Temperature 3D](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/images/temperature.png)
 
 
 

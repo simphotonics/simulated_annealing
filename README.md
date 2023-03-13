@@ -46,7 +46,7 @@ that the acceptance probability decreases with decreasing temperature (for &Delt
 As such, the temperature is a parameter that controls the probability of up-hill moves.
 </details>
 
-![Energy Simulated Annealing](https://github.com/simphotonics/simulated_annealing/raw/main/example/plots/energy_composite.gif)
+![Energy Simulated Annealing](https://github.com/simphotonics/simulated_annealing/raw/main/images/energy_composite.gif)
 
 The process is demonstrated in the animation above. The left figure shows a
 spherical 3D search space while the energy value is represented by colour.
@@ -193,7 +193,7 @@ The figure below shows a typical SA log where the x-coordinate of the solution (
 converges asymptotically to 0.5.
 The graph is discussed in more detail [here].
 
-![Convergence Graph](https://github.com/simphotonics/simulated_annealing/raw/main/example/plots/convergence.gif)
+![Convergence Graph](https://github.com/simphotonics/simulated_annealing/raw/main/images/convergence.gif)
 
 The number of inner iterations (performed while the temperature is kept constant)
 is also referred to as Markov chain length and is determined by a function with typedef [`MarkovChainLength`][MarkovChainLength]. It can be adjusted by setting the

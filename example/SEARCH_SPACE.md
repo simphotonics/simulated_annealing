@@ -133,8 +133,8 @@ final triangularSpace = SearchSpace([x, y]);
 The left figure in the image below shows 2000 points randomly selected from the triangular search space (magenta coloured dots).
 There is an aggreggation of points towards the left side of the search space boundary indicating that the 2D PDF of the search_space `triangularSpace` is non-uniform.
 
-![Triangular Search Space](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/triangular_search_space.png)
-![Inverse CDF of a uniform PDF](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/inverseCdfUniform.png)
+![Triangular Search Space](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/images/triangular_search_space.png)
+![Inverse CDF of a uniform PDF](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/images/inverseCdfUniform.png)
 
 The non-uniform distribution of points along the search space is related to the
 uniform distribution of the interval `x`. For a sufficiently large sample, the number of points with x-coordinate between 0 and 1 is approximately equal to the number of points with x-coordinate between 9 and 10.
@@ -169,8 +169,8 @@ and the inverse cummulative distribution function given by:
 
 cdf<sup>-1</sup>(p, x<sub>min</sub>, x<sub>max</sub>) = x<sub>min</sub> + (x<sub>max</sub> - x<sub>min</sub>)&middot;&Sqrt;p &nbsp;&nbsp;&nbsp;where p &in; \[0, 1\].
 
-![Triangular Search Space Uniform PDF](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/triangular_search_space_uniform.png)
-![Inverse CDF of a linear PDF](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/inverseCdfLinear.png)
+![Triangular Search Space Uniform PDF](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/images/triangular_search_space_uniform.png)
+![Inverse CDF of a linear PDF](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/images/inverseCdfLinear.png)
 
 The iCDF for the x-coordinate is shown on the right in the image above. It ensures that values of `x` that are
 closer to zero are less likely to be selected.
@@ -213,8 +213,8 @@ The graphs on the
 right show the iCDF used for the interval &theta;.
 
 
-![Spherical Surface](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/spherical_space_surface.png)
-![Inverse CDF of Theta](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/inverseCdfThetaUniform.png)
+![Spherical Surface](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/images/spherical_space_surface.png)
+![Inverse CDF of Theta](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/images/inverseCdfThetaUniform.png)
 
 
 In order to correct the 2-dimensional spherical PDF we have to explicitly specify an iCDF when creating the interval `theta`. The corrected iCDF of theta takes the form:
@@ -244,8 +244,8 @@ final space = SearchSpace([phi, theta]);
  The graphs on the right shows a plot of the iCDF for different boundaries theta<sub>min</sub>
  and theta<sub>max</sub>.
 
- ![Spherical Surface](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/spherical_space_surface_uniform.png)
-![Inverse CDF of Theta](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/inverseCdfTheta.png)
+ ![Spherical Surface](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/images/spherical_space_surface_uniform.png)
+![Inverse CDF of Theta](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/images/inverseCdfTheta.png)
 
 
 ## Features and bugs

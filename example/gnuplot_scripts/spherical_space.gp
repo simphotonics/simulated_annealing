@@ -45,7 +45,7 @@ show origin;
 
 # '../data/energy.dat' using 1:2:4 ps 0.5 pt 3 lt 1 lc "red" t "Energy", \
 
-set output '../../images/spherical_space.png'
+set output '../plots/spherical_space.png'
 
 splot '../data/spherical_space.dat' lt 1 ps 0.25 pt 5 t "Points In Search Space", \
 '../data/spherical_space_perturbation.dat' ps 0.3 pt 7 lt 2 t "Random Points Around Test Point", \

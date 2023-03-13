@@ -42,7 +42,7 @@ set lmargin 0.1;
 set origin 0.05, 0
 show origin;
 
-set output '../../images/hemispherical_space.png'
+set output '../plots/hemispherical_space.png'
 
 splot '../data/hemisphere.dat' lt 1 ps 0.25 pt 5 t "Points In Search Space", \
 '../data/hemisphere_perturbation.dat' ps 0.3 pt 7 lt 2 t "Random Points Around Test Point", \
