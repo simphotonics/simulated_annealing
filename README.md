@@ -13,17 +13,23 @@ the **ground state** of the system.
 Simulated annealing works by randomly
 selecting a new point in the neighbourhood of the
 current solution, evaluating the energy function E,
-and deciding if the new solution is accepted or rejected.
-If E < E<sub>min</sub> ,where E<sub>min</sub> is a previously found solution,
-the new solution is accepted. Crucially, if &Delta;E > 0,
-the algorithm still accepts the new solution with probability:
-P(&Delta;E > 0, T) = e<sup>-&Delta;E/(k<sub>B</sub>&middot;T)</sup>
-where &Delta;E = E - E<sub>min</sub>.
+and deciding if the new solution is accepted or rejected:
+* If &Delta;E = E - E<sub>min</sub> < 0 ,where E<sub>min</sub> is a previously
+found minimum, the new solution is accepted with probability: 1.0.
+* If &Delta;E > 0, the new solution is accepted with probability:
+P(&Delta;E > 0, T) = e<sup>-&Delta;E/(k<sub>B</sub>&middot;T)</sup>.
+The [Boltzmann constant][Boltzmann] k<sub>B</sub>  relates the system
+temperature with the kinetic energy of particles in a gas.
+In the context of SA, it is customary to set k<sub>B</sub>&nbsp;&equiv;&nbsp;1.
+
+The solution acceptance probability decreases with decreasing temperature
+(for &Delta;E > 0). As such, the temperature is a parameter
+that controls the probability of up-hill moves.
 Accepting up-hill moves provides a method of escaping from local energy minima.
 
-<details><summary> The algorithm name was coined by Kirkpatrick... click to show details.
+<details><summary> The algorithm name was coined by ... click to show details.
 </summary>
-The algorithm name was coined by Kirkpatrick et al. and was
+Kirkpatrick et al. and was
 derived from the process of annealing a metal alloy or glass.
 The first step of the annealing process consists of heating a
 solid material above a critical temperature. This allows its atoms to gain
@@ -31,13 +37,7 @@ sufficient kinetic energy to be able to rearrange themselves.
 Then the temperature is decreased sufficiently slowly
 in order to minimize atomic lattice defects as the material solidifies.
 
-The [Boltzmann constant][Boltzmann] k<sub>B</sub>  relates the system
-temperature with the kinetic energy of particles in a gas.
-In the context of SA, it is customary to set k<sub>B</sub>&nbsp;&equiv;&nbsp;1.
-With this convention, the probability of accepting a new solution is given by:
 
-P(&Delta;E > 0, T) = e<sup>-&Delta;E/T</sup>&nbsp;&nbsp;and&nbsp;&nbsp;P(&Delta;E <0, T) = 1.0,
-where &Delta;E = E - E<sub>min</sub>.
 
 The expression above ensures
 that the acceptance probability decreases with decreasing temperature (for &Delta;E > 0).
