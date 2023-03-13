@@ -11,21 +11,23 @@ The function to be minimized can be interpreted as the
 the **ground state** of the system.
 
 Simulated annealing works by randomly
-selecting a new point in the neighbourhood of the
-current solution, evaluating the energy function E,
+selecting a new point (y<sub>0</sub>,&nbsp;y<sub>1</sub>,&nbsp;
+...,&nbsp;y<sub>n</sub>)  in the neighbourhood of the
+current solution, evaluating the energy function E(y<sub>0</sub>,&nbsp;
+y<sub>1</sub>,&nbsp;...,&nbsp;y<sub>n</sub>),
 and deciding if the new solution is accepted or rejected:
 * If &Delta;E = E - E<sub>min</sub> < 0 ,where E<sub>min</sub> is a previously
-found minimum, the new solution is accepted with probability: 1.0.
+found energy minimum, the new solution is accepted with probability: 1.0.
 * If &Delta;E > 0, the new solution is accepted with probability:
 P(&Delta;E > 0, T) = e<sup>-&Delta;E/(k<sub>B</sub>&middot;T)</sup>.
 The [Boltzmann constant][Boltzmann] k<sub>B</sub>  relates the system
 temperature with the kinetic energy of particles in a gas.
 In the context of SA, it is customary to set k<sub>B</sub>&nbsp;&equiv;&nbsp;1.
 
-The solution acceptance probability decreases with decreasing temperature
-(for &Delta;E > 0). As such, the temperature is a parameter
-that controls the probability of up-hill moves.
 Accepting up-hill moves provides a method of escaping from local energy minima.
+The acceptance probability for solution satisfying &Delta;E > 0
+decreases with decreasing temperature. As such, the temperature is a parameter
+that controls the probability of up-hill moves.
 
 <details><summary> The algorithm name was coined by ... click to show details.
 </summary>
@@ -68,7 +70,7 @@ The following steps are required to set up the SA algorithm.
    are predefined as static functions of the
    class [`SearchSpace`][SearchSpace].
 2. Define the system [`EnergyField`][EnergyField], an object encapsulating
-   the energy function (cost function) and its domain (the search space).
+   the energy function (cost function) and its domain: the search space.
 3. Create an instance of [`LoggingSimulator`][LoggingSimulator] or
    alternatively extend the abstract class [`Simulator`][SimulatorClass].
 4. Start the [simulated annealing][simulator] process.

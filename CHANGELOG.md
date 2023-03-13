@@ -1,8 +1,11 @@
+## 0.3.5
+- Added static functions returning predefined search spaces to class `SearchSpace`.
+
 ## 0.3.4
-- Extended the class `SeachSpace`. It now includes the static getters `sphere`, `box`,
-  and `triangle` returning instances with these common geometries.
+- Extended the class `SeachSpace`. It now includes the static getters `sphere`,
+  `box`, and `triangle` returning instances with these common geometries.
 - Added the classes `SingularInterval` and `PeriodicInterval`.
-- Added tests. 
+- Added tests.
 
 
 ## 0.3.3
