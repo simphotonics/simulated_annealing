@@ -1,42 +1,179 @@
 import 'dart:math' show min, max, Random;
+import 'package:lazy_memo/lazy_memo.dart';
 
 import '../extensions/random_in_range.dart';
 
 /// Function defining an interval start/end point.
 typedef ParametricPoint = num Function();
 
+typedef Next = num Function();
+typedef Perturb = num Function(num position, num deltaPosition);
+
 /// Abstract class representing a numerical interval.
 abstract class Interval {
-  Interval({this.inverseCdf});
+  Interval({this.inverseCdf, this.name = ''});
 
   /// Inverse cummulative distribution function.
   final InverseCdf? inverseCdf;
 
-  /// Returns the next random number in the interval.
-  ///
-  /// If `nGrid > 1` the interval is divided in
-  /// into a grid with `nGrid` points.
-  num next({int nGrid = 0});
+  /// The start of the numerical interval [start]...[end].
+  num get start;
 
-  /// Returns the next random number in the intersection of the intervals
+  /// The end of the numerical interval [start]...[end].
+  num get end;
+
+  /// Returns the name of interval.
+  final String name;
+
+  /// Returns the levels of a discrete interval.
+  int get levels => _levels;
+
+  /// The levels of a discrete interval.
+  /// The initial value is zero indicating a continuous interval.
+  int _levels = 0;
+
+  /// Returns `true` if the interval is discrete (has at least 2 gridpoints).
+  bool get isDiscrete => (_levels >= 2);
+
+  /// Returns `true` if the interval is continuous.
+  bool get isContinuous => (_levels < 2);
+
+  /// Returns the grid points associated with the discrete interval.
+  List<num> get gridPoints => List<num>.generate(_levels, (i) {
+        return start + i * dx();
+      });
+
+  /// Step size between discrete levels.
+  late final dx = Lazy<num>(
+    () => _levels >= 2 ? (end - start) / (_levels - 1) : 0,
+  );
+
+  /// Sets the number of discrete levels (gridPoints).
+  /// A value of zero indicates a continuous interval.
+  set levels(int value) {
+    if (value < 2) {
+      _levels = 0;
+      _next = _nextContinuous;
+      _perturb = _perturbContinuous;
+    } else {
+      _levels = value;
+      _next = _nextDiscrete;
+      _perturb = _perturbDiscrete;
+    }
+    dx.updateCache();
+  }
+
+  num _nextContinuous() {
+    if (_isUpToDate) {
+      return _cache;
+    } else {
+      _isUpToDate = true;
+      return _cache =
+          Interval.random.nextInRange(start, end, inverseCdf: inverseCdf);
+    }
+  }
+
+  /// Returns the next random number sampled from
+  /// the interval `(start, end)`.
+  /// * Note: The interval consists of
+  /// [levels] gridPoints that are equidistantly distributed.
+  /// * The first gridPoint coincides with [start] the last one with [end].
+  /// * Returns a cached value if the cache is up-to-date.
+  /// * If the cache is stale an new random number is returned and cached.
+  num _nextDiscrete() {
+    if (_isUpToDate) {
+      return _cache;
+    } else {
+      _isUpToDate = true;
+      final next = Interval.random.nextInRange(
+        start,
+        end,
+        inverseCdf: inverseCdf,
+      );
+      return _cache = start + dx() * ((next - start) / dx()).round();
+    }
+  }
+
+  /// Internal variable storing the function [next].
+  late Next _next = _nextContinuous;
+
+  /// Returns the next random number sampled from
+  /// the interval `(start, end)`.
+  /// * Returns a cached value if the cache is up-to-date.
+  /// * If the cache is stale an new random number is returned and cached.
+  num next() => _next();
+
+  num _perturbContinuous(
+    num position,
+    num deltaPosition,
+  ) {
+    deltaPosition = deltaPosition.abs();
+    final startOverlap = max(position - deltaPosition, start);
+    final endOverlap = min(position + deltaPosition, end);
+    if (startOverlap > end || endOverlap < start) {
+      _isUpToDate = false;
+      return double.nan;
+    } else {
+      _isUpToDate = true;
+      return _cache = random.nextInRange(
+        startOverlap,
+        endOverlap,
+        inverseCdf: inverseCdf,
+      );
+    }
+  }
+
+  num _perturbDiscrete(
+    num position,
+    num deltaPosition,
+  ) {
+    deltaPosition = deltaPosition.abs();
+    final startOverlap = max(position - deltaPosition, start);
+    final endOverlap = min(position + deltaPosition, end);
+    if (startOverlap > end || endOverlap < start) {
+      _isUpToDate = false;
+      return double.nan;
+    } else {
+      _isUpToDate = true;
+      final next = random.nextInRange(
+        startOverlap,
+        endOverlap,
+        inverseCdf: inverseCdf,
+      );
+      return _cache = start + dx() * ((next - start) / dx()).round();
+    }
+  }
+
+  /// Internal variable storing the function [perturb].
+  late Perturb _perturb = _perturbContinuous;
+
+  /// Returns the next random number sampled from the interval
+  /// obtained by intersecting:
   /// `(start, end)` and `(position - deltaPosition, position + deltaPosition)`.
-  /// Returns `position` if the intersection is the empty interval.
-  num perturb(num position, num deltaPosition, {int nGrid = 0});
+  /// * If the intersection is empty, `double.nan` is returned.
+  /// * Returns a cached value if the cache is up-to-date.
+  /// * If the cache is stale a new random number is returned and cached.
+  num perturb(num position, num deltaPosition) => _perturb(
+        position,
+        deltaPosition,
+      );
 
-  /// Returns the grid points associated with an interval.
-  ///
-  /// Returns an empty list if `nGrid < 2`.
-  List<num> gridPoints(int nGrid);
+  /// Returns true if position is safisfying
+  /// `(start <= position && position <= end)`.
+  bool contains(num position) => start <= position && position <= end;
 
-  /// Returns true if `point` belongs to the interval.
-  bool contains(num point);
-
-  /// Returns true if this and the interval defined by `start` and
-  /// `end` overlap.
-  bool overlaps(num start, num end);
+  /// Returns true if the interval defined by the points
+  /// `left` and `right` overlaps `this`.
+  bool overlaps(num left, num right) {
+    final start = min(left, right);
+    final end = max(left, right);
+    if (end < this.start) return false;
+    if (start > this.end) return false;
+    return true;
+  }
 
   /// Returns the size of the interval.
-  num get size;
+  num get size => end - start;
 
   /// Cached random number in interval.
   /// @nodoc
@@ -45,11 +182,29 @@ abstract class Interval {
   /// Logical flag indicating if `_cache` is up to date.
   bool _isUpToDate = false;
 
-  /// Clears the internal cache holding next. After calling this function
-  /// the method `next` will return a new random number sampled from the
-  /// interval `(start, end)`.
-  void clearCache() {
+  /// Returns `true` is the cached random numbers are up-to-date.
+  bool get isUpToDate => _isUpToDate;
+
+  /// Marks the internal cache as stale. After calling this function
+  /// the methods [next] and [perturb] will return a new random number sampled
+  /// from the interval `start...end`.
+  void updateCache() {
     _isUpToDate = false;
+  }
+
+  @override
+  String toString() {
+    final b = StringBuffer();
+    b.writeln('$runtimeType:');
+    b.writeln('   name: $name,');
+    b.writeln('   start: $start');
+    b.writeln('   end: $end');
+    if (_isUpToDate) {
+      b.write('   cached next: $_cache');
+    } else {
+      b.write('   cached next: not set');
+    }
+    return b.toString();
   }
 
   /// The random number generator.
@@ -66,85 +221,60 @@ abstract class Interval {
 /// of a surface of a sphere.
 class SingularInterval extends FixedInterval {
   /// Constructs a singular fixed interval.
-  SingularInterval(num value) : super._(value, value);
+  SingularInterval(num value, {String name = ''})
+      : super._(
+          value,
+          value,
+          name: name,
+        );
 
   SingularInterval.of(SingularInterval interval)
       : super._(
           interval.start,
           interval.end,
+          name: interval.name,
         );
 
-  /// Returns the value stored in `start`.
-  ///
-  /// ---
-  /// * `nGrid`: Number of grid points. If `nGrid > 1` the interval
-  ///   is divided into an equidistant grid
-  ///   with `nGrid` points: `[xMin + dx, xMin + 2 * dx, ..., xMax - dx]`
-  ///   where `dx = (xMax - xMin) / nGrid` and any random number returned
-  ///   coincides with a gridpoint.
+  /// Returns the singular value `start.
   @override
-  num next({int nGrid = 0}) => start;
+  num next() => start;
 
-  /// Returns the next random number sampled from the interval
-  /// obtained by intersecting:
-  /// `(start, start)` and `(position - deltaPosition, position + deltaPosition)`.
-  /// * If the intersection is empty, `position` is returned unperturbed.
-  /// ---
-  /// * `nGrid`: Number of grid points. If `nGrid > 1` the interval
-  ///   is divided into an equidistant grid
-  ///   with `nGrid` points: `[xMin + dx, xMin + 2 * dx, ..., xMax - dx]`
-  ///   where `dx = (xMax - xMin) / nGrid` and any random number returned
-  ///   coincides with a gridpoint.
+  /// Returns `position` if `start == position`.
+  /// Returns `double.nan` otherwise.
   @override
   num perturb(
     num position,
-    num deltaPosition, {
-    int nGrid = 0,
-  }) {
-    if (start == position) {
+    num deltaPosition,
+  ) {
+    deltaPosition = deltaPosition.abs();
+    if (overlaps(position - deltaPosition, position + deltaPosition)) {
       return start;
     } else {
-      return position;
+      return double.nan;
     }
   }
 
-  @override
-  String toString() {
-    final b = StringBuffer();
-    b.writeln('SingularInterval:');
-    b.writeln('  start: $start');
-    b.writeln('  end: $end');
-    return b.toString();
-  }
+  // @override
+  // String toString() {
+  //   final b = StringBuffer();
+  //   b.writeln('SingularInterval:');
+  //   b.writeln('  start: $start');
+  //   b.write('  end: $end');
+  //   return b.toString();
+  // }
 
   /// Returns `true` if position coincides with `start`.
   @override
   bool contains(num position) => (position == start);
-
-  /// Returns true if the interval defined by the points
-  /// `left` and `right` overlaps `this`.
-  @override
-  bool overlaps(num left, num right) {
-    if (left < start && right < start) return false;
-    if (left > end && right > end) return false;
-    return true;
-  }
-
-  /// Returns the only grid point coinciding with `start` and `end`.
-  @override
-  List<num> gridPoints(int nGrid) {
-    return [start];
-  }
 }
 
 /// A fixed numerical interval defined by
 /// the start point `start` and the end point `end`.
 class FixedInterval extends Interval {
   /// Constructs a fixed interval (`start`, `end`).
-  FixedInterval._(num start, num end, {InverseCdf? inverseCdf})
+  FixedInterval._(num start, num end, {super.inverseCdf, super.name})
       : start = min(start, end),
-        end = max(start, end),
-        super(inverseCdf: inverseCdf);
+        end = max(start, end);
 
   /// Returns an instance of [FixedInterval].
   ///
@@ -153,285 +283,181 @@ class FixedInterval extends Interval {
     num start,
     num end, {
     InverseCdf? inverseCdf,
+    String name = '',
   }) {
     return start == end
-        ? SingularInterval(start)
-        : FixedInterval._(start, end, inverseCdf: inverseCdf);
+        ? SingularInterval(start, name: name)
+        : FixedInterval._(
+            start,
+            end,
+            inverseCdf: inverseCdf,
+            name: name,
+          );
   }
 
   /// Constructs a copy of `interval`.
   ///
   /// Note: The cache is *not* copied. Each instance of [FixedInterval]
   /// manages its own cache.
-  factory FixedInterval.of(FixedInterval interval) =>
-      FixedInterval(interval.start, interval.end,
-          inverseCdf: interval.inverseCdf);
+  factory FixedInterval.of(FixedInterval interval) {
+    if (interval is SingularInterval) {
+      return SingularInterval.of(interval);
+    } else if (interval is PeriodicInterval) {
+      return PeriodicInterval.of(interval);
+    } else {
+      return FixedInterval(
+        interval.start,
+        interval.end,
+        inverseCdf: interval.inverseCdf,
+        name: interval.name,
+      );
+    }
+  }
 
   /// Start point of the numerical interval.
+  @override
   final num start;
 
   /// End point of the numerical interval.
+  @override
   final num end;
 
   /// Returns the size of the interval.
   @override
   late final num size = end - start;
-
-  /// Returns the next random number sampled from
-  /// the interval `(start, end)`.
-  /// * Returns a cached value if the cache is up-to-date.
-  /// * If the cache is stale an new random number is returned and cached.
-  /// ---
-  /// * `nGrid`: Number of grid points. If `nGrid > 1` the interval
-  ///   is divided into an equidistant grid
-  ///   with `nGrid` points: `[xMin + dx, xMin + 2 * dx, ..., xMax - dx]`
-  ///   where `dx = (xMax - xMin) / nGrid` and any random number returned
-  ///   coincides with a gridpoint.
-  @override
-  num next({int nGrid = 0}) {
-    if (_isUpToDate) {
-      return _cache;
-    } else {
-      _isUpToDate = true;
-      return _cache = Interval.random.nextInRange(
-        start,
-        end,
-        inverseCdf: inverseCdf,
-        nGrid: nGrid,
-      );
-    }
-  }
-
-  /// Returns the next random number sampled from the interval
-  /// obtained by intersecting:
-  /// `(start, end)` and `(position - deltaPosition, position + deltaPosition)`.
-  /// * If the intersection is empty, `position` is returned unperturbed.
-  /// * Returns a cached value if the cache is up-to-date.
-  /// * If the cache is stale an new random number is returned and cached.
-  /// ---
-  /// * `nGrid`: Number of grid points. If `nGrid > 1` the interval
-  ///   is divided into an equidistant grid
-  ///   with `nGrid` points: `[xMin + dx, xMin + 2 * dx, ..., xMax - dx]`
-  ///   where `dx = (xMax - xMin) / nGrid` and any random number returned
-  ///   coincides with a gridpoint.
-  @override
-  num perturb(
-    num position,
-    num deltaPosition, {
-    int nGrid = 0,
-  }) {
-    deltaPosition = deltaPosition.abs();
-    final startOverlap = max(position - deltaPosition, start);
-    final endOverlap = min(position + deltaPosition, end);
-    if (startOverlap > end || endOverlap < start) {
-      _isUpToDate = false;
-      return position;
-    } else {
-      _isUpToDate = true;
-      return _cache = Interval.random.nextInRange(
-        startOverlap,
-        endOverlap,
-        inverseCdf: inverseCdf,
-        nGrid: nGrid,
-      );
-    }
-  }
-
-  @override
-  String toString() {
-    final b = StringBuffer();
-    b.writeln('FixedInterval:');
-    b.writeln('  start: $start');
-    b.writeln('  end: $end');
-    if (_isUpToDate) {
-      b.write('  cached next: $_cache');
-    } else {
-      b.write('  cached next: not set');
-    }
-
-    return b.toString();
-  }
-
-  /// Returns true if position is safisfying
-  /// `(start <= position && position <= end)`.
-  @override
-  bool contains(num position) => start <= position && position <= end;
-
-  /// Returns true if the interval defined by the points
-  /// `left` and `right` overlaps `this`.
-  @override
-  bool overlaps(num left, num right) {
-    final start = min(left, right);
-    final end = max(left, right);
-    if (end < this.start) return false;
-    if (start > this.end) return false;
-    return true;
-  }
-
-  @override
-  List<num> gridPoints(int nGrid) {
-    return Interval.random.gridPoints(start, end, nGrid);
-  }
 }
 
 /// An interval that wraps around itself.
 ///
 /// Usage: Defining the interval representing
 /// the longitudinal angle of spherical coordinates.
-/// Any angle may then be remapped to the interaval 0...2pi.
+/// Any angle may then be remapped to the interval 0...2pi.
 class PeriodicInterval extends FixedInterval {
-  PeriodicInterval(super.start, super.end, {InverseCdf? inverseCdf})
-      : super._(inverseCdf: inverseCdf);
+  PeriodicInterval(super.start, super.end, {super.inverseCdf, super.name})
+      : super._();
 
   PeriodicInterval.of(FixedInterval interval)
-      : super._(interval.start, interval.end, inverseCdf: interval.inverseCdf);
+      : super._(
+          interval.start,
+          interval.end,
+          inverseCdf: interval.inverseCdf,
+          name: interval.name,
+        );
 
   @override
-  num perturb(
+  num _perturbContinuous(
     num position,
-    num deltaPosition, {
-    int nGrid = 0,
-  }) {
+    num deltaPosition,
+  ) {
     _isUpToDate = true;
     deltaPosition = deltaPosition.abs();
-    final nextPoint = Interval.random.nextInRange(
+    final next = Interval.random.nextInRange(
       position - deltaPosition,
       position + deltaPosition,
       inverseCdf: inverseCdf,
-      nGrid: nGrid,
     );
 
-    if (nextPoint < start || nextPoint > end) {
-      final remainder = nextPoint.remainder(size);
+    if (next < start || next > end) {
+      final remainder = next.remainder(size);
       return _cache =
           remainder.isNegative ? end + remainder : start + remainder;
     } else {
-      return _cache = nextPoint;
+      return _cache = next;
+    }
+  }
+
+  @override
+  num _perturbDiscrete(
+    num position,
+    num deltaPosition,
+  ) {
+    _isUpToDate = true;
+    deltaPosition = deltaPosition.abs();
+    var next = Interval.random.nextInRange(
+      position - deltaPosition,
+      position + deltaPosition,
+      inverseCdf: inverseCdf,
+    );
+
+    if (next < start || next > end) {
+      final remainder = next.remainder(size);
+      next = remainder.isNegative ? end + remainder : start + remainder;
+    }
+    return _cache = start + dx() * ((next - start) / dx()).round();
+  }
+
+  @override
+  bool overlaps(num left, num right) {
+    if (left.isNaN || right.isNaN) {
+      return false;
+    } else {
+      return true;
     }
   }
 }
 
 /// A numerical interval defined by
-/// the parametric start point function `pStart` and the end point `pEnd`.
+/// the parametric start point function `startFunc` and the end
+/// point `endFunc`.
 class ParametricInterval extends Interval {
-  /// Constructs a parametric interval.
-  ParametricInterval(this.pStart, this.pEnd, {InverseCdf? inverseCdf})
-      : super(
-          inverseCdf: inverseCdf,
-        );
+  /// Constructs a parametric interval defined by
+  /// the parametric start point function `startFunc` and the end
+  /// point function `endFunc`.
+  ParametricInterval(
+    this.startFunc,
+    this.endFunc, {
+    super.inverseCdf,
+    super.name,
+  });
+
+  /// Constructs a copy of [interval].
+  ///
+  /// Note: Cached variables are not copied.
+  ParametricInterval.of(ParametricInterval interval)
+      : startFunc = interval.startFunc,
+        endFunc = interval.endFunc,
+        super(inverseCdf: interval.inverseCdf);
 
   /// Start point of the numerical interval.
-  final ParametricPoint pStart;
+  final ParametricPoint startFunc;
 
   /// End point of the numerical interval.
-  final ParametricPoint pEnd;
+  final ParametricPoint endFunc;
 
-  /// Returns the next random number that is larger
-  /// than `pStart()` inclusive,
-  /// and smaller than `pEnd()`, exclusive.
-  /// * Returns a cached value if the cache is up-to-date.
-  /// * To clear the cache call `clearCache()`.
-  /// ---
-  /// * `nGrid`: Number of grid points. If `nGrid > 1` the interval
-  ///   is divided into an equidistant grid
-  ///   with `nGrid` points: `[xMin + dx, xMin + 2 * dx, ..., xMax - dx]`
-  ///   where `dx = (xMax - xMin) / nGrid` and any random number returned
-  ///   coincides with a gridpoint.
-  /// ---
-  /// * Result caching enables defining parameterized intervals where some
-  ///   intervals depend on other intervals.
-  ///   ```
-  ///   /// Defines a 2D circular sampling area centered at
-  ///   /// (0, 0) with radius 2.75.
-  ///   final r = 2.75;
-  ///   final x = Interval(-r, r);
-  ///   final y = ParametricInterval(
-  ///     () => -sqrt(r**2 - pow(x.next(),2)),
-  ///     () =>  sqrt(r**2 - pow(x.next(),2)),
-  ///   );
-  ///
-  ///   final space = SearchSpace([x,y]);
-  ///   ```
-  @override
-  num next({int nGrid = 0}) {
-    if (_isUpToDate) {
-      return _cache;
-    } else {
-      _isUpToDate = true;
-      return _cache = Interval.random.nextInRange(
-        pStart(),
-        pEnd(),
-        inverseCdf: inverseCdf,
-        nGrid: nGrid,
-      );
-    }
-  }
+  /// Lazy variable with initializer of type [ParametricPoint].
+  late final _start = Lazy<num>(startFunc);
 
-  /// Returns the next random number sampled from the interval
-  /// obtained by intersecting:
-  /// `(start, end)` and `(position - deltaPosition, position + deltaPosition)`.
-  /// * If the intersection is empty, `position` is returned unperturbed.
-  /// * Returns a cached value if the cache is up-to-date.
-  /// * If the cache is stale an new random number is returned and cached.
-  /// ---
-  /// * `nGrid`: Number of grid points. If `nGrid > 1` the interval
-  ///   is divided into an equidistant grid
-  ///   with `nGrid` points: `[xMin + dx, xMin + 2 * dx, ..., xMax - dx]`
-  ///   where `dx = (xMax - xMin) / nGrid` and any random number returned
-  ///   coincides with a gridpoint.
-  @override
-  num perturb(num position, num deltaPosition, {int nGrid = 0}) {
-    if (overlaps(position - deltaPosition, position + deltaPosition)) {
-      _isUpToDate = true;
-      return _cache = Interval.random.nextInRange(
-        max(position - deltaPosition, pStart()),
-        min(position + deltaPosition, pEnd()),
-        inverseCdf: inverseCdf,
-        nGrid: nGrid,
-      );
-    } else {
-      _isUpToDate = false;
-      return position;
-    }
-  }
+  /// Lazy variable with initializer of type [ParametricPoint].
+  late final _end = Lazy<num>(endFunc);
 
-  /// Returns true if `position` is safisfying
-  /// `(position >= pStart() && x<= pEnd()))`.
   @override
-  bool contains(num position) => (position >= pStart() && position <= pEnd() ||
-      position >= pEnd() && position <= pStart());
+  num get start => min(_start(), _end());
 
-  /// Returns true if the interval defined by the points
-  /// `left` and `right` overlaps with `this`.
   @override
-  bool overlaps(num left, num right) {
-    if (right < pStart() && left < pStart()) return false;
-    if (left > pEnd() && right > pEnd()) return false;
-    return true;
+  num get end => max(_start(), _end());
+
+  @override
+  void updateCache() {
+    super.updateCache();
+
+    /// Re-initialize lazy variables.
+    _start.updateCache();
+    _end.updateCache();
   }
 
   @override
   String toString() {
     final b = StringBuffer();
-    b.writeln('ParametricInterval (current boundaries):');
-    b.writeln('  start: ${pStart()}');
-    b.writeln('  end: ${pEnd()}');
+    b.writeln('ParametricInterval:');
+    b.writeln('   name: $name');
+    b.writeln('   current boundaries:');
+    b.writeln('   start: ${startFunc()}');
+    b.writeln('   end: ${endFunc()}');
     if (_isUpToDate) {
-      b.write('  cached next: $_cache');
+      b.write('   cached next: $_cache');
     } else {
-      b.write('  cached next: not set');
+      b.write('   cached next: not set');
     }
     return b.toString();
-  }
-
-  /// Returns the current size of the interval.
-  ///
-  /// Note: For parametric intervals the length may not be constant.
-  @override
-  num get size => (pEnd() - pStart()).abs();
-
-  @override
-  List<num> gridPoints(int nGrid) {
-    return Interval.random.gridPoints(pStart(), pEnd(), nGrid);
   }
 }
