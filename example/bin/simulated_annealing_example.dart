@@ -3,8 +3,6 @@ import 'package:list_operators/list_operators.dart';
 import 'package:simulated_annealing/simulated_annealing.dart';
 import '../../test/src/energy_field_instance.dart';
 
-
-
 /// To run this program navigate to the root folder in your local
 /// copy of the package `simulated_annealing` and use the command:
 /// $ dart example/bin/simulated_annealing_example.dart

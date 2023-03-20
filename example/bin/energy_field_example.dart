@@ -7,8 +7,6 @@ import 'package:simulated_annealing/simulated_annealing.dart';
 // Defining a spherical space.
 final space = SearchSpace.sphere(rMin: 0, rMax: 2);
 
-
-
 // Defining an energy function.
 final globalMin = [0.5, 0.7, 0.8];
 final localMin = [-1.0, -1.0, -0.5];

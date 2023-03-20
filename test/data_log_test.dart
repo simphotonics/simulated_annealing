@@ -21,10 +21,9 @@ void main() {
       expect(log.length, 1);
       expect(log.keys, equals(['x']));
     });
-
   });
   group('Entries:', () {
-     test('add/get value', () {
+    test('add/get value', () {
       final log = DataLog<num>();
       log.add('temperature', 100);
       expect(log.get('temperature'), [100.0]);
@@ -34,7 +33,6 @@ void main() {
       log.addAll(['x', 'y', 'z'], [1, 2, 3]);
       log.addAll(['x', 'y', 'z'], [1.1, 2.2, 3.3]);
       expect(log.get('x'), [1, 1.1]);
-
     });
     test('getAll', () {
       final log = DataLog<num>();
@@ -45,8 +43,6 @@ void main() {
         [1.1, 2.2, 3.3],
       ]);
     });
-
-
   });
   group('Errors:', () {
     final log = DataLog<num>();

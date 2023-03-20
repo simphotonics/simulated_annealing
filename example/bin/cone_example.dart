@@ -17,7 +17,7 @@ void main(List<String> args) async {
   /// Search space including all points on the surface of
   /// a cone (rho is const).
   final space = SearchSpace.cone(rhoMin: 1.5, rhoMax: 2.0, zMin: -2, zMax: 2);
-    //..levels = ([36, 36, 20]);
+  //..levels = ([36, 36, 20]);
 
   final position = [0.7, -1.6, 0.5];
   final deltaPosition = [0.6, 0.2, 0.5];
