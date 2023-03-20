@@ -1,5 +1,8 @@
 
 ## 0.3.6
+- Amended docs.
+
+## 0.3.5
 - Added class `DataLog`, removed class `DataRecorder`.
 - Removed optional parameter `nGrid` from method `next()` and `perturb()`.
   This applies to the classes `Interval`, `SearchSpace`, and `EnergyField`.

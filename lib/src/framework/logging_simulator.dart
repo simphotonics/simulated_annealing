@@ -6,7 +6,8 @@ import 'energy_field.dart';
 import 'simulator.dart';
 
 /// Annealing simulator capable of logging variables via an object of
-/// type `DataRecorder`.
+/// type [DataLog].
+/// 
 class LoggingSimulator extends Simulator {
   /// Constructs an object of type `LoggingSimulator`.
   /// * field: An object of type `EnergyField` encapsulating the

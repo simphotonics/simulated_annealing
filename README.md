@@ -169,7 +169,6 @@ The following steps are required to set up the SA algorithm.
     ```
     </details>
 
-<br/>
 
 ## Algorithm Tuning
 
