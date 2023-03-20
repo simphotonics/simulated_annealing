@@ -1,9 +1,9 @@
 name: simulated_annealing
 
-description: Simulated annealing framework for Dart for finding the global
-  minimum of multi-variate functions.
+description: Simulated annealing framework for finding the global
+  minimum of multi-variate functions. 
 
-version: 0.3.6
+version: 0.3.5
 
 homepage: https://github.com/simphotonics/simulated_annealing
 

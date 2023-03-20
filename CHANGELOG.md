@@ -4,10 +4,8 @@
 - Removed optional parameter `nGrid` from method `next()` and `perturb()`.
   This applies to the classes `Interval`, `SearchSpace`, and `EnergyField`.
   Instead, interval can be make discrete by setting the class variable `levels`.
-  
-
-## 0.3.5
-- Added static functions returning predefined search spaces to class `SearchSpace`.
+- Added static functions returning predefined search
+  spaces to class `SearchSpace`.
 
 ## 0.3.4
 - Extended the class `SeachSpace`. It now includes the static getters `sphere`,
