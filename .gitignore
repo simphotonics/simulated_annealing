@@ -27,4 +27,4 @@ example/data
 example/backup
 
 # Figures that can be recreated.
-example/plots
+# example/plots

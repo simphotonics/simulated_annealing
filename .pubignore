@@ -1,0 +1,4 @@
+# Do not publish files that can be reproduced
+example/plots
+example/data
+doc
