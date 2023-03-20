@@ -1,3 +1,11 @@
+
+## 0.3.6
+- Added class `DataLog`, removed class `DataRecorder`.
+- Removed optional parameter `nGrid` from method `next()` and `perturb()`.
+  This applies to the classes `Interval`, `SearchSpace`, and `EnergyField`.
+  Instead, interval can be make discrete by setting the class variable `levels`.
+  
+
 ## 0.3.5
 - Added static functions returning predefined search spaces to class `SearchSpace`.
 

@@ -1,4 +1,5 @@
-// Defining a spherical space.
+// Defining a spherical space in terms of Cartesian Coordinates
+// using parametric intervals.
 import 'dart:math';
 
 import 'package:list_operators/list_operators.dart';

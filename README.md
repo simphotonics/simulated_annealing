@@ -69,84 +69,107 @@ The following steps are required to set up the SA algorithm.
    (circle, sphere, rectangle, box, disk, cone, triangle)
    are predefined as static functions of the
    class [`SearchSpace`][SearchSpace].
+
+   <details><summary> Click to show the source code.</summary>
+
+    ```Dart
+    // Defining a spherical space in terms of Cartesian Coordinates
+    // using parametric intervals.
+    import 'dart:math';
+
+    import 'package:list_operators/list_operators.dart';
+    import 'package:simulated_annealing/simulated_annealing.dart';
+
+    final radius = 2;
+    final x = FixedInterval(-radius, radius, name: 'x');
+
+    num yLimit() => sqrt(pow(radius, 2) - pow(x.next(), 2));
+    final y = ParametricInterval(() => -yLimit(), yLimit, name: 'y');
+
+    num zLimit() => sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2));
+    final z = ParametricInterval(() => -zLimit(), zLimit, name: 'z');
+
+    final deltaPositionMin = <num>[1e-6, 1e-6, 1e-6];
+    final space = SearchSpace.parametric([x, y, z]);
+    ```
+    </details>
+
+
 2. Define the system [`EnergyField`][EnergyField], an object encapsulating
    the energy function (cost function) and its domain: the search space.
+
+   <details><summary> Click to show the source code.</summary>
+
+    ```Dart
+    // Defining an energy function.
+    final globalMin = [0.5, 0.7, 0.8];
+    final localMin = [-1.0, -1.0, -0.5];
+    num energy(List<num> position) {
+      return 4.0 -
+          4.0 * exp(-4 * globalMin.distance(position)) -
+          0.3 * exp(-6 * localMin.distance(position));
+    }
+
+    final field = EnergyField(
+      energy,
+      space,
+    );
+
+    ```
+    </details>
 3. Create an instance of [`LoggingSimulator`][LoggingSimulator] or
    alternatively extend the abstract class [`Simulator`][SimulatorClass].
+    <details><summary> Click to show source code.</summary>
+
+    ```Dart
+    import 'dart:io';
+    import 'package:list_operators/list_operators.dart';
+    import 'package:simulated_annealing/simulated_annealing.dart';
+    import '../../test/src/energy_field_instance.dart';
+
+      // Construct a simulator instance.
+      final simulator = LoggingSimulator(
+        field, // Defined in file `energy_field_example.dart'
+        gammaStart: 0.8,
+        gammaEnd: 0.05,
+        outerIterations: 100,
+        innerIterationsStart: 2,
+        innerIterationsEnd: 10,
+      );
+
+      // The perturbation magnitude at the end of the annealing cycle.
+      simulator.deltaPositionEnd = [1e-7, 1e-7, 1e-7];
+    ```
+    </details>
+
 4. Start the [simulated annealing][simulator] process.
+    <details><summary> Click to show the source code.</summary>
 
-<details><summary> Click to show source code.</summary>
+    ```Dart
 
-```Dart
+    /// To run this program navigate to the root folder in your local
+    /// copy of the package `simulated_annealing` and use the command:
+    /// $ dart example/bin/simulated_annealing_example.dart
+    void main() async {
+      print(await simulator.info);
 
-import 'dart:io';
+      print('Start annealing process ...');
+      final xSol = await simulator.anneal(
+        isRecursive: true,
+        isVerbose: true,
+      );
+      print('Annealing ended.');
+      print('Writing log to file: example/data/log.dat');
+      await File('example/data/log.dat').writeAsString(simulator.export());
+      print('Finished writing. ');
 
-import 'package:list_operators/list_operators.dart';
-import 'package:simulated_annealing/simulated_annealing.dart';
+      print('Solution: $xSol');
+      print('xSol - globalMin: ${xSol - globalMin}.');
+    }
+    ```
+    </details>
 
-// A predefined search space.
-final space = SearchSpace.sphere(rMin: 0, rMax: 2);
-
-final globalMin = [0.5, 0.7, 0.8].cartesianToSpherical;
-final localMin = [-1.0, -1.0, -0.5].cartesianToSpherical;
-
-// Defining an energy function.
-num energy(List<num> position) {
-  return 4.0 -
-      4.0 *
-          exp(-4 *
-              globalMin.distance(
-                position,
-                coordinates: Coordinates.spherical,
-              )) -
-      2.0 *
-          exp(-6 *
-              localMin.distance(
-                position,
-                coordinates: Coordinates.spherical,
-              ));
-}
-
-final field = EnergyField(
-  energy,
-  space,
-);
-
-/// To run this program navigate to the root folder in your local
-/// copy of the package `simulated_annealing` and use the command:
-/// $ dart example/bin/simulated_annealing_example.dart
-void main() async {
-  // Construct a simulator instance.
-  final simulator = LoggingSimulator(
-    field, // Defined in file `energy_field_example.dart'
-    gammaStart: 0.8,
-    gammaEnd: 0.05,
-    outerIterations: 150,
-    innerIterationsStart: 5,
-    innerIterationsEnd: 10,
-  );
-
-  simulator.gridStart = [];
-  simulator.gridEnd = [];
-  simulator.deltaPositionEnd = [1e-9, 1e-9, 1e-9];
-
-  print(await simulator.info);
-
-  print('Start annealing process ...');
-  final xSol = await simulator.anneal(
-    isRecursive: true,
-  );
-  print('Annealing ended.');
-  print('Writing log to file: example/data/log.dat');
-  await File('example/data/log.dat').writeAsString(simulator.export());
-  print('Finished writing. ');
-
-  print('Solution: $xSol');
-  print('xSol - globalMin: ${xSol - globalMin}.');
-}
-
-```
-</details><br/>
+<br/>
 
 ## Algorithm Tuning
 
@@ -196,8 +219,9 @@ The graph is discussed in more detail [here].
 ![Convergence Graph](https://github.com/simphotonics/simulated_annealing/raw/main/images/convergence.gif)
 
 The number of inner iterations (performed while the temperature is kept constant)
-is also referred to as Markov chain length and is determined by a function with typedef [`MarkovChainLength`][MarkovChainLength]. It can be adjusted by setting the
-simulator arguments `innerIterationsSTart` and `innerIterationsEnd`. In general,
+is also referred to as Markov chain length and is determined by a
+function with typedef [`MarkovChainLength`][MarkovChainLength]. It can be adjusted by setting the
+simulator arguments `innerIterationsStart` and `innerIterationsEnd`. In general,
 it is advisable to increase the number of inner Iterations towards the end of
 the annealing process in order to increase the algorithm precision.
 
