@@ -5,13 +5,13 @@ import 'package:list_operators/list_operators.dart';
 import 'package:simulated_annealing/simulated_annealing.dart';
 
 final radius = 2;
-final x = FixedInterval(-radius, radius);
+final x = FixedInterval(-radius, radius, name: 'x');
 
 num yLimit() => sqrt(pow(radius, 2) - pow(x.next(), 2));
-final y = ParametricInterval(() => -yLimit(), yLimit);
+final y = ParametricInterval(() => -yLimit(), yLimit, name: 'y');
 
 num zLimit() => sqrt(pow(radius, 2) - pow(y.next(), 2) - pow(x.next(), 2));
-final z = ParametricInterval(() => -zLimit(), zLimit);
+final z = ParametricInterval(() => -zLimit(), zLimit, name: 'z');
 
 final deltaPositionMin = <num>[1e-6, 1e-6, 1e-6];
 final space = SearchSpace.parametric([x, y, z]);

@@ -94,23 +94,23 @@ abstract class Simulator {
   /// * sampleSize: Size of sample used to estimate the start temperature
   ///   and the final temperature of the annealing process.
   Simulator(
-    EnergyField field, {
+    this.field, {
     this.gammaStart = 0.7,
     this.gammaEnd = 0.2,
     this.outerIterations = 750,
     this.innerIterationsStart = 5,
     this.innerIterationsEnd = 20,
     this.sampleSize = 500,
-  }) : _field = EnergyField.of(field) {
+  }) {
     /// Initial values:
-    _currentMinEnergy = _field.value;
-    _currentMinPosition = _field.position;
+    _currentMinEnergy = field.value;
+    _currentMinPosition = field.position;
     _acceptanceProbability = 1.0;
-    _startPosition = _field.position;
+    _startPosition = field.position;
   }
 
   /// Energy field.
-  final EnergyField _field;
+  final EnergyField field;
 
   /// Acceptance probability at temperature `tStart`.
   final num gammaStart;
@@ -134,7 +134,7 @@ abstract class Simulator {
   final int sampleSize;
 
   /// Initial annealing temperature.
-  late final Lazy<Future<num>> _tStart = Lazy<Future<num>>(() => _field.tStart(
+  late final Lazy<Future<num>> _tStart = Lazy<Future<num>>(() => field.tStart(
         gammaStart,
         deltaPosition: deltaPositionStart,
         sampleSize: sampleSize,
@@ -144,7 +144,7 @@ abstract class Simulator {
   Future<num> get tStart => _tStart();
 
   /// Final annealing temperature.
-  late final Lazy<Future<num>> _tEnd = Lazy<Future<num>>(() => _field.tEnd(
+  late final Lazy<Future<num>> _tEnd = Lazy<Future<num>>(() => field.tEnd(
         gammaEnd,
         deltaPosition: deltaPositionEnd,
         sampleSize: sampleSize,
@@ -196,7 +196,7 @@ abstract class Simulator {
   }
 
   /// The initial perturbation magnitudes.
-  late final List<num> _deltaPositionStart = _field.size;
+  late final List<num> _deltaPositionStart = field.size;
 
   /// Returns the initial perturbation magnitudes.
   List<num> get deltaPositionStart => List.of(_deltaPositionStart);
@@ -211,7 +211,7 @@ abstract class Simulator {
 
   /// The perturbation magnitudes at the end of the annealing cycle.
   late final List<num> _deltaPositionEnd = List<num>.filled(
-    _field.dimensions,
+    field.dimensions,
     1e-6,
     growable: true,
   );
@@ -227,62 +227,6 @@ abstract class Simulator {
     _updateLazyVariables();
   }
 
-  /// Specifies the number of grid points at
-  /// the beginning of the annealing process.
-  late final List<int> _gridStart = List<int>.filled(
-    _field.dimensions,
-    40,
-    growable: true,
-  );
-
-  /// Returns the grid sizes along each dimension
-  ///  at the beginning of the annealing process.
-  List<int> get gridStart => List.of(_gridStart);
-
-  /// Sets the number of grid points at the beginning of the annealing process.
-  ///
-  /// Default value: 40 grid points along each dimension.
-  set gridStart(List<int> value) {
-    _gridStart
-      ..clear()
-      ..addAll(value);
-    _updateLazyVariables();
-  }
-
-  /// Grid sizes along each dimension at the end of the annealing process.
-  late final List<int> _gridEnd = List<int>.filled(
-    _field.dimensions,
-    40,
-    growable: true,
-  );
-
-  /// Returns the number of grid points along each dimension
-  ///  at the end of the annealing process.
-  List<int> get gridEnd => List.of(_gridEnd);
-
-  /// Sets the grid sizes at the end of the annealing process.
-  ///
-  /// Default value: 40 grid points along each dimension.
-  set gridEnd(List<int> value) {
-    _gridEnd
-      ..clear()
-      ..addAll(value);
-    _updateLazyVariables();
-  }
-
-  /// A sequence of grid vectors.
-  late final Lazy<Future<List<List<int>>>> _grid =
-      Lazy<Future<List<List<int>>>>(() => _temperatures()
-          .then<List<List<int>>>((temperatures) => interpolate<int>(
-                temperatures,
-                gridStart,
-                gridEnd,
-              )));
-
-  /// Returns the currently used sequence of grid vectors.
-  Future<List<List<int>>> get grid => _grid().then<List<List<int>>>((grid) =>
-      List<List<int>>.generate(grid.length, (i) => List<int>.of(grid[i])));
-
   /// The starting position.
   late final List<num> _startPosition;
 
@@ -294,7 +238,7 @@ abstract class Simulator {
     _startPosition
       ..clear()
       ..addAll(value);
-    _field.perturb(_startPosition, deltaPositionStart * 0.0);
+    field.perturb(_startPosition, deltaPositionStart * 0.0);
   }
 
   /// Annealing temperatures.
@@ -328,10 +272,10 @@ abstract class Simulator {
               (i) => List<num>.of(pertubationMagnitudes[i])));
 
   /// Current field position.
-  List<num> get currentPosition => _field.position;
+  List<num> get currentPosition => field.position;
 
   /// Energy at current field position.
-  num get currentEnergy => _field.value;
+  num get currentEnergy => field.value;
 
   /// Current energy minimizing field position.
   late List<num> _currentMinPosition;
@@ -346,22 +290,16 @@ abstract class Simulator {
   num get currentMinEnergy => _currentMinEnergy;
 
   /// Global energy minimizing solution.
-  List<num> get globalMinPosition => _field.minPosition;
+  List<num> get globalMinPosition => field.minPosition;
 
   /// Global energy minimum.
-  num get globalMinEnergy => _field.minValue;
+  num get globalMinEnergy => field.minValue;
 
   /// Current temperature;
   late num _t;
 
   /// Current temperature.
   num get t => _t;
-
-  /// Holds the grid used in the current iteration step.
-  late List<int> _currentGrid;
-
-  /// Returns the grid used in the current iteration step.
-  List<int> get currentGrid => _currentGrid;
 
   /// Current perturbation magnitude.
   late List<num> _deltaPosition;
@@ -389,7 +327,7 @@ abstract class Simulator {
   /// Can be used to add entries to a log.
   void recordLog();
 
-  /// Returns map containing the number of inner iterations for
+  /// Returns a map containing the number of inner iterations for
   /// each outer iteration step.
   Future<Map<int, int>> iterationMap({
     bool isRecursive = false,
@@ -420,7 +358,7 @@ abstract class Simulator {
     // Outer iteration loop.
     for (i; i < temperatures.length; i++) {
       _t = temperatures[i];
-      // Store number of iterations at constant temperature.
+      // Store the number of iterations at constant temperature.
       result[i] = nInner(_t);
     }
     return result;
@@ -443,7 +381,6 @@ abstract class Simulator {
     /// Initialize parameters:
     final temperatures = await this.temperatures;
     final perturbationMagnitudes = await this.perturbationMagnitudes;
-    final grid = await this.grid;
 
     int nInner(num t) => markovChainLength(t,
         tStart: temperatures.first,
@@ -456,7 +393,6 @@ abstract class Simulator {
     if (_recursionCounter == 0) {
       _t = temperatures.first;
       _deltaPosition = perturbationMagnitudes.first;
-      _currentGrid = grid.first;
       prepareLog();
       recordLog();
     }
@@ -478,42 +414,44 @@ abstract class Simulator {
     for (i; i < temperatures.length; i++) {
       _t = temperatures[i];
       _deltaPosition = perturbationMagnitudes[i];
-      _currentGrid = grid[i];
-
-      // int scalingFactor =
-      //     pow(_currentGrid.prod(), 1.0 / (_currentGrid.length * 3)).toInt();
 
       // Inner iteration loop.
       for (var j = 0; j < nInner(_t); j++) {
         // Choose next random point and calculate energy difference.
-        dE = _field.perturb(
+        dE = field.perturb(
               _currentMinPosition,
               _deltaPosition,
-              grid: _currentGrid,
             ) -
             _currentMinEnergy;
 
         if (dE < 0) {
-          _currentMinEnergy = _field.value;
-          _currentMinPosition = _field.position;
+          _currentMinEnergy = field.value;
+          _currentMinPosition = field.position;
           _acceptanceProbability = 1.0;
         } else {
           _acceptanceProbability = exp(-dE / _t);
           if (_acceptanceProbability > Interval.random.nextDouble()) {
-            _currentMinEnergy = _field.value;
-            _currentMinPosition = _field.position;
+            _currentMinEnergy = field.value;
+            _currentMinPosition = field.position;
           }
         }
         recordLog();
       }
     }
+
     if (globalMinEnergy < _currentMinEnergy) {
-      if (isVerbose) {
-        print('------------------------------------------------');
-        print('E_min_global($globalMinPosition) = $globalMinEnergy ');
-        print('E_min($_currentMinPosition) = $_currentMinEnergy!');
-        print('Returning global minimum solution!');
-        print('');
+      if ((globalMinPosition - _currentMinPosition).abs() < _deltaPositionEnd) {
+        if (isVerbose) {
+          print('------------------------------------------------');
+          print('E_min_global($globalMinPosition) = $globalMinEnergy ');
+          print('E_min($_currentMinPosition) = $_currentMinEnergy!');
+          print('x_min_global - x_min_local = '
+              '${globalMinPosition - _currentMinPosition}.');
+          print('deltaPositionEnd = $deltaPositionEnd');
+          print('Returning global minimum solution!');
+          print('');
+        }
+        // return globalMinPosition;
       }
       _currentMinPosition = globalMinPosition;
       _currentMinEnergy = globalMinEnergy;
@@ -533,9 +471,7 @@ abstract class Simulator {
     b.writeln('Simulator: ');
     b.writeln('  outerIterations: $outerIterations');
     b.writeln('  startPosition: $_startPosition');
-    b.writeln('  gridStart: $gridStart');
-    b.writeln('  gridEnd: $gridEnd');
-    b.writeln('  Field: $_field'.replaceAll('\n', '\n  '));
+    b.writeln('  Field: $field'.replaceAll('\n', '\n  '));
     return b.toString();
   }
 
@@ -547,11 +483,9 @@ abstract class Simulator {
     b.writeln('Simulator: ');
     b.writeln('  outerIterations: $outerIterations');
     b.writeln('  startPosition: $_startPosition');
-    b.writeln('  gridStart: $gridStart');
-    b.writeln('  gridEnd: $gridEnd');
     b.writeln('  tStart: ${await tStart}');
     b.writeln('  tEnd: ${await tEnd}');
-    b.writeln('  Field: $_field'.replaceAll('\n', '\n  '));
+    b.writeln('  Field: $field'.replaceAll('\n', '\n  '));
     return b.toString();
   }
 }

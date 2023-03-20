@@ -7,22 +7,23 @@ import 'package:simulated_annealing/simulated_annealing.dart';
 // Defining a spherical space.
 final space = SearchSpace.sphere(rMin: 0, rMax: 2);
 
+
+
 // Defining an energy function.
-final globalMin = [0.5, 0.7, 0.8].cartesianToSpherical;
-final localMin = [-1.0, -1.0, -0.5].cartesianToSpherical;
+final globalMin = [0.5, 0.7, 0.8];
+final localMin = [-1.0, -1.0, -0.5];
 num energy(List<num> position) {
-  return 2.0 -
-      2.0 *
+  position = position.sphericalToCartesian;
+  return 4.0 -
+      4.0 *
           exp(-4 *
               globalMin.distance(
                 position,
-                coordinates: Coordinates.spherical,
               )) -
-      1.0 *
-          exp(-6 *
+      0.3 *
+          exp(-4 *
               localMin.distance(
                 position,
-                coordinates: Coordinates.spherical,
               ));
 }
 

@@ -81,6 +81,13 @@ abstract class InverseCdfs {
   static num triangular(num p, num xMin, num xMax) =>
       xMin + (xMax - xMin) * sqrt(p);
 
+  /// Returns the inverse cummulative distribution of the coordinate `z` of
+  /// a three-dimensional search space with conical geometry.
+  /// The search space:
+  /// * Extends from `zMin` to `zMax` along the vertical axis.
+  /// * p is a probability with value 0...1.
+  static num zCone(num p, num zMin, num zMax) => zMax - (zMax - zMin) * sqrt(p);
+
   /// Returns the inverse cummulative distribution of the radius `rho` of
   /// a search space with cylindrical geometry specified by the coordinates
   /// `[rho, phi, z]`. See [SearchSpace].

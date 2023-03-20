@@ -90,7 +90,9 @@ abstract class Interval {
         end,
         inverseCdf: inverseCdf,
       );
-      return _cache = start + dx() * ((next - start) / dx()).round();
+      // If dx == 0 => start == end.
+      return _cache =
+          (dx() == 0) ? start : start + dx() * ((next - start) / dx()).round();
     }
   }
 
@@ -140,7 +142,8 @@ abstract class Interval {
         endOverlap,
         inverseCdf: inverseCdf,
       );
-      return _cache = start + dx() * ((next - start) / dx()).round();
+      return _cache =
+          dx() == 0 ? start : start + dx() * ((next - start) / dx()).round();
     }
   }
 
@@ -199,6 +202,20 @@ abstract class Interval {
     b.writeln('   name: $name');
     b.writeln('   start: $start');
     b.writeln('   end: $end');
+    if (isDiscrete) {
+      final gridPoints = this.gridPoints;
+      b.write('   discrete: $levels levels: [');
+      for (final gridPoint in gridPoints.take(2)) {
+        b.write('${gridPoint.toStringAsPrecision(5)}, ');
+      }
+      if (levels > 2) {
+        b.write('..., ${gridPoints.last.toStringAsPrecision(5)}];');
+      } else {
+        b.write('];');
+      }
+      b.write(' dx: ${dx().toStringAsPrecision(6)}\n');
+    }
+
     if (_isUpToDate) {
       b.write('   cached next: $_cache');
     } else {
@@ -443,6 +460,7 @@ class ParametricInterval extends Interval {
     /// Re-initialize lazy variables.
     _start.updateCache();
     _end.updateCache();
+    dx.updateCache();
   }
 
   @override
@@ -453,6 +471,19 @@ class ParametricInterval extends Interval {
     b.writeln('   current boundaries:');
     b.writeln('   start: ${startFunc()}');
     b.writeln('   end: ${endFunc()}');
+    if (isDiscrete) {
+      final gridPoints = this.gridPoints;
+      b.write('   discrete: $levels levels: [');
+      for (final gridPoint in gridPoints.take(2)) {
+        b.write('${gridPoint.toStringAsPrecision(5)}, ');
+      }
+      if (levels > 2) {
+        b.write('..., ${gridPoints.last.toStringAsPrecision(5)}];');
+      } else {
+        b.write('];');
+      }
+      b.write(' dx: ${dx().toStringAsPrecision(6)}\n');
+    }
     if (_isUpToDate) {
       b.write('   cached next: $_cache');
     } else {

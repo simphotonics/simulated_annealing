@@ -1,4 +1,7 @@
-import 'data_recorder.dart';
+import 'package:exception_templates/exception_templates.dart';
+import 'package:list_operators/list_operators.dart';
+
+import 'data_log.dart';
 import 'energy_field.dart';
 import 'simulator.dart';
 
@@ -39,15 +42,16 @@ class LoggingSimulator extends Simulator {
           innerIterationsEnd: innerIterationsEnd,
         );
 
-  /// Records the simulator log.
-  final _rec = NumericalDataRecorder();
+  /// Stored the simulator data log. Works with the extensions `DataLog` and
+  /// `Export`.
+  final _dataLog = DataLog<num>();
 
   /// Exports all records.
   String export({
     int precision = 10,
     String delimiter = '   ',
   }) =>
-      _rec.export(
+      _dataLog.export(
         precision: precision,
         delimiter: delimiter,
       );
@@ -57,7 +61,7 @@ class LoggingSimulator extends Simulator {
     int precision = 10,
     String delimiter = '   ',
   }) =>
-      _rec.exportLast(
+      _dataLog.exportLast(
         precision: precision,
         delimiter: delimiter,
       );
@@ -67,28 +71,63 @@ class LoggingSimulator extends Simulator {
     int precision = 10,
     String delimiter = '   ',
   }) =>
-      _rec.exportLast(
+      _dataLog.exportLast(
         precision: precision,
         delimiter: delimiter,
       );
 
+  /// Returns a list of valid keys with length `field.dimensions`.
+  List<String> _validpositionKeys() {
+    final positionKeys = field.space.intervalNames;
+    if (positionKeys.length != field.dimensions) {
+      throw ErrorOf<LoggingSimulator>(
+          message: 'Invalid keys detected.',
+          invalidState: 'Keys: $positionKeys have '
+              'length ${positionKeys.length}.',
+          expectedState: 'A list of unique strings with '
+              'length ${field.dimensions}.');
+    }
+    if (positionKeys.toSet().length != positionKeys.length) {
+      throw ErrorOf<LoggingSimulator>(
+          message: 'Invalid keys detected.',
+          invalidState: 'Keys: $positionKeys are not unique.',
+          expectedState: 'A list of unique strings.');
+    }
+    return positionKeys;
+  }
+
+  /// Returns a list of valid keys that can be used to store
+  /// `field.dimensions` coordinates.
+  /// The keys are the names of the [Interval]s used to define
+  /// the [SearchSpace], see [EnergyField].
+  late final positionKeys = _validpositionKeys();
+
+  /// Returns a valid list of keys that can be used to store
+  /// `field.dimensions` coordinates.
+  late final deltaPositionKeys =
+      List<String>.generate(positionKeys.length, (i) {
+    final first = positionKeys[i][0].toUpperCase();
+    final rest = positionKeys[i].substring(1);
+    return 'd$first$rest';
+  }).unmodifiable;
+
   /// Returns the current position log.
-  List<List<num>> get currentPositionLog => _rec.getVector('x');
+  List<List<num>> get currentPositionLog => _dataLog.getAll(positionKeys);
 
   /// Returns the current perturbation magnitude log.
-  List<List<num>> get deltaPositionLog => _rec.getVector('deltaPosition');
+  List<List<num>> get deltaPositionLog => _dataLog.getAll(deltaPositionKeys);
 
   /// Returns the current energy log.
-  List<num> get currentEnergyLog => _rec.getScalar('Energy');
+  List<num> get currentEnergyLog => _dataLog.get('Energy');
 
   /// Returns the current min. energy log.
-  List<num> get currentMinEnergyLog => _rec.getScalar('Energy Min');
+  List<num> get currentMinEnergyLog => _dataLog.get('Energy Min');
 
   /// Returns the current acceptance probability log.
-  List<num> get acceptanceProbabilityLog => _rec.getScalar('P(dE > 0)');
+  List<num> get acceptanceProbabilityLog => _dataLog.get('P(dE > 0)');
 
   /// Returns the current temperature log.
-  List<num> get temperatureLog => _rec.getScalar('Temperature');
+  List<num> get temperatureLog => _dataLog.get('Temperature');
 
   /// The number of times `recordLog()` was called.
   int _logCount = 0;
@@ -101,12 +140,12 @@ class LoggingSimulator extends Simulator {
 
   @override
   void recordLog() {
-    _rec.addVector('x', currentPosition);
-    _rec.addVector('deltaPosition', deltaPosition);
-    _rec.addScalar('Energy', currentEnergy);
-    _rec.addScalar('Energy Min', currentMinEnergy);
-    _rec.addScalar('P(dE > 0)', acceptanceProbability);
-    _rec.addScalar('Temperature', t);
+    _dataLog.addAll(positionKeys, currentPosition);
+    _dataLog.addAll(deltaPositionKeys, deltaPosition);
+    _dataLog.add('Energy', currentEnergy);
+    _dataLog.add('Energy Min', currentMinEnergy);
+    _dataLog.add('P(dE > 0)', acceptanceProbability);
+    _dataLog.add('Temperature', t);
     ++_logCount;
   }
 }

@@ -18,9 +18,8 @@ class EnergyField {
   /// * `searchSpace`: The function domain.
   EnergyField(
     this.energy,
-    SearchSpace searchSpace,
-  )   : _searchSpace = searchSpace,
-        _minValue = double.infinity {
+    this.space,
+  ) : _minValue = double.infinity {
     // Populate field _minPosition with a random point in the search space.
     next();
   }
@@ -28,7 +27,7 @@ class EnergyField {
   /// Copy constructor.
   factory EnergyField.of(EnergyField energyField) => EnergyField(
         energyField.energy,
-        energyField._searchSpace,
+        energyField.space,
       );
 
   /// Function representing the system energy.
@@ -37,7 +36,7 @@ class EnergyField {
   /// The domain over which the `energy` function is defined.
   /// The simulated annealing algorithm will search this region for
   /// optimal solutions.
-  final SearchSpace _searchSpace;
+  final SearchSpace space;
 
   /// Stores the current field position.
   late List<num> _position;
@@ -61,7 +60,7 @@ class EnergyField {
   late List<num> _minPosition;
 
   /// Returns the field position with the smallest energy encountered.
-  List<num> get minPosition => List<num>.from(_minPosition);
+  List<num> get minPosition => List<num>.of(_minPosition);
 
   /// Returns the energy at a point selected randomly
   /// from the region (`position - deltaPosition, position + deltaPosition`).
@@ -70,12 +69,8 @@ class EnergyField {
   /// * The new position can be accessed via the getter
   /// `this.position`. The return value of `perturb()` can
   /// also be accessed via `this.value`.
-  num perturb(
-    List<num> position,
-    List<num> deltaPosition, {
-    List<int> grid = const [],
-  }) {
-    _position = _searchSpace.perturb(
+  num perturb(List<num> position, List<num> deltaPosition) {
+    _position = space.perturb(
       position,
       deltaPosition,
     );
@@ -90,16 +85,11 @@ class EnergyField {
   /// Returns the energy at a randomly
   /// selected point in the search space.
   ///
-  /// `grid`: The grid sizes along each dimension.
-  /// The grid is used to turn a continuous search space into a discret
-  /// search space. The default value is an empty list
-  /// (i.e. a continuous search space).
-  ///
   /// Note: The new position can be accessed via the getter
   /// `this.position`. The return value of `next()` can
   /// also be accessed via `this.value`.
-  num next({List<int> grid = const []}) {
-    _position = _searchSpace.next();
+  num next() {
+    _position = space.next();
     _value = energy(_position);
     if (_value < _minValue) {
       _minValue = _value;
@@ -111,7 +101,6 @@ class EnergyField {
   /// Returns a list of energy values sampled from the entire search space.
   Future<List<num>> sampleEnergy({
     int sampleSize = 100,
-    List<int> grid = const <int>[],
   }) async =>
       List<num>.generate(
         sampleSize,
@@ -125,7 +114,7 @@ class EnergyField {
   }) async =>
       List<List<num>>.generate(sampleSize, (_) {
         next();
-        return [..._position.sphericalToCartesian, _value];
+        return [..._position, _value];
       });
 
   /// Returns a list containing the energy values at two
@@ -154,7 +143,7 @@ class EnergyField {
       } while (state0 == state1 && count < maxTrials);
       if (count > maxTrials) {
         throw ExceptionOf<EnergyField>(
-            message: 'Error in function \'transitions().\'',
+            message: 'Error in function \'transitions($deltaPosition).\'',
             invalidState: 'Could not generate an uphill transition. '
                 'in $maxTrials trials.',
             expectedState: 'A non-constant energy function.');
@@ -172,14 +161,11 @@ class EnergyField {
   }
 
   /// Returns a list of energy values sampled from a neighbourhood
-  /// around `position` using perturbation
-  /// magnitudes `deltaPosition`.
-  /// * `grid`: The grid sizes along each dimension.
-  /// The grid is used to turn a continuous search space into a discret
-  /// search space. The default value is an empty list (i.e. a continuous search space).
+  /// around [position] using perturbation
+  /// magnitudes [deltaPosition].
+  /// * `sampleSize`: The length of the returned list containing the sample.
   /// * `selectUphillMoves`: Set to `true` to filter out down-hill transitions (
   /// where the new energy value is lower than the energy at `position`).
-  /// * `sampleSize`: The length of the returned list containing the sample.
   Future<List<num>> sampleEnergyCloseTo(
     List<num> position,
     List<num> deltaPosition, {
@@ -289,7 +275,7 @@ class EnergyField {
           );
       ++counter;
       //print('gamma: $gammaEstimate temperature: $optTemperature');
-    } while ((gammaEstimate - gamma).abs() > gamma * 1e-3 && counter < 20);
+    } while ((gammaEstimate - gamma).abs() > gamma * 1e-3 && counter < 100);
     return optTemperature;
   }
 
@@ -346,10 +332,10 @@ class EnergyField {
   }
 
   /// Returns the search space dimension.
-  int get dimensions => _searchSpace.dimensions;
+  int get dimensions => space.dimensions;
 
   /// Returns the size of the energy field domain (the search space).
-  List<num> get size => List<num>.of(_searchSpace.size);
+  List<num> get size => List<num>.of(space.size);
 
   @override
   String toString() {
@@ -357,7 +343,7 @@ class EnergyField {
     b.writeln('Energy Field: ');
     b.writeln('  minPosition: $minPosition');
     b.writeln('  energy min: $_minValue');
-    b.writeln('  $_searchSpace'.replaceAll('\n', '\n  '));
+    b.writeln('  $space'.replaceAll('\n', '\n  '));
     return b.toString();
   }
 }

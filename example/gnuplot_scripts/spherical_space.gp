@@ -32,8 +32,8 @@ set ytics ('-2' -2.0, '-1' -1.0, '0' 0.0, '1' 1.0, '2' 2.0);
 set ztics ('-2' -2.0, '-1' -1.0, '0' 0.0, '1' 1.0, '2' 2.0);
 
 
-set term pngcairo size 500, 500 font "Sans,12"
-# set term qt size 500, 500 font "Sans,12"
+# set term pngcairo size 500, 500 font "Sans,12"
+set term qt size 500, 500 font "Sans,12"
 
 set lmargin 0.1;
 # set bmargin 0.0;
@@ -43,13 +43,13 @@ set origin 0.05, 0
 show origin;
 #set mapping spherical
 
-# '../data/energy.dat' using 1:2:4 ps 0.5 pt 3 lt 1 lc "red" t "Energy", \
 
-set output '../plots/spherical_space.png'
+# set output '../plots/spherical_space.png'
 
 splot '../data/spherical_space.dat' lt 1 ps 0.25 pt 5 t "Points In Search Space", \
 '../data/spherical_space_perturbation.dat' ps 0.3 pt 7 lt 2 t "Random Points Around Test Point", \
 '../data/spherical_space_test_point.dat' ps 1 pt 7 lt 1 lc "red" t "Test Point", \
+'../data/energy.dat' using 1:2:4 ps 0.5 pt 3 lt 1 lc "red" t "Energy", \
 "-" w p ps 2 pt 9 lt 9 lc "blue" t "Origin"
 0 0 0
 e

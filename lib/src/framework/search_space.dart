@@ -43,6 +43,10 @@ class SearchSpace {
   /// The search space name.
   final String name;
 
+  /// Return the interval names.
+  late final intervalNames =
+      List<String>.generate(dimensions, (i) => _intervals[i].name).unmodifiable;
+
   /// The number of intervals that were used to define the
   /// [SearchSpace].
   final int dimensions;
@@ -299,18 +303,18 @@ class SearchSpace {
     final r = FixedInterval(
       rMin,
       rMax,
-      name: 'radius <r>',
+      name: 'r',
       inverseCdf: InverseCdfs.r,
     );
     final theta = FixedInterval(
       thetaMin,
       thetaMax,
       inverseCdf: InverseCdfs.polarAngle,
-      name: 'polar angle <theta>',
+      name: 'theta',
     );
     final phi = (phiMin == phiMax)
-        ? SingularInterval(phiMin, name: 'azimuth <phi>')
-        : PeriodicInterval(phiMin, phiMax, name: 'azimuth <phi>');
+        ? SingularInterval(phiMin, name: 'phi')
+        : PeriodicInterval(phiMin, phiMax, name: 'phi');
 
     // Defining a spherical search space.
     return SearchSpace.fixed([r, theta, phi], name: 'sphere');
@@ -418,8 +422,35 @@ class SearchSpace {
       () => -sqrt(r2 - pow(x.next(), 2)),
       () => sqrt(r2 - pow(x.next(), 2)),
     );
-
     return SearchSpace.parametric([x, y]);
+  }
+
+  /// Returns a three dimensional [SearchSpace] with a
+  /// cylindrical geometry defined in terms of
+  /// Cartesian coordiantes `[x, y, z]`.
+  static SearchSpace cylinderCartesian({
+    num rho = 1,
+    num zMin = 0,
+    num zMax = 1,
+    List<num> centre = const <double>[0.0, 0.0, 0, 0],
+  }) {
+    // Define intervals.
+    final x0 = centre[0];
+    final y0 = centre[1];
+    final z0 = centre[2];
+    final x = FixedInterval(
+      x0 - rho,
+      x0 + rho,
+      name: 'x',
+    );
+    final r2 = rho * rho;
+    final y = ParametricInterval(
+      () => y0 - sqrt(r2 - pow(x.next() - x0, 2)),
+      () => y0 + sqrt(r2 - pow(x.next() - x0, 2)),
+      name: 'y',
+    );
+    final z = FixedInterval(z0 + zMin, z0 + zMax, name: 'z');
+    return SearchSpace.parametric([x, y, z], name: 'cylinder xyz');
   }
 
   /// Returns a three-dimensional search space with spherical
@@ -474,21 +505,55 @@ class SearchSpace {
     num zMin = 0,
     num zMax = 2,
   }) {
+    // Validated input.
+    final rhoInput = [rhoMin, rhoMax];
+    rhoMin = rhoInput.min();
+    rhoMax = rhoInput.max();
+    final zInput = [zMin, zMax];
+    zMin = zInput.min();
+    zMax = zInput.max();
+
+    if (rhoMin < 0) {
+      throw ErrorOf<SearchSpace>(
+          message: 'Error in function SearchSpace.cone().',
+          invalidState: 'Negative radius found: rhoMin: $rhoMin',
+          expectedState: 'A positive value for parameter <rho>.');
+    }
+    if (rhoMax < 0) {
+      throw ErrorOf<SearchSpace>(
+          message: 'Error in function SearchSpace.cone().',
+          invalidState: 'Negative radius found: rhoMin: $rhoMin',
+          expectedState: 'A positive value for parameter <rho>.');
+    }
+
     // Define intervals.
-    final z = FixedInterval(zMin, zMax, inverseCdf: InverseCdfs.triangular);
-    final phi = PeriodicInterval(phiMin, phiMax);
+    final z = FixedInterval(
+      zMin,
+      zMax,
+      inverseCdf: InverseCdfs.zCone,
+      name: 'z',
+    );
+    final phi = PeriodicInterval(phiMin, phiMax, name: 'phi');
 
     // /// Radius as a function of the vertical coordinate.
     // num rhoParam(num z) {
     //   return (-z * (rhoMax - rhoMin) + rhoMax * zMax - rhoMin * zMin) /
     //       (zMax - zMin);
     // }
-
+    final dz = zMax - zMin;
+    if (dz == 0) {
+      throw ErrorOf<SearchSpace>(
+          message: 'Error in function SearchSpace.cone().',
+          invalidState: 'Height of cone is: $dz',
+          expectedState: 'zMax - zMin != 0.');
+    }
+    final dzMid = rhoMin / rhoMax * dz;
+    final zMid = zMin + dzMid;
     final rho = ParametricInterval(
-      () => 0,
-      () => z.next() * rhoMax / (rhoMax - rhoMin),
-      inverseCdf: InverseCdfs.triangular,
-    );
+        () => z.next() < zMid ? rhoMin / dzMid * (zMid - z.next()) : 0.0,
+        () => rhoMax / dz * (zMax - z.next()),
+        inverseCdf: InverseCdfs.triangular,
+        name: 'rho');
 
     return SearchSpace.parametric([rho, phi, z], order: [2, 1, 0]);
   }

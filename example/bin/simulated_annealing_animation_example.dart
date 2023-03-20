@@ -1,4 +1,4 @@
-import 'energy_field_example.dart';
+import '../../test/src/energy_field_instance.dart';
 import '../../test/src/snapshot_logging_simulator.dart';
 
 /// To run this program please navigate to the package root folder
@@ -14,9 +14,6 @@ void main() async {
     gammaStart: 0.8,
     gammaEnd: 0.05,
   );
-
-  simulator.gridStart = [];
-  simulator.gridEnd = [];
 
   print(await simulator.info);
   print('Start annealing process ...');
