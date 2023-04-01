@@ -1,4 +1,7 @@
 
+## 0.3.8
+- Updated deps.
+
 ## 0.3.7
 - Updated deps.
 
