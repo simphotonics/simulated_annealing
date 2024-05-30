@@ -25,24 +25,16 @@ class SnapshotLoggingSimulator extends LoggingSimulator {
   ///   and the final temperature of the annealing process.
   /// Not included with the framework because the class uses dart:io.
   SnapshotLoggingSimulator(
-    EnergyField field, {
+    super.field, {
     required this.outputPath,
     this.nth = 1,
-    num gammaStart = 0.8,
-    num gammaEnd = 0.1,
-    int outerIterations = 750,
-    int innerIterationsStart = 5,
-    int innerIterationsEnd = 20,
-    int sampleSize = 500,
-  }) : super(
-          field,
-          gammaStart: gammaStart,
-          gammaEnd: gammaEnd,
-          outerIterations: outerIterations,
-          innerIterationsStart: innerIterationsStart,
-          innerIterationsEnd: innerIterationsEnd,
-          sampleSize: sampleSize,
-        );
+    super.gammaStart,
+    super.gammaEnd,
+    super.outerIterations,
+    super.innerIterationsStart,
+    super.innerIterationsEnd,
+    super.sampleSize,
+  });
 
   int _frameCounter = -1;
 

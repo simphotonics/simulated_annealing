@@ -26,22 +26,14 @@ class LoggingSimulator extends Simulator {
   /// * sampleSize: Size of sample used to estimate the start temperature
   ///   and the final temperature of the annealing process.
   LoggingSimulator(
-    EnergyField field, {
-    num gammaStart = 0.8,
-    num gammaEnd = 0.1,
-    int outerIterations = 750,
-    int innerIterationsStart = 5,
-    int innerIterationsEnd = 20,
-    int sampleSize = 500,
-  }) : super(
-          field,
-          gammaStart: gammaStart,
-          gammaEnd: gammaEnd,
-          outerIterations: outerIterations,
-          sampleSize: sampleSize,
-          innerIterationsStart: innerIterationsStart,
-          innerIterationsEnd: innerIterationsEnd,
-        );
+    super.field, {
+    super.gammaStart = 0.8,
+    super.gammaEnd = 0.1,
+    super.outerIterations,
+    super.innerIterationsStart,
+    super.innerIterationsEnd,
+    super.sampleSize,
+  });
 
   /// Stored the simulator data log. Works with the extensions `DataLog` and
   /// `Export`.
