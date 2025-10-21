@@ -14,15 +14,16 @@ final y = ParametricInterval(
 );
 
 double zRange() => sqrt(pow(r, 2) - pow(y.next(), 2) - pow(x.next(), 2));
-final z = ParametricInterval(
-  () => zRange(),
-  () => zRange(),
-);
+final z = ParametricInterval(() => zRange(), () => zRange());
 
 // Defining a spherical search space.
 // Intervals are listed in order of dependence.
-final space =
-    SearchSpace.sphere(rMin: r, rMax: r, thetaMin: 0, thetaMax: pi / 2);
+final space = SearchSpace.sphere(
+  rMin: r,
+  rMax: r,
+  thetaMin: 0,
+  thetaMax: pi / 2,
+);
 
 void main() async {
   final position = [1.9, pi / 4, -pi / 2];
@@ -33,19 +34,13 @@ void main() async {
   final sample = space.sample(sampleSize: 2000).sphericalToCartesian;
 
   final perturbation = space
-      .sampleCloseTo(
-        position,
-        deltaPosition,
-        sampleSize: 400,
-      )
+      .sampleCloseTo(position, deltaPosition, sampleSize: 400)
       .sphericalToCartesian;
 
-  await File('example/data/hemisphere.dat').writeAsString(
-    sample.export(),
-  );
-  await File('example/data/hemisphere_perturbation.dat').writeAsString(
-    perturbation.export(),
-  );
+  await File('example/data/hemisphere.dat').writeAsString(sample.export());
+  await File(
+    'example/data/hemisphere_perturbation.dat',
+  ).writeAsString(perturbation.export());
 
   await File('example/data/hemisphere_test_point.dat').writeAsString('''
     # Test Point

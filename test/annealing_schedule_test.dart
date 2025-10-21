@@ -85,23 +85,20 @@ void main() {
 
     test('linearSchedule', () {
       final deltaPositionLinear = defaultPerturbationSequence(
-          temperaturesLinear, deltaPositionMax, deltaPositionMin);
-      expect(
-        deltaPositionLinear[0],
-        closeToList(deltaPositionMax, delta),
+        temperaturesLinear,
+        deltaPositionMax,
+        deltaPositionMin,
       );
-      expect(
-        deltaPositionLinear[99],
-        closeToList(deltaPositionMin, delta),
-      );
+      expect(deltaPositionLinear[0], closeToList(deltaPositionMax, delta));
+      expect(deltaPositionLinear[99], closeToList(deltaPositionMin, delta));
     });
     test('exponentialSchedule', () {
       final deltaPositionExponential = defaultPerturbationSequence(
-          temperaturesLinear, deltaPositionMax, deltaPositionMin);
-      expect(
-        deltaPositionExponential[0],
-        closeToList(deltaPositionMax, delta),
+        temperaturesLinear,
+        deltaPositionMax,
+        deltaPositionMin,
       );
+      expect(deltaPositionExponential[0], closeToList(deltaPositionMax, delta));
       expect(
         deltaPositionExponential[99],
         closeToList(deltaPositionMin, delta),
@@ -119,12 +116,9 @@ void main() {
     });
     test('Interpolated value', () {
       expect(
-          markovChainLength(
-            (tStart - tEnd) / 2,
-            tStart: tStart,
-            tEnd: tEnd,
-          ),
-          12);
+        markovChainLength((tStart - tEnd) / 2, tStart: tStart, tEnd: tEnd),
+        12,
+      );
     });
   });
 }

@@ -1,4 +1,7 @@
 
+## 0.4.1
+- Updated dependencies.
+
 ## 0.4.0
 - Updated deps.
 - Dart version ^3.0.0 required

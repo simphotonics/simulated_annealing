@@ -13,22 +13,11 @@ final localMin = [-1.0, -1.0, -0.5];
 num energy(List<num> position) {
   position = position.sphericalToCartesian;
   return 4.0 -
-      4.0 *
-          exp(-4 *
-              globalMin.distance(
-                position,
-              )) -
-      0.3 *
-          exp(-4 *
-              localMin.distance(
-                position,
-              ));
+      4.0 * exp(-4 * globalMin.distance(position)) -
+      0.3 * exp(-4 * localMin.distance(position));
 }
 
-final field = EnergyField(
-  energy,
-  space,
-);
+final field = EnergyField(energy, space);
 
 void main(List<String> args) async {
   print(field);
@@ -36,9 +25,7 @@ void main(List<String> args) async {
   print('');
   print('Writing data ...');
 
-  final sample = await field.sample(
-    sampleSize: 2000,
-  );
+  final sample = await field.sample(sampleSize: 2000);
 
   await File('example/data/energy.dat').writeAsString(
     sample.export(label: '#Energy Spherical Search Space: x, y, z, Energy'),

@@ -21,12 +21,8 @@ typedef ProbabilityScale = num Function(num p);
 
 /// A generalized inverse cummulative distribution function,
 /// where the probability is scaled by a function of typedef [ProbabilityScale].
-typedef FunctionalInverseCdf = num Function(
-  num p,
-  num start,
-  num end, {
-  required ProbabilityScale scale,
-});
+typedef FunctionalInverseCdf =
+    num Function(num p, num start, num end, {required ProbabilityScale scale});
 
 abstract class InverseCdfs {
   /// The inverse cummulative distribution of
@@ -123,14 +119,10 @@ extension RandomInRange on Random {
   /// * Note: The function `inverseCdf(p, start, end)` must return a
   ///   value in the range `[start, end)` for each argument `p`
   ///   in the range `[0,1)`.
-  num nextInRange(
-    num start,
-    num end, {
-    InverseCdf? inverseCdf,
-  }) =>
+  num nextInRange(num start, num end, {InverseCdf? inverseCdf}) =>
       (inverseCdf == null)
-          ? InverseCdfs.uniform(nextDouble(), start, end)
-          : inverseCdf(nextDouble(), start, end);
+      ? InverseCdfs.uniform(nextDouble(), start, end)
+      : inverseCdf(nextDouble(), start, end);
 
   /// Generates a random floating point
   /// value in the range from `start`,
@@ -175,10 +167,12 @@ extension RandomInRange on Random {
     } catch (e) {
       if (list.isEmpty) {
         throw ErrorOf<Random>(
-            message: 'Could not generate next value using the '
-                'extension method `nextFromList`.',
-            invalidState: 'The provided list is empty.',
-            expectedState: 'A non-empty list containing possible values.');
+          message:
+              'Could not generate next value using the '
+              'extension method `nextFromList`.',
+          invalidState: 'The provided list is empty.',
+          expectedState: 'A non-empty list containing possible values.',
+        );
       }
       rethrow;
     }

@@ -7,11 +7,7 @@ void main() {
     final left = 0;
     final right = 3;
     final x = FixedInterval(left + 2, right);
-    final y = ParametricInterval(
-      () => left,
-      () => x.next(),
-      name: 'Test',
-    );
+    final y = ParametricInterval(() => left, () => x.next(), name: 'Test');
     test('name', () {
       expect(x.name, '');
       expect(y.name, 'Test');

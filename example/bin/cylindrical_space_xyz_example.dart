@@ -43,9 +43,9 @@ void main(List<String> args) async {
   print('Writing data ...');
 
   /// Write to file:
-  await File('example/data/cylindrical_space.dat').writeAsString(
-    sample.export(label: '#Cylindrical Search Space: x, y, z'),
-  );
+  await File(
+    'example/data/cylindrical_space.dat',
+  ).writeAsString(sample.export(label: '#Cylindrical Search Space: x, y, z'));
   await File('example/data/cylindrical_space_perturbation.dat').writeAsString(
     perturbations.export(label: '#Cylindrical Perturbations: x, y, z'),
   );

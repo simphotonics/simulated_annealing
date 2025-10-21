@@ -40,8 +40,8 @@ abstract class Interval {
 
   /// Returns the grid points associated with the discrete interval.
   List<num> get gridPoints => List<num>.generate(_levels, (i) {
-        return start + i * dx();
-      });
+    return start + i * dx();
+  });
 
   /// Step size between discrete levels.
   late final dx = Lazy<num>(
@@ -68,8 +68,11 @@ abstract class Interval {
       return _cache;
     } else {
       _isUpToDate = true;
-      return _cache =
-          Interval.random.nextInRange(start, end, inverseCdf: inverseCdf);
+      return _cache = Interval.random.nextInRange(
+        start,
+        end,
+        inverseCdf: inverseCdf,
+      );
     }
   }
 
@@ -91,8 +94,9 @@ abstract class Interval {
         inverseCdf: inverseCdf,
       );
       // If dx == 0 => start == end.
-      return _cache =
-          (dx() == 0) ? start : start + dx() * ((next - start) / dx()).round();
+      return _cache = (dx() == 0)
+          ? start
+          : start + dx() * ((next - start) / dx()).round();
     }
   }
 
@@ -105,10 +109,7 @@ abstract class Interval {
   /// * If the cache is stale an new random number is returned and cached.
   num next() => _next();
 
-  num _perturbContinuous(
-    num position,
-    num deltaPosition,
-  ) {
+  num _perturbContinuous(num position, num deltaPosition) {
     deltaPosition = deltaPosition.abs();
     final startOverlap = max(position - deltaPosition, start);
     final endOverlap = min(position + deltaPosition, end);
@@ -125,10 +126,7 @@ abstract class Interval {
     }
   }
 
-  num _perturbDiscrete(
-    num position,
-    num deltaPosition,
-  ) {
+  num _perturbDiscrete(num position, num deltaPosition) {
     deltaPosition = deltaPosition.abs();
     final startOverlap = max(position - deltaPosition, start);
     final endOverlap = min(position + deltaPosition, end);
@@ -142,8 +140,9 @@ abstract class Interval {
         endOverlap,
         inverseCdf: inverseCdf,
       );
-      return _cache =
-          dx() == 0 ? start : start + dx() * ((next - start) / dx()).round();
+      return _cache = dx() == 0
+          ? start
+          : start + dx() * ((next - start) / dx()).round();
     }
   }
 
@@ -156,10 +155,8 @@ abstract class Interval {
   /// * If the intersection is empty, `double.nan` is returned.
   /// * Returns a cached value if the cache is up-to-date.
   /// * If the cache is stale a new random number is returned and cached.
-  num perturb(num position, num deltaPosition) => _perturb(
-        position,
-        deltaPosition,
-      );
+  num perturb(num position, num deltaPosition) =>
+      _perturb(position, deltaPosition);
 
   /// Returns true if position is safisfying
   /// `(start <= position && position <= end)`.
@@ -239,18 +236,10 @@ abstract class Interval {
 class SingularInterval extends FixedInterval {
   /// Constructs a singular fixed interval.
   SingularInterval(num value, {String name = ''})
-      : super._(
-          value,
-          value,
-          name: name,
-        );
+    : super._(value, value, name: name);
 
   SingularInterval.of(SingularInterval interval)
-      : super._(
-          interval.start,
-          interval.end,
-          name: interval.name,
-        );
+    : super._(interval.start, interval.end, name: interval.name);
 
   /// Returns the singular value `start.
   @override
@@ -259,10 +248,7 @@ class SingularInterval extends FixedInterval {
   /// Returns `position` if `start == position`.
   /// Returns `double.nan` otherwise.
   @override
-  num perturb(
-    num position,
-    num deltaPosition,
-  ) {
+  num perturb(num position, num deltaPosition) {
     deltaPosition = deltaPosition.abs();
     if (overlaps(position - deltaPosition, position + deltaPosition)) {
       return start;
@@ -290,8 +276,8 @@ class SingularInterval extends FixedInterval {
 class FixedInterval extends Interval {
   /// Constructs a fixed interval (`start`, `end`).
   FixedInterval._(num start, num end, {super.inverseCdf, super.name})
-      : start = min(start, end),
-        end = max(start, end);
+    : start = min(start, end),
+      end = max(start, end);
 
   /// Returns an instance of [FixedInterval].
   ///
@@ -304,12 +290,7 @@ class FixedInterval extends Interval {
   }) {
     return start == end
         ? SingularInterval(start, name: name)
-        : FixedInterval._(
-            start,
-            end,
-            inverseCdf: inverseCdf,
-            name: name,
-          );
+        : FixedInterval._(start, end, inverseCdf: inverseCdf, name: name);
   }
 
   /// Constructs a copy of `interval`.
@@ -351,21 +332,18 @@ class FixedInterval extends Interval {
 /// Any angle may then be remapped to the interval 0...2pi.
 class PeriodicInterval extends FixedInterval {
   PeriodicInterval(super.start, super.end, {super.inverseCdf, super.name})
-      : super._();
+    : super._();
 
   PeriodicInterval.of(FixedInterval interval)
-      : super._(
-          interval.start,
-          interval.end,
-          inverseCdf: interval.inverseCdf,
-          name: interval.name,
-        );
+    : super._(
+        interval.start,
+        interval.end,
+        inverseCdf: interval.inverseCdf,
+        name: interval.name,
+      );
 
   @override
-  num _perturbContinuous(
-    num position,
-    num deltaPosition,
-  ) {
+  num _perturbContinuous(num position, num deltaPosition) {
     _isUpToDate = true;
     deltaPosition = deltaPosition.abs();
     final next = Interval.random.nextInRange(
@@ -376,18 +354,16 @@ class PeriodicInterval extends FixedInterval {
 
     if (next < start || next > end) {
       final remainder = next.remainder(size);
-      return _cache =
-          remainder.isNegative ? end + remainder : start + remainder;
+      return _cache = remainder.isNegative
+          ? end + remainder
+          : start + remainder;
     } else {
       return _cache = next;
     }
   }
 
   @override
-  num _perturbDiscrete(
-    num position,
-    num deltaPosition,
-  ) {
+  num _perturbDiscrete(num position, num deltaPosition) {
     _isUpToDate = true;
     deltaPosition = deltaPosition.abs();
     var next = Interval.random.nextInRange(
@@ -431,9 +407,9 @@ class ParametricInterval extends Interval {
   ///
   /// Note: Cached variables are not copied.
   ParametricInterval.of(ParametricInterval interval)
-      : startFunc = interval.startFunc,
-        endFunc = interval.endFunc,
-        super(inverseCdf: interval.inverseCdf);
+    : startFunc = interval.startFunc,
+      endFunc = interval.endFunc,
+      super(inverseCdf: interval.inverseCdf);
 
   /// Start point of the numerical interval.
   final ParametricPoint startFunc;

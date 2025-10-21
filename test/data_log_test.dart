@@ -8,12 +8,9 @@ void main() {
     final log = DataLog<num>();
     test('non-existent record', () {
       expect(
-          log.get('non-existent'),
-          isA<List<num>>().having(
-            (list) => list.isEmpty,
-            'isEmpty',
-            true,
-          ));
+        log.get('non-existent'),
+        isA<List<num>>().having((list) => list.isEmpty, 'isEmpty', true),
+      );
     });
     test('length', () {
       expect(log.length, 0);
@@ -81,26 +78,29 @@ void main() {
     log.addAll(['x', 'y', 'z'], [1, 2, 3]);
     test('export', () {
       expect(
-          log.export(precision: 4),
-          '#    temperature       x       y       z     \n'
-          '100.0   0.000   0.000   0.000   \n'
-          '101.2   1.000   2.000   3.000   \n'
-          '\n'
-          '');
+        log.export(precision: 4),
+        '#    temperature       x       y       z     \n'
+        '100.0   0.000   0.000   0.000   \n'
+        '101.2   1.000   2.000   3.000   \n'
+        '\n'
+        '',
+      );
     });
     test('exportFirst', () {
       expect(
-          log.exportFirst(precision: 4),
-          '#    temperature       x       y       z     \n'
-          '100.0   0.000   0.000   0.000   \n'
-          '');
+        log.exportFirst(precision: 4),
+        '#    temperature       x       y       z     \n'
+        '100.0   0.000   0.000   0.000   \n'
+        '',
+      );
     });
     test('exportLast', () {
       expect(
-          log.exportLast(precision: 4),
-          '#    temperature       x       y       z     \n'
-          '101.2   1.000   2.000   3.000   \n'
-          '');
+        log.exportLast(precision: 4),
+        '#    temperature       x       y       z     \n'
+        '101.2   1.000   2.000   3.000   \n'
+        '',
+      );
     });
   });
 }

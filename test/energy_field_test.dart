@@ -5,8 +5,6 @@ import 'src/energy_field_instance.dart';
 
 void main() async {
   // Testing class: Interval.
-
-  print(space);
   group('Sampling:', () {
     test('sampleField', () async {
       final sample = await field.sampleEnergy();
@@ -14,8 +12,10 @@ void main() async {
     });
     test('sampleEnergyCloseTo', () async {
       final sample = await field.sampleEnergyCloseTo(
-          globalMin, deltaPositionMin,
-          selectUphillMoves: true);
+        globalMin,
+        deltaPositionMin,
+        selectUphillMoves: true,
+      );
       expect(sample.length, 100);
       expect(field.energy(globalMin), lessThanOrEqualTo(sample.min()));
     });
@@ -68,14 +68,8 @@ void main() async {
       expect(t, isNotNaN);
     });
     test('t(gamma = 0.1) < t(gamma = 0.8)', () async {
-      final t01 = await field.tEnd(
-        0.1,
-        deltaPosition: deltaPosition,
-      );
-      final t08 = await field.tEnd(
-        0.8,
-        deltaPosition: deltaPosition,
-      );
+      final t01 = await field.tEnd(0.1, deltaPosition: deltaPosition);
+      final t08 = await field.tEnd(0.8, deltaPosition: deltaPosition);
       expect(t01, lessThan(t08));
     });
   });

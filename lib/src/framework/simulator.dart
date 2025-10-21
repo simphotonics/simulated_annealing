@@ -27,17 +27,18 @@ int markovChainLength(
   int chainLengthEnd = 20,
 }) =>
     ((chainLengthStart - chainLengthEnd) *
-            (temperature - tStart) ~/
-            (tStart - tEnd) +
-        chainLengthStart);
+        (temperature - tStart) ~/
+        (tStart - tEnd) +
+    chainLengthStart);
 
 /// Function returning a sequence of pertubation
 /// magnitude vectors.
-typedef PerturbationSequence = List<List<num>> Function(
-  List<num> temperatures,
-  List<num> deltaPositionMax,
-  List<num> deltaPositionMin,
-);
+typedef PerturbationSequence =
+    List<List<num>> Function(
+      List<num> temperatures,
+      List<num> deltaPositionMax,
+      List<num> deltaPositionMin,
+    );
 
 /// Returns a sequence of vectors
 /// by interpolating between
@@ -50,14 +51,16 @@ List<List<T>> interpolate<T extends num>(
   List<T> end,
 ) {
   final a = (start - end) / (temperatures.first - temperatures.last);
-  final b = start -
+  final b =
+      start -
       (start - end) *
           (temperatures.first / (temperatures.first - temperatures.last));
   return List<List<T>>.generate(
-      temperatures.length,
-      (i) => T == int
-          ? (a * temperatures[i]).plus(b).toListOfInt() as List<T>
-          : (a * temperatures[i]).plus(b) as List<T>);
+    temperatures.length,
+    (i) => T == int
+        ? (a * temperatures[i]).plus(b).toListOfInt() as List<T>
+        : (a * temperatures[i]).plus(b) as List<T>,
+  );
 }
 
 /// Returns a sequence of perturbation magnitude vectors by
@@ -68,12 +71,7 @@ List<List<num>> defaultPerturbationSequence(
   List<num> temperatures,
   List<num> deltaPositionMax,
   List<num> deltaPositionMin,
-) =>
-    interpolate(
-      temperatures,
-      deltaPositionMax,
-      deltaPositionMin,
-    );
+) => interpolate(temperatures, deltaPositionMax, deltaPositionMin);
 
 /// Annealing simulator
 abstract class Simulator {
@@ -134,21 +132,25 @@ abstract class Simulator {
   final int sampleSize;
 
   /// Initial annealing temperature.
-  late final Lazy<Future<num>> _tStart = Lazy<Future<num>>(() => field.tStart(
-        gammaStart,
-        deltaPosition: deltaPositionStart,
-        sampleSize: sampleSize,
-      ));
+  late final Lazy<Future<num>> _tStart = Lazy<Future<num>>(
+    () => field.tStart(
+      gammaStart,
+      deltaPosition: deltaPositionStart,
+      sampleSize: sampleSize,
+    ),
+  );
 
   /// Initial annealing temperature.
   Future<num> get tStart => _tStart();
 
   /// Final annealing temperature.
-  late final Lazy<Future<num>> _tEnd = Lazy<Future<num>>(() => field.tEnd(
-        gammaEnd,
-        deltaPosition: deltaPositionEnd,
-        sampleSize: sampleSize,
-      ));
+  late final Lazy<Future<num>> _tEnd = Lazy<Future<num>>(
+    () => field.tEnd(
+      gammaEnd,
+      deltaPosition: deltaPositionEnd,
+      sampleSize: sampleSize,
+    ),
+  );
 
   /// Final annealing temperature.
   Future<num> get tEnd => _tEnd();
@@ -243,11 +245,9 @@ abstract class Simulator {
 
   /// Annealing temperatures.
   late final Lazy<Future<List<num>>> _temperatures = Lazy<Future<List<num>>>(
-    () => Future.wait([tStart, tEnd]).then((t) => temperatureSequence(
-          t[0],
-          t[1],
-          iterations: outerIterations,
-        )),
+    () => Future.wait(
+      [tStart, tEnd],
+    ).then((t) => temperatureSequence(t[0], t[1], iterations: outerIterations)),
   );
 
   /// Returns an [UnmodifiableListView] of the annealing temperatures
@@ -258,18 +258,20 @@ abstract class Simulator {
   /// Perturbation magnitudes.
   late final Lazy<Future<List<List<num>>>> _perturbationMagnitudes =
       Lazy<Future<List<List<num>>>>(
-    () => _temperatures().then<List<List<num>>>((temperatures) => interpolate(
-          temperatures,
-          deltaPositionStart,
-          deltaPositionEnd,
-        )),
-  );
+        () => _temperatures().then<List<List<num>>>(
+          (temperatures) =>
+              interpolate(temperatures, deltaPositionStart, deltaPositionEnd),
+        ),
+      );
 
   /// Returns the sequence of perturbation magnitudes.
   Future<List<List<num>>> get perturbationMagnitudes =>
-      _perturbationMagnitudes().then<List<List<num>>>((pertubationMagnitudes) =>
-          List<List<num>>.generate(pertubationMagnitudes.length,
-              (i) => List<num>.of(pertubationMagnitudes[i])));
+      _perturbationMagnitudes().then<List<List<num>>>(
+        (pertubationMagnitudes) => List<List<num>>.generate(
+          pertubationMagnitudes.length,
+          (i) => List<num>.of(pertubationMagnitudes[i]),
+        ),
+      );
 
   /// Current field position.
   List<num> get currentPosition => field.position;
@@ -338,11 +340,13 @@ abstract class Simulator {
 
     final result = <int, int>{};
 
-    int nInner(num t) => markovChainLength(t,
-        tStart: temperatures.first,
-        tEnd: temperatures.last,
-        chainLengthStart: innerIterationsStart,
-        chainLengthEnd: innerIterationsEnd);
+    int nInner(num t) => markovChainLength(
+      t,
+      tStart: temperatures.first,
+      tEnd: temperatures.last,
+      chainLengthStart: innerIterationsStart,
+      chainLengthEnd: innerIterationsEnd,
+    );
 
     if (_recursionCounter == 0) {
       _t = temperatures.first;
@@ -382,11 +386,13 @@ abstract class Simulator {
     final temperatures = await this.temperatures;
     final perturbationMagnitudes = await this.perturbationMagnitudes;
 
-    int nInner(num t) => markovChainLength(t,
-        tStart: temperatures.first,
-        tEnd: temperatures.last,
-        chainLengthStart: innerIterationsStart,
-        chainLengthEnd: innerIterationsEnd);
+    int nInner(num t) => markovChainLength(
+      t,
+      tStart: temperatures.first,
+      tEnd: temperatures.last,
+      chainLengthStart: innerIterationsStart,
+      chainLengthEnd: innerIterationsEnd,
+    );
 
     num dE = 0;
 
@@ -418,10 +424,8 @@ abstract class Simulator {
       // Inner iteration loop.
       for (var j = 0; j < nInner(_t); j++) {
         // Choose next random point and calculate energy difference.
-        dE = field.perturb(
-              _currentMinPosition,
-              _deltaPosition,
-            ) -
+        dE =
+            field.perturb(_currentMinPosition, _deltaPosition) -
             _currentMinEnergy;
 
         if (dE < 0) {
@@ -445,8 +449,10 @@ abstract class Simulator {
           print('------------------------------------------------');
           print('E_min_global($globalMinPosition) = $globalMinEnergy ');
           print('E_min($_currentMinPosition) = $_currentMinEnergy!');
-          print('x_min_global - x_min_local = '
-              '${globalMinPosition - _currentMinPosition}.');
+          print(
+            'x_min_global - x_min_local = '
+            '${globalMinPosition - _currentMinPosition}.',
+          );
           print('deltaPositionEnd = $deltaPositionEnd');
           print('Returning global minimum solution!');
           print('');

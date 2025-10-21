@@ -16,7 +16,7 @@ In the sections below show how to construct objects of type
 ## Terminology
 
 An **interval** is a numerical interval defined by a its boundaries.
-The base class of all intervals is ['Interval'][Interval].
+The base class of all intervals is [`Interval`][Interval].
 - **start**: The left boundary of an interval.
 - **end**: The right boundary of an interval.
 - **continuous** interval: An interval that includes *start*, *end*, and
@@ -256,6 +256,8 @@ Please file feature requests and bugs at the [issue tracker].
 [SearchSpace]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/SearchSpace-class.html
 
 [FixedInterval]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/FixedInterval-class.html
+
+[Interval]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/Interval-class.html
 
 [SingularInterval]: https://pub.dev/documentation/simulated_annealing/latest/simulated_annealing/SingularInterval-class.html
 

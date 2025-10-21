@@ -25,26 +25,20 @@ void main() async {
   final result = await simulator.anneal();
   final temperatures = exponentialSequence(tStart, tEnd);
   final perturbationMagnitudes = defaultPerturbationSequence(
-      temperatures, simulator.deltaPositionStart, simulator.deltaPositionEnd);
+    temperatures,
+    simulator.deltaPositionStart,
+    simulator.deltaPositionEnd,
+  );
 
   group('Parameters:', () {
     test('deltaPositionStart', () {
-      expect(
-        simulator.deltaPositionStart,
-        closeToList(field.size, 0.25),
-      );
+      expect(simulator.deltaPositionStart, closeToList(field.size, 0.25));
     });
     test('deltaPositionEnd', () {
-      expect(
-        simulator.deltaPositionEnd,
-        [1e-6, 1e-6, 1e-6],
-      );
+      expect(simulator.deltaPositionEnd, [1e-6, 1e-6, 1e-6]);
     });
     test('startPosition', () {
-      expect(
-        simulatorWithPresets.startPosition,
-        [0, 0, 0],
-      );
+      expect(simulatorWithPresets.startPosition, [0, 0, 0]);
     });
     test('tStart', () async {
       expect(await simulator.tStart, isNotNaN);
@@ -61,16 +55,16 @@ void main() async {
   });
   group('Perturbation Magnitudes:', () {
     test('start', () {
-      expect(perturbationMagnitudes.first,
-          closeToList(simulator.deltaPositionStart, 1e-12));
+      expect(
+        perturbationMagnitudes.first,
+        closeToList(simulator.deltaPositionStart, 1e-12),
+      );
     });
     test('end', () {
       expect(
-          perturbationMagnitudes.last,
-          closeToList(
-            simulator.deltaPositionEnd,
-            1e-12,
-          ));
+        perturbationMagnitudes.last,
+        closeToList(simulator.deltaPositionEnd, 1e-12),
+      );
     });
   });
   group('Simulator With Presets', () {
@@ -78,10 +72,7 @@ void main() async {
       expect(simulatorWithPresets.currentPosition, [0, 0, 0]);
     });
     test('start energy', () {
-      expect(
-        simulatorWithPresets.currentEnergy,
-        field.energy([0, 0, 0]),
-      );
+      expect(simulatorWithPresets.currentEnergy, field.energy([0, 0, 0]));
     });
   });
 }

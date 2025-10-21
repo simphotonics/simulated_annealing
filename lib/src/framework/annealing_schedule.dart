@@ -1,10 +1,7 @@
 import 'dart:math';
 
-typedef TemperatureSequence = List<num> Function(
-  num tStart,
-  num tEnd, {
-  int iterations,
-});
+typedef TemperatureSequence =
+    List<num> Function(num tStart, num tEnd, {int iterations});
 
 /// Linear temperature sequence with entries:
 ///
@@ -22,15 +19,13 @@ List<num> linearSequence(num tStart, num tEnd, {int iterations = 1000}) {
 ///
 /// The factor `beta` is calculated such that the last
 /// entry of the sequence is equal to `tEnd`.
-List<num> geometricSequence(
-  num tStart,
-  num tEnd, {
-  int iterations = 1000,
-}) {
+List<num> geometricSequence(num tStart, num tEnd, {int iterations = 1000}) {
   final beta = exp(log(tEnd / tStart) / (iterations - 1));
   var current = tStart.abs();
-  final result =
-      List<num>.generate(iterations - 1, (i) => current = current * beta);
+  final result = List<num>.generate(
+    iterations - 1,
+    (i) => current = current * beta,
+  );
   return result..insert(0, tStart.abs());
 }
 
@@ -39,14 +34,12 @@ List<num> geometricSequence(
 ///
 /// `t(k) = tStart * exp(-pow(k / (2 * sigma), 2)` where
 /// `sigma = n/sqrt(2 * log(tStart / tEnd))`.
-List<num> normalSequence(
-  num tStart,
-  num tEnd, {
-  int iterations = 1000,
-}) {
+List<num> normalSequence(num tStart, num tEnd, {int iterations = 1000}) {
   final invTwoSigmaSq = log(tStart / tEnd) / pow(iterations - 1, 2);
   return List<num>.generate(
-      iterations, (i) => tStart * exp(-i * i * invTwoSigmaSq));
+    iterations,
+    (i) => tStart * exp(-i * i * invTwoSigmaSq),
+  );
 }
 
 /// Exponentially decreasing sequence with start value `tStart` and
@@ -69,5 +62,7 @@ List<num> exponentialSequence(num tStart, num tEnd, {int iterations = 1000}) {
 List<num> lundySequence(num tStart, num tEnd, {int iterations = 1000}) {
   final beta = (1 / tEnd - 1 / tStart) / (iterations - 1);
   return List<num>.generate(
-      iterations, (i) => tStart / (1 + i * beta * tStart));
+    iterations,
+    (i) => tStart / (1 + i * beta * tStart),
+  );
 }

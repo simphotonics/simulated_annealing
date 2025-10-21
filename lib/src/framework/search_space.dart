@@ -12,29 +12,25 @@ class SearchSpace {
   /// Constructs an object of type `SearchSpace`.
   /// * `intervals`: A list of fixed intervals defining the search space.
   SearchSpace.fixed(List<FixedInterval> intervals, {this.name = ''})
-      : dimensions = intervals.length,
-        _intervals = List<FixedInterval>.generate(
-          intervals.length,
-          (index) => FixedInterval.of(intervals[index]),
-        ),
-        _order = List<int>.generate(
-          intervals.length,
-          (index) => index,
-        );
+    : dimensions = intervals.length,
+      _intervals = List<FixedInterval>.generate(
+        intervals.length,
+        (index) => FixedInterval.of(intervals[index]),
+      ),
+      _order = List<int>.generate(intervals.length, (index) => index);
 
-  SearchSpace.parametric(List<Interval> intervals,
-      {List<int> order = const <int>[], this.name = ''})
-      : dimensions = intervals.length,
-        _intervals = List<Interval>.generate(
-          intervals.length,
-          (index) => intervals[index],
-        ),
-        _order = order.isEmpty
-            ? List<int>.generate(
-                intervals.length,
-                (index) => index,
-              )
-            : order;
+  SearchSpace.parametric(
+    List<Interval> intervals, {
+    List<int> order = const <int>[],
+    this.name = '',
+  }) : dimensions = intervals.length,
+       _intervals = List<Interval>.generate(
+         intervals.length,
+         (index) => intervals[index],
+       ),
+       _order = order.isEmpty
+           ? List<int>.generate(intervals.length, (index) => index)
+           : order;
 
   /// Intervals defining the boundary of the sampling space.
   /// * The list `_intervals` must not be empty.
@@ -44,8 +40,10 @@ class SearchSpace {
   final String name;
 
   /// Return the interval names.
-  late final intervalNames =
-      List<String>.generate(dimensions, (i) => _intervals[i].name).unmodifiable;
+  late final intervalNames = List<String>.generate(
+    dimensions,
+    (i) => _intervals[i].name,
+  ).unmodifiable;
 
   /// The number of intervals that were used to define the
   /// [SearchSpace].
@@ -73,20 +71,16 @@ class SearchSpace {
   ///
   /// Note: An interval is considered discrete if it has at least two
   /// grid points.
-  List<int> get levels => List<int>.generate(
-        dimensions,
-        (i) => _intervals[i].levels,
-      );
+  List<int> get levels =>
+      List<int>.generate(dimensions, (i) => _intervals[i].levels);
 
   /// Unvalidated order.
   final List<int> _order;
 
   /// Normal order.
-  late final UnmodifiableListView<int> normalOrder =
-      UnmodifiableListView(List<int>.generate(
-    dimensions,
-    (index) => index,
-  ));
+  late final UnmodifiableListView<int> normalOrder = UnmodifiableListView(
+    List<int>.generate(dimensions, (index) => index),
+  );
 
   /// Validates the parameter [order] before it is used for the first time.
   List<int> validOrder() {
@@ -94,9 +88,10 @@ class SearchSpace {
       return _order;
     } else {
       throw ErrorOf<SearchSpace>(
-          message: 'The parameter <order> is invalid.',
-          expectedState: 'A permutation of the normal order: $normalOrder',
-          invalidState: 'Instead found order = $_order.');
+        message: 'The parameter <order> is invalid.',
+        expectedState: 'A permutation of the normal order: $normalOrder',
+        invalidState: 'Instead found order = $_order.',
+      );
     }
   }
 
@@ -128,10 +123,7 @@ class SearchSpace {
       }
       return result;
     } else {
-      return List<num>.generate(
-        dimensions,
-        (i) => _intervals[i].next(),
-      );
+      return List<num>.generate(dimensions, (i) => _intervals[i].next());
     }
   }
 
@@ -156,25 +148,29 @@ class SearchSpace {
         }
         return result;
       } else {
-        return List<num>.generate(dimensions,
-            (i) => _intervals[i].perturb(position[i], deltaPosition[i]));
+        return List<num>.generate(
+          dimensions,
+          (i) => _intervals[i].perturb(position[i], deltaPosition[i]),
+        );
       }
     } on RangeError catch (_) {
       if (position.length != dimensions) {
         throw ErrorOf<SearchSpace>(
-            message: 'Could not generate random point around $position.',
-            invalidState:
-                'Dimension mismatch: $dimensions != ${position.length}.',
-            expectedState: 'The vector position must have length $dimensions.');
+          message: 'Could not generate random point around $position.',
+          invalidState:
+              'Dimension mismatch: $dimensions != ${position.length}.',
+          expectedState: 'The vector position must have length $dimensions.',
+        );
       }
       if (deltaPosition.length != dimensions) {
         throw ErrorOf<SearchSpace>(
-            message:
-                'Could not generate perturbation using magnitudes $deltaPosition.',
-            invalidState:
-                'Dimension mismatch: $dimensions != ${deltaPosition.length}.',
-            expectedState:
-                'The vector deltaPosition must have length $dimensions.');
+          message:
+              'Could not generate perturbation using magnitudes $deltaPosition.',
+          invalidState:
+              'Dimension mismatch: $dimensions != ${deltaPosition.length}.',
+          expectedState:
+              'The vector deltaPosition must have length $dimensions.',
+        );
       }
       rethrow;
     }
@@ -231,9 +227,10 @@ class SearchSpace {
     } catch (e) {
       if (position.length != dimensions) {
         throw ErrorOf<SearchSpace>(
-            message: 'Error encountered in method: \'contains($position)\'.',
-            invalidState: 'Space dimension $dimensions != $position.length.',
-            expectedState: 'The vector argument must have length $dimensions.');
+          message: 'Error encountered in method: \'contains($position)\'.',
+          invalidState: 'Space dimension $dimensions != $position.length.',
+          expectedState: 'The vector argument must have length $dimensions.',
+        );
       }
       rethrow;
     }
@@ -241,23 +238,21 @@ class SearchSpace {
 
   /// Returns a list containing `sampleSize` points randomly
   /// sampled from the entire search space.
-  List<List<num>> sample({
-    int sampleSize = 2000,
-  }) =>
+  List<List<num>> sample({int sampleSize = 2000}) =>
       List<List<num>>.generate(sampleSize, (_) => next());
 
   /// Returns a list containing [sampleSize] points randomly
   /// sampled from the vicinity of [position].
   /// * The size of the neighbourhood around [position] is given by
   /// [deltaPosition].
-  List<List<num>> sampleCloseTo(List<num> position, List<num> deltaPosition,
-          {int sampleSize = 600}) =>
-      List<List<num>>.generate(
-          sampleSize,
-          (_) => perturb(
-                position,
-                deltaPosition,
-              ));
+  List<List<num>> sampleCloseTo(
+    List<num> position,
+    List<num> deltaPosition, {
+    int sampleSize = 600,
+  }) => List<List<num>>.generate(
+    sampleSize,
+    (_) => perturb(position, deltaPosition),
+  );
 
   @override
   String toString() {
@@ -300,12 +295,7 @@ class SearchSpace {
     num phiMax = 2 * pi,
   }) {
     // Define intervals.
-    final r = FixedInterval(
-      rMin,
-      rMax,
-      name: 'r',
-      inverseCdf: InverseCdfs.r,
-    );
+    final r = FixedInterval(rMin, rMax, name: 'r', inverseCdf: InverseCdfs.r);
     final theta = FixedInterval(
       thetaMin,
       thetaMax,
@@ -333,8 +323,8 @@ class SearchSpace {
     final phi = (phiMin == phiMax)
         ? SingularInterval(phiMin)
         : (phiMax - phiMin) == 2 * pi
-            ? PeriodicInterval(phiMin, phiMax)
-            : FixedInterval(phiMin, phiMax);
+        ? PeriodicInterval(phiMin, phiMax)
+        : FixedInterval(phiMin, phiMax);
 
     // Defining a spherical search space.
     return SearchSpace.fixed([r, phi]);
@@ -371,10 +361,7 @@ class SearchSpace {
     num yMin = 0,
     num yMax = 1,
   }) =>
-      SearchSpace.fixed([
-        FixedInterval(xMin, xMax),
-        FixedInterval(yMin, yMax),
-      ]);
+      SearchSpace.fixed([FixedInterval(xMin, xMax), FixedInterval(yMin, yMax)]);
 
   /// Returns a search space with a box geometry.
   static SearchSpace box({
@@ -384,12 +371,11 @@ class SearchSpace {
     num yMax = 1,
     num zMin = 0,
     num zMax = 1,
-  }) =>
-      SearchSpace.fixed([
-        FixedInterval(xMin, xMax),
-        FixedInterval(yMin, yMax),
-        FixedInterval(zMin, zMax),
-      ]);
+  }) => SearchSpace.fixed([
+    FixedInterval(xMin, xMax),
+    FixedInterval(yMin, yMax),
+    FixedInterval(zMin, zMax),
+  ]);
 
   /// Returns a two-dimensional search space with triangular geometry.
   /// * Extends from `xMin` to `xMax` along the horizontal axis.
@@ -438,11 +424,7 @@ class SearchSpace {
     final x0 = centre[0];
     final y0 = centre[1];
     final z0 = centre[2];
-    final x = FixedInterval(
-      x0 - rho,
-      x0 + rho,
-      name: 'x',
-    );
+    final x = FixedInterval(x0 - rho, x0 + rho, name: 'x');
     final r2 = rho * rho;
     final y = ParametricInterval(
       () => y0 - sqrt(r2 - pow(x.next() - x0, 2)),
@@ -466,33 +448,18 @@ class SearchSpace {
     final x0 = centre[0];
     final y0 = centre[1];
     final z0 = centre[2];
-    final x = FixedInterval(
-      x0 - radius,
-      x0 + radius,
-    );
+    final x = FixedInterval(x0 - radius, x0 + radius);
     final y = ParametricInterval(
-      () =>
-          y0 -
-          sqrt(
-            pow(radius, 2) - pow(x.next() - x0, 2),
-          ),
-      () =>
-          y0 +
-          sqrt(
-            pow(radius, 2) - pow(x.next() - x0, 2),
-          ),
+      () => y0 - sqrt(pow(radius, 2) - pow(x.next() - x0, 2)),
+      () => y0 + sqrt(pow(radius, 2) - pow(x.next() - x0, 2)),
     );
     final z = ParametricInterval(
       () =>
           z0 -
-          sqrt(
-            pow(radius, 2) - pow(y.next() - y0, 2) - pow(x.next() - x0, 2),
-          ),
+          sqrt(pow(radius, 2) - pow(y.next() - y0, 2) - pow(x.next() - x0, 2)),
       () =>
           z0 +
-          sqrt(
-            pow(radius, 2) - pow(y.next() - y0, 2) - pow(x.next() - x0, 2),
-          ),
+          sqrt(pow(radius, 2) - pow(y.next() - y0, 2) - pow(x.next() - x0, 2)),
     );
     return SearchSpace.parametric([x, y, z], order: []);
   }
@@ -515,15 +482,17 @@ class SearchSpace {
 
     if (rhoMin < 0) {
       throw ErrorOf<SearchSpace>(
-          message: 'Error in function SearchSpace.cone().',
-          invalidState: 'Negative radius found: rhoMin: $rhoMin',
-          expectedState: 'A positive value for parameter <rho>.');
+        message: 'Error in function SearchSpace.cone().',
+        invalidState: 'Negative radius found: rhoMin: $rhoMin',
+        expectedState: 'A positive value for parameter <rho>.',
+      );
     }
     if (rhoMax < 0) {
       throw ErrorOf<SearchSpace>(
-          message: 'Error in function SearchSpace.cone().',
-          invalidState: 'Negative radius found: rhoMin: $rhoMin',
-          expectedState: 'A positive value for parameter <rho>.');
+        message: 'Error in function SearchSpace.cone().',
+        invalidState: 'Negative radius found: rhoMin: $rhoMin',
+        expectedState: 'A positive value for parameter <rho>.',
+      );
     }
 
     // Define intervals.
@@ -543,17 +512,19 @@ class SearchSpace {
     final dz = zMax - zMin;
     if (dz == 0) {
       throw ErrorOf<SearchSpace>(
-          message: 'Error in function SearchSpace.cone().',
-          invalidState: 'Height of cone is: $dz',
-          expectedState: 'zMax - zMin != 0.');
+        message: 'Error in function SearchSpace.cone().',
+        invalidState: 'Height of cone is: $dz',
+        expectedState: 'zMax - zMin != 0.',
+      );
     }
     final dzMid = rhoMin / rhoMax * dz;
     final zMid = zMin + dzMid;
     final rho = ParametricInterval(
-        () => z.next() < zMid ? rhoMin / dzMid * (zMid - z.next()) : 0.0,
-        () => rhoMax / dz * (zMax - z.next()),
-        inverseCdf: InverseCdfs.triangular,
-        name: 'rho');
+      () => z.next() < zMid ? rhoMin / dzMid * (zMid - z.next()) : 0.0,
+      () => rhoMax / dz * (zMax - z.next()),
+      inverseCdf: InverseCdfs.triangular,
+      name: 'rho',
+    );
 
     return SearchSpace.parametric([rho, phi, z], order: [2, 1, 0]);
   }

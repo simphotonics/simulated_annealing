@@ -6,11 +6,7 @@ void main() {
   group('FixedInterval:', () {
     num left = 0;
     num right = 3;
-    final interval = FixedInterval(
-      left,
-      right,
-      name: 'Test',
-    );
+    final interval = FixedInterval(left, right, name: 'Test');
     test('name', () {
       expect(interval.name, 'Test');
     });
@@ -60,12 +56,9 @@ void main() {
     });
     test('gridPoints:', () {
       expect(
-          interval.gridPoints,
-          isA<List<num>>().having(
-            (list) => list.isEmpty,
-            'isEmpty',
-            true,
-          ));
+        interval.gridPoints,
+        isA<List<num>>().having((list) => list.isEmpty, 'isEmpty', true),
+      );
     });
     test('caching', () {
       expect(interval.next(), interval.next());
@@ -80,12 +73,13 @@ void main() {
     final discreteInterval = FixedInterval(left, right)..levels = 10;
     test('levels', () {
       expect(
-          discreteInterval,
-          isA<FixedInterval>().having(
-            (interval) => interval.levels,
-            'levels',
-            10,
-          ));
+        discreteInterval,
+        isA<FixedInterval>().having(
+          (interval) => interval.levels,
+          'levels',
+          10,
+        ),
+      );
     });
     test('isDiscrete', () {
       expect(discreteInterval.isDiscrete, isTrue);

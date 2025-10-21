@@ -24,15 +24,9 @@ num zBoundary() {
   return sqrt(pow(radius, 2.0) - pow(x.next(), 2) - pow(y.next(), 2));
 }
 
-final y = ParametricInterval(
-  () => -yBoundary(),
-  () => yBoundary(),
-);
+final y = ParametricInterval(() => -yBoundary(), () => yBoundary());
 
-final z = ParametricInterval(
-  () => -zBoundary(),
-  () => zBoundary(),
-);
+final z = ParametricInterval(() => -zBoundary(), () => zBoundary());
 
 // Defining a spherical search space.
 // Intervals are listed in order of dependence.
@@ -48,15 +42,15 @@ void main() async {
 
   final sample = List<List<num>>.generate(2000, (_) => space.next());
 
-  final perturbation =
-      List<List<num>>.generate(500, (_) => space.perturb(xTest, deltaPosition));
+  final perturbation = List<List<num>>.generate(
+    500,
+    (_) => space.perturb(xTest, deltaPosition),
+  );
 
-  await File('../data/spherical_space.dat').writeAsString(
-    sample.export(),
-  );
-  await File('../data/spherical_space_perturbation.dat').writeAsString(
-    perturbation.export(),
-  );
+  await File('../data/spherical_space.dat').writeAsString(sample.export());
+  await File(
+    '../data/spherical_space_perturbation.dat',
+  ).writeAsString(perturbation.export());
 
   await File('../data/spherical_space_center_point.dat').writeAsString('''
     # Perturbation Centerpoint

@@ -22,10 +22,7 @@ void main() async {
   print(await simulator.info);
 
   print('Start annealing process ...');
-  final xSol = await simulator.anneal(
-    isRecursive: true,
-    isVerbose: true,
-  );
+  final xSol = await simulator.anneal(isRecursive: true, isVerbose: true);
   print('Annealing ended.');
   print('Writing log to file: example/data/log.dat');
   await File('example/data/log.dat').writeAsString(simulator.export());

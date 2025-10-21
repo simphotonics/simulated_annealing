@@ -60,11 +60,14 @@ void main() {
 
     test('Value coincides with grid point', () {
       expect(
-          r.gridPoints(xMin, xMax, 10),
-          contains(closeTo(
+        r.gridPoints(xMin, xMax, 10),
+        contains(
+          closeTo(
             r.nextLevelInRange(xMin, xMax, 10, inverseCdf: inverseCdf),
             1e-12,
-          )));
+          ),
+        ),
+      );
     });
   });
 
@@ -75,13 +78,16 @@ void main() {
     });
     test('Error if list is empty', () {
       expect(
-          () => r.nextFromList(<String>[]),
-          throwsA(isA<ErrorOf<Random>>().having(
+        () => r.nextFromList(<String>[]),
+        throwsA(
+          isA<ErrorOf<Random>>().having(
             (e) => e.message,
             'message',
             'Could not generate next value using the extension'
                 ' method `nextFromList`.',
-          )));
+          ),
+        ),
+      );
     });
   });
 }

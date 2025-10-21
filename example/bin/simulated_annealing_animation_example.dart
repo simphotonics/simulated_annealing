@@ -18,10 +18,7 @@ void main() async {
   print(await simulator.info);
   print('Start annealing process ...');
 
-  final xSol = await simulator.anneal(
-    isRecursive: true,
-    isVerbose: true,
-  );
+  final xSol = await simulator.anneal(isRecursive: true, isVerbose: true);
   print('Annealing ended.');
   print('Solution: $xSol');
 }

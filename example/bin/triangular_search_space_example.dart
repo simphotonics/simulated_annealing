@@ -13,12 +13,7 @@ double invCDF(num p, num xMin, num xMax) => xMin + (xMax - xMin) * sqrt(p);
 /// ```
 
 void main() async {
-  final space = SearchSpace.triangle(
-    xMin: 0,
-    xMax: 6,
-    yMin: -100,
-    yMax: 150,
-  );
+  final space = SearchSpace.triangle(xMin: 0, xMax: 6, yMin: -100, yMax: 150);
 
   print('Space size: ${space.size}.');
 
@@ -28,18 +23,20 @@ void main() async {
   final sample = List<List<num>>.generate(2000, (_) => space.next());
 
   final perturbation = List<List<num>>.generate(
-      900, (_) => space.perturb(testPoint, magnitudes));
-
-  await File('example/data/triangular_search_space.dat').writeAsString(
-    sample.export(),
-  );
-  await File('example/data/triangular_search_space_perturbation.dat')
-      .writeAsString(
-    perturbation.export(),
+    900,
+    (_) => space.perturb(testPoint, magnitudes),
   );
 
-  await File('example/data/triangular_search_space_center_point.dat')
-      .writeAsString('''
+  await File(
+    'example/data/triangular_search_space.dat',
+  ).writeAsString(sample.export());
+  await File(
+    'example/data/triangular_search_space_perturbation.dat',
+  ).writeAsString(perturbation.export());
+
+  await File(
+    'example/data/triangular_search_space_center_point.dat',
+  ).writeAsString('''
     # Perturbation Centerpoint
     ${[testPoint].export()}''');
 

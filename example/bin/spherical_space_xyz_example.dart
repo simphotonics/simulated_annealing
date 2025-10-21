@@ -6,8 +6,8 @@ import 'package:simulated_annealing/simulated_annealing.dart';
 void main() async {
   final radius = 1.0;
 
-// Defining a spherical search space consisting of all points on
-// the surface of a sphere with radius 2.
+  // Defining a spherical search space consisting of all points on
+  // the surface of a sphere with radius 2.
   final space = SearchSpace.sphereCartesian(
     radius: radius,
     //centre: [1, 1, 1],
@@ -31,9 +31,9 @@ void main() async {
   print('');
   print('Writing data ...');
 
-  await File('example/data/spherical_space.dat').writeAsString(
-    sample.export(label: '#Spherical Search Space: x, y, z'),
-  );
+  await File(
+    'example/data/spherical_space.dat',
+  ).writeAsString(sample.export(label: '#Spherical Search Space: x, y, z'));
 
   await File('example/data/spherical_space_perturbation.dat').writeAsString(
     perturbations.export(label: '#Spherical Perturbations: x, y, z'),

@@ -33,11 +33,7 @@ void main(List<String> args) async {
   final sample = space.sample(sampleSize: 3000).cylindricalToCartesian;
 
   final perturbations = space
-      .sampleCloseTo(
-        position,
-        deltaPosition,
-        sampleSize: 600,
-      )
+      .sampleCloseTo(position, deltaPosition, sampleSize: 600)
       .cylindricalToCartesian;
   print(space);
 
@@ -45,17 +41,17 @@ void main(List<String> args) async {
   print('Writing data ...');
 
   /// Write to file:
-  await File('example/data/cylindrical_space.dat').writeAsString(
-    sample.export(label: '#Cylindrical Search Space: x, y, z'),
-  );
+  await File(
+    'example/data/cylindrical_space.dat',
+  ).writeAsString(sample.export(label: '#Cylindrical Search Space: x, y, z'));
   await File('example/data/cylindrical_space_perturbation.dat').writeAsString(
     perturbations.export(label: '#Cylindrical Perturbations: x, y, z'),
   );
 
-  await File('example/data/cylindrical_space_test_point.dat').writeAsString('''
-    ${[
-    position.cylindricalToCartesian
-  ].export(label: '#Perturbation Centrepoint: x, y, z')}''');
+  await File('example/data/cylindrical_space_test_point.dat').writeAsString(
+    '''
+    ${[position.cylindricalToCartesian].export(label: '#Perturbation Centrepoint: x, y, z')}''',
+  );
 
   print('Data written successfully. \nGood bye.');
   // The search space can be visualized by navigating to the folder

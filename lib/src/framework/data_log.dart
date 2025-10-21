@@ -64,11 +64,14 @@ class DataLog<T extends Object> {
   void addAll(List<String> keys, List<T> values) {
     if (keys.length != values.length) {
       throw ErrorOf<DataLog<T>>(
-          message: 'Error in method addAll($keys, $values). '
-              'Could not store $values using keys $keys.',
-          expectedState: 'Both lists must have the same length.',
-          invalidState: 'keys.length: ${keys.length}, '
-              'values.length: ${values.length}.');
+        message:
+            'Error in method addAll($keys, $values). '
+            'Could not store $values using keys $keys.',
+        expectedState: 'Both lists must have the same length.',
+        invalidState:
+            'keys.length: ${keys.length}, '
+            'values.length: ${values.length}.',
+      );
     }
     for (var i = 0; i < keys.length; i++) {
       add(keys[i], values[i]);
@@ -112,19 +115,15 @@ class DataLog<T extends Object> {
       int tmp = get(keys[i]).length;
       if (count != tmp) {
         throw ErrorOf<DataLog<T>>(
-            message: 'Error in method getAll($keys).',
-            invalidState: 'The record ${keys[i]} has length $tmp.',
-            expectedState: 'All records must have the same length.');
+          message: 'Error in method getAll($keys).',
+          invalidState: 'The record ${keys[i]} has length $tmp.',
+          expectedState: 'All records must have the same length.',
+        );
       }
     }
 
     for (var i = 0; i < count; ++i) {
-      result.add(
-        List<T>.generate(
-          dim,
-          (k) => get(keys[k])[i],
-        ),
-      );
+      result.add(List<T>.generate(dim, (k) => get(keys[k])[i]));
     }
     return result;
   }
@@ -153,12 +152,14 @@ extension Export on DataLog<num> {
       data.add(get(key));
     }
     b.write('\n');
-    b.writeln(data.export(
-      label: '',
-      flip: true,
-      precision: precision,
-      delimiter: delimiter,
-    ));
+    b.writeln(
+      data.export(
+        label: '',
+        flip: true,
+        precision: precision,
+        delimiter: delimiter,
+      ),
+    );
     return b.toString();
   }
 

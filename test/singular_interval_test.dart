@@ -46,12 +46,9 @@ void main() {
     });
     test('gridPoints:', () {
       expect(
-          s.gridPoints,
-          isA<List<num>>().having(
-            (list) => list.isEmpty,
-            'isEmpty',
-            true,
-          ));
+        s.gridPoints,
+        isA<List<num>>().having((list) => list.isEmpty, 'isEmpty', true),
+      );
     });
   });
   group('Discrete Interval:', () {

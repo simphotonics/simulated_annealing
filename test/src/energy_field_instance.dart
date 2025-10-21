@@ -27,7 +27,4 @@ num energy(List<num> position) {
       0.3 * exp(-6 * localMin.distance(position));
 }
 
-final field = EnergyField(
-  energy,
-  space,
-);
+final field = EnergyField(energy, space);

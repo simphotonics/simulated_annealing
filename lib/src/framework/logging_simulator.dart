@@ -40,51 +40,37 @@ class LoggingSimulator extends Simulator {
   final _dataLog = DataLog<num>();
 
   /// Exports all records.
-  String export({
-    int precision = 10,
-    String delimiter = '   ',
-  }) =>
-      _dataLog.export(
-        precision: precision,
-        delimiter: delimiter,
-      );
+  String export({int precision = 10, String delimiter = '   '}) =>
+      _dataLog.export(precision: precision, delimiter: delimiter);
 
   /// Exports the first record.
-  String exportFirst({
-    int precision = 10,
-    String delimiter = '   ',
-  }) =>
-      _dataLog.exportLast(
-        precision: precision,
-        delimiter: delimiter,
-      );
+  String exportFirst({int precision = 10, String delimiter = '   '}) =>
+      _dataLog.exportLast(precision: precision, delimiter: delimiter);
 
   /// Exports the last record.
-  String exportLast({
-    int precision = 10,
-    String delimiter = '   ',
-  }) =>
-      _dataLog.exportLast(
-        precision: precision,
-        delimiter: delimiter,
-      );
+  String exportLast({int precision = 10, String delimiter = '   '}) =>
+      _dataLog.exportLast(precision: precision, delimiter: delimiter);
 
   /// Returns a list of valid keys with length `field.dimensions`.
   List<String> _validpositionKeys() {
     final positionKeys = field.space.intervalNames;
     if (positionKeys.length != field.dimensions) {
       throw ErrorOf<LoggingSimulator>(
-          message: 'Invalid keys detected.',
-          invalidState: 'Keys: $positionKeys have '
-              'length ${positionKeys.length}.',
-          expectedState: 'A list of unique strings with '
-              'length ${field.dimensions}.');
+        message: 'Invalid keys detected.',
+        invalidState:
+            'Keys: $positionKeys have '
+            'length ${positionKeys.length}.',
+        expectedState:
+            'A list of unique strings with '
+            'length ${field.dimensions}.',
+      );
     }
     if (positionKeys.toSet().length != positionKeys.length) {
       throw ErrorOf<LoggingSimulator>(
-          message: 'Invalid keys detected.',
-          invalidState: 'Keys: $positionKeys are not unique.',
-          expectedState: 'A list of unique strings.');
+        message: 'Invalid keys detected.',
+        invalidState: 'Keys: $positionKeys are not unique.',
+        expectedState: 'A list of unique strings.',
+      );
     }
     return positionKeys;
   }
@@ -97,8 +83,9 @@ class LoggingSimulator extends Simulator {
 
   /// Returns a valid list of keys that can be used to store
   /// `field.dimensions` coordinates.
-  late final deltaPositionKeys =
-      List<String>.generate(positionKeys.length, (i) {
+  late final deltaPositionKeys = List<String>.generate(positionKeys.length, (
+    i,
+  ) {
     final first = positionKeys[i][0].toUpperCase();
     final rest = positionKeys[i].substring(1);
     return 'd$first$rest';

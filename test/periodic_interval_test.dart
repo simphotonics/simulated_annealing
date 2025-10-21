@@ -6,11 +6,7 @@ void main() {
   group('PeriodicInterval:', () {
     num left = 0;
     num right = 3;
-    final interval = PeriodicInterval(
-      left,
-      right,
-      name: 'Periodic Interval',
-    );
+    final interval = PeriodicInterval(left, right, name: 'Periodic Interval');
     test('name', () {
       expect(interval.name, 'Periodic Interval');
     });
@@ -61,12 +57,9 @@ void main() {
     });
     test('gridPoints:', () {
       expect(
-          interval.gridPoints,
-          isA<List<num>>().having(
-            (list) => list.isEmpty,
-            'isEmpty',
-            true,
-          ));
+        interval.gridPoints,
+        isA<List<num>>().having((list) => list.isEmpty, 'isEmpty', true),
+      );
     });
     test('caching', () {
       expect(interval.next(), interval.next());
@@ -84,12 +77,13 @@ void main() {
     });
     test('levels', () {
       expect(
-          discreteInterval,
-          isA<PeriodicInterval>().having(
-            (interval) => interval.levels,
-            'levels',
-            10,
-          ));
+        discreteInterval,
+        isA<PeriodicInterval>().having(
+          (interval) => interval.levels,
+          'levels',
+          10,
+        ),
+      );
     });
     test('dx', () {
       expect(

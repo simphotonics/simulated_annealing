@@ -8,10 +8,10 @@ import 'package:test/test.dart';
 void main() {
   // Testing class: Space
   group('Fixed SearchSpace:', () {
-    final space = SearchSpace.fixed(
-      [FixedInterval(0, 2), FixedInterval(10, 100)],
-      name: '2D Test Interval',
-    );
+    final space = SearchSpace.fixed([
+      FixedInterval(0, 2),
+      FixedInterval(10, 100),
+    ], name: '2D Test Interval');
     test('name', () {
       expect(space.name, '2D Test Interval');
     });
@@ -24,9 +24,10 @@ void main() {
       final deltaPosition = [1e-2, 1e-1];
       final point = space.perturb(position, deltaPosition);
       expect(
-          position - deltaPosition <= point &&
-              point < position.plus(deltaPosition),
-          true);
+        position - deltaPosition <= point &&
+            point < position.plus(deltaPosition),
+        true,
+      );
       expect(space.contains(point), true);
       for (var i = 0; i < position.length; i++) {
         expect(point[i], closeTo(position[i], deltaPosition[i]));
@@ -75,10 +76,7 @@ void main() {
     });
 
     test('size', () {
-      expect(
-        space.size,
-        CloseToList([4.0, 4.0, 4.0], 0.25),
-      );
+      expect(space.size, CloseToList([4.0, 4.0, 4.0], 0.25));
     });
   });
   group('Exceptions:', () {
@@ -88,10 +86,7 @@ void main() {
       final position = [0.5, 0.5];
       final deltaPosition = [0.1, 0.1, 0.1];
       expect(
-        () => space.perturb(
-          position,
-          deltaPosition,
-        ),
+        () => space.perturb(position, deltaPosition),
         throwsA(
           isA<ErrorOf<SearchSpace>>().having(
             (e) => e.message,
@@ -105,10 +100,7 @@ void main() {
       final position = [0.5, 0.5, 0.5];
       final deltaPosition = [0.1, 0.1];
       expect(
-        () => space.perturb(
-          position,
-          deltaPosition,
-        ),
+        () => space.perturb(position, deltaPosition),
         throwsA(
           isA<ErrorOf<SearchSpace>>().having(
             (e) => e.message,

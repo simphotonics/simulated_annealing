@@ -26,11 +26,7 @@ void main(List<String> args) async {
   final sample = space.sample(sampleSize: 2000).cylindricalToCartesian;
 
   final perturbations = space
-      .sampleCloseTo(
-        position,
-        deltaPosition,
-        sampleSize: 100,
-      )
+      .sampleCloseTo(position, deltaPosition, sampleSize: 100)
       .cylindricalToCartesian;
 
   print(space);
@@ -39,17 +35,17 @@ void main(List<String> args) async {
   print('Writing data ...');
 
   /// Write to file:
-  await File('example/data/cone.dat').writeAsString(
-    sample.export(label: '#Conical Search Space: x, y, z'),
-  );
+  await File(
+    'example/data/cone.dat',
+  ).writeAsString(sample.export(label: '#Conical Search Space: x, y, z'));
   await File('example/data/cone_perturbation.dat').writeAsString(
     perturbations.export(label: '#Conical Perturbations: x, y, z'),
   );
 
-  await File('example/data/cone_test_point.dat').writeAsString('''
-    ${[
-    position.cylindricalToCartesian
-  ].export(label: '#Perturbation Centrepoint: x, y, z')}''');
+  await File('example/data/cone_test_point.dat').writeAsString(
+    '''
+    ${[position.cylindricalToCartesian].export(label: '#Perturbation Centrepoint: x, y, z')}''',
+  );
 
   print('Data written successfully. \nGood bye.');
 }

@@ -17,8 +17,8 @@ function: **deltaPosition**(T)&nbsp;=&nbsp;**a**\*&nbsp;T&nbsp;+&nbsp;**b**,
 where **a**&nbsp;=&nbsp;(**deltaPositionMax**&nbsp;-&nbsp;**deltaPositionMin**)/(T<sub>start</sub>&nbsp;-&nbsp;T<sub>end</sub>)
 and **b**&nbsp;=&nbsp;**deltaPositionMax**&nbsp;-&nbsp;**a**\*T<sub>start</sub>.
 
-![Annealing Schedule](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/annealing_schedule.png)
-![Temperature 3D](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/example/plots/temperature.png)
+![Annealing Schedule](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/images/annealing_schedule.png)
+![Temperature 3D](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/images/temperature.png)
 
 The perturbation magnitude **deltaPosition** specifies a region of the search space around
 the current solution **position**. From this region a random point is selected as the

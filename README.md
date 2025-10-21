@@ -7,8 +7,8 @@
 of a function E(x<sub>0</sub>,&nbsp;x<sub>1</sub>,&nbsp;...,&nbsp;x<sub>n</sub>)
 for a given region &omega;(x<sub>0</sub>,&nbsp;x<sub>1</sub>,&nbsp;...,&nbsp;x<sub>n</sub>).
 The function to be minimized can be interpreted as the
-**system energy**. In that case, the global minimum represents
-the **ground state** of the system.
+*system energy*. In that case, the global minimum represents
+the *ground state* of the system.
 
 Simulated annealing works by randomly
 selecting a new point (y<sub>0</sub>,&nbsp;y<sub>1</sub>,&nbsp;
@@ -25,7 +25,7 @@ temperature with the kinetic energy of particles in a gas.
 In the context of SA, it is customary to set k<sub>B</sub>&nbsp;&equiv;&nbsp;1.
 
 Accepting up-hill moves provides a method of escaping from local energy minima.
-The acceptance probability for solution satisfying &Delta;E > 0
+The acceptance probability for solutions satisfying &Delta;E > 0
 decreases with decreasing temperature. As such, the temperature is a parameter
 that controls the probability of up-hill moves.
 
@@ -39,16 +39,11 @@ sufficient kinetic energy to be able to rearrange themselves.
 Then the temperature is decreased sufficiently slowly
 in order to minimize atomic lattice defects as the material solidifies.
 
-
-
-The expression above ensures
-that the acceptance probability decreases with decreasing temperature (for &Delta;E > 0).
-As such, the temperature is a parameter that controls the probability of up-hill moves.
 </details>
 
 ![Energy Simulated Annealing](https://github.com/simphotonics/simulated_annealing/raw/main/images/energy_composite.gif)
 
-The process is demonstrated in the animation above. The left figure shows a
+The annealing process is shown in the animation above. The left figure shows a
 spherical 3D search space while the energy value is represented by colour.
 The figure on the right shows a projection of the energy function onto the
 x-y plane. Initially, random points are chosen
@@ -187,7 +182,7 @@ degree of trial and error is required to determine which annealing schedule
 works best for a given problem.
 
 
-The behaviour of the annealing simulator can be tuned using the following **optional** parameters of the [`Simulator`][SimulatorClass] constructor:
+The behaviour of the annealing simulator can be tuned using the following *optional* parameters of the [`Simulator`][SimulatorClass] constructor:
 * `gammaStart`: Initial acceptance probability with default value 0.7. Useful values for &gamma;<sub>start</sub>
 are in the range of \[0.7,&nbsp;0.9\]. If &gamma;<sub>start</sub> is too low, up-hill moves are unlikely (potentially) preventing the SA algorithm from
 escaping a local miniumum. If &gamma;<sub>start</sub> is set close to 1.0 the algorithm will accept
@@ -207,7 +202,7 @@ too many up-hill moves at high temperatures wasting computational time and delay
 
 
 Additionally, it is possible to set the class variable `temperatureSequence`
-to function of type [`TemperatureSequence`][TemperatureSequence]
+to a function of type [`TemperatureSequence`][TemperatureSequence]
 that is used to determine the temperature at each outer iteration step.
 
 

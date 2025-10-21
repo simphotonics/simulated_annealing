@@ -16,19 +16,14 @@ class EnergyField {
   /// Constructs an object of type `EnergyField`.
   /// * `energy`: Function representing the system energy (or cost function).
   /// * `searchSpace`: The function domain.
-  EnergyField(
-    this.energy,
-    this.space,
-  ) : _minValue = double.infinity {
+  EnergyField(this.energy, this.space) : _minValue = double.infinity {
     // Populate field _minPosition with a random point in the search space.
     next();
   }
 
   /// Copy constructor.
-  factory EnergyField.of(EnergyField energyField) => EnergyField(
-        energyField.energy,
-        energyField.space,
-      );
+  factory EnergyField.of(EnergyField energyField) =>
+      EnergyField(energyField.energy, energyField.space);
 
   /// Function representing the system energy.
   final Energy energy;
@@ -70,10 +65,7 @@ class EnergyField {
   /// `this.position`. The return value of `perturb()` can
   /// also be accessed via `this.value`.
   num perturb(List<num> position, List<num> deltaPosition) {
-    _position = space.perturb(
-      position,
-      deltaPosition,
-    );
+    _position = space.perturb(position, deltaPosition);
     _value = energy(_position);
     if (_value < _minValue) {
       _minValue = _value;
@@ -99,19 +91,12 @@ class EnergyField {
   }
 
   /// Returns a list of energy values sampled from the entire search space.
-  Future<List<num>> sampleEnergy({
-    int sampleSize = 100,
-  }) async =>
-      List<num>.generate(
-        sampleSize,
-        (_) => next(),
-      );
+  Future<List<num>> sampleEnergy({int sampleSize = 100}) async =>
+      List<num>.generate(sampleSize, (_) => next());
 
   /// Returns an object of type [List<List<num>>] with length [sampleSize].
   /// Each entry is obtained by listing the current position and energy.
-  Future<List<List<num>>> sample({
-    int sampleSize = 100,
-  }) async =>
+  Future<List<List<num>>> sample({int sampleSize = 100}) async =>
       List<List<num>>.generate(sampleSize, (_) {
         next();
         return [..._position, _value];
@@ -143,10 +128,12 @@ class EnergyField {
       } while (state0 == state1 && count < maxTrials);
       if (count > maxTrials) {
         throw ExceptionOf<EnergyField>(
-            message: 'Error in function \'transitions($deltaPosition).\'',
-            invalidState: 'Could not generate an uphill transition. '
-                'in $maxTrials trials.',
-            expectedState: 'A non-constant energy function.');
+          message: 'Error in function \'transitions($deltaPosition).\'',
+          invalidState:
+              'Could not generate an uphill transition. '
+              'in $maxTrials trials.',
+          expectedState: 'A non-constant energy function.',
+        );
       } else {
         if (state0 < state1) {
           result.first.add(state0);
@@ -187,18 +174,18 @@ class EnergyField {
       } while (i < sampleSize && counter < 50 * sampleSize);
       if (result.length < sampleSize) {
         throw ExceptionOf<EnergyField>(
-            message: 'Error in function \'sampleCloseTo\'',
-            invalidState: 'Could not generate $sampleSize uphill transitions '
-                'with initial position: $position and energy: $eMin. ');
+          message: 'Error in function \'sampleCloseTo\'',
+          invalidState:
+              'Could not generate $sampleSize uphill transitions '
+              'with initial position: $position and energy: $eMin. ',
+        );
       }
       return result;
     } else {
       return List<num>.generate(
-          sampleSize,
-          (_) => perturb(
-                position,
-                deltaPosition,
-              ));
+        sampleSize,
+        (_) => perturb(position, deltaPosition),
+      );
     }
   }
 
@@ -240,17 +227,15 @@ class EnergyField {
   }) async {
     if (gamma <= 0 || gamma >= 1) {
       throw ErrorOf<EnergyField>(
-          message: 'Error in function optimalTemperature',
-          invalidState: 'Found \'gamma\': $gamma.',
-          expectedState: 'Expected: 0 < gamma < 1.');
+        message: 'Error in function optimalTemperature',
+        invalidState: 'Found \'gamma\': $gamma.',
+        expectedState: 'Expected: 0 < gamma < 1.',
+      );
     }
     if (deltaPosition.isEmpty) {
       deltaPosition = size / 4;
     }
-    final transitions = this.transitions(
-      deltaPosition,
-      sampleSize: sampleSize,
-    );
+    final transitions = this.transitions(deltaPosition, sampleSize: sampleSize);
 
     final deltaE = transitions.last - transitions.first;
 
@@ -268,11 +253,8 @@ class EnergyField {
     }
     do {
       gammaEstimate = _gammaStart(transitions, optTemperature);
-      optTemperature = optTemperature *
-          pow(
-            log(gammaEstimate) / log(gamma),
-            0.2,
-          );
+      optTemperature =
+          optTemperature * pow(log(gammaEstimate) / log(gamma), 0.2);
       ++counter;
       //print('gamma: $gammaEstimate temperature: $optTemperature');
     } while ((gammaEstimate - gamma).abs() > gamma * 1e-3 && counter < 100);
@@ -292,9 +274,10 @@ class EnergyField {
   }) async {
     if (gamma <= 0 || gamma >= 1) {
       throw ErrorOf<EnergyField>(
-          message: 'Error in function tEnd()',
-          invalidState: 'Found \'gamma\': $gamma.',
-          expectedState: 'Expected: 0 < gamma < 1.');
+        message: 'Error in function tEnd()',
+        invalidState: 'Found \'gamma\': $gamma.',
+        expectedState: 'Expected: 0 < gamma < 1.',
+      );
     }
     // Initial transition values.
     final e0 = _minValue;
@@ -320,11 +303,8 @@ class EnergyField {
     }
     do {
       gammaEstimate = _gammaEnd(e1, optTemperature);
-      optTemperature = optTemperature *
-          pow(
-            log(gammaEstimate) / log(gamma),
-            0.2,
-          );
+      optTemperature =
+          optTemperature * pow(log(gammaEstimate) / log(gamma), 0.2);
       ++counter;
       //print('gamma: $gammaEstimate temperature: $optTemperature');
     } while ((gammaEstimate - gamma).abs() > gamma * 1e-3 && counter < 100);
