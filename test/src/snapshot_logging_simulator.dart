@@ -11,20 +11,20 @@ class SnapshotLoggingSimulator extends LoggingSimulator {
   /// * `outputPath`: Output path including file name base.
   /// ----
   /// Optional parameters:
-  /// * `nth`: Write every n-th frame to file.
-  /// * gammaStart: Probability of solution acceptance if `dE == dEnergyStart`
+  /// * [nth]: Write every n-th frame to file.
+  /// * [gammaStart]: Probability of solution acceptance if `dE == dEnergyStart`
   ///   and the temperature is the initial temperature of the annealing process.
-  /// * gammaEnd: Probability of solution acceptance if `dE == dEnergyEnd`
+  /// * [gammaEnd]: Probability of solution acceptance if `dE == dEnergyEnd`
   ///   and the temperature is the final temperatures of the annealing process.
-  /// * outerIterations: Number of iterations when cooling.
-  /// * innerIterationsStart: Number of iterations at constant temperature
+  /// * [outerIterations]: Number of iterations when cooling.
+  /// * [innerIterationsStart]: Number of iterations at constant temperature
   ///   at the start of the annealing process.
-  /// * innerIterationsEnd: Number of iterations at constant temperature
+  /// * [innerIterationsEnd]: Number of iterations at constant temperature
   ///   at the end of the annealing process.
-  /// * sampleSize: Size of sample used to estimate the start temperature
+  /// * [sampleSize]: Size of sample used to estimate the start temperature
   ///   and the final temperature of the annealing process.
   /// Not included with the framework because the class uses dart:io.
-  SnapshotLoggingSimulator(
+  new(
     super.field, {
     required this.outputPath,
     this.nth = 1,

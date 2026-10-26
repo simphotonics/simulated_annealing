@@ -10,22 +10,22 @@ import 'simulator.dart';
 ///
 class LoggingSimulator extends Simulator {
   /// Constructs an object of type `LoggingSimulator`.
-  /// * field: An object of type `EnergyField` encapsulating the
+  /// * [field]: An object of type [EnergyField] encapsulating the
   ///   energy function (cost function)  and search space.
   /// ---
   /// &nbsp;&nbsp;&nbsp;&nbsp;  *Optional parameters*:
-  /// * gammaStart: Probability of solution acceptance if `dE == dEnergyStart`
+  /// * [gammaStart]: Probability of solution acceptance if `dE == dEnergyStart`
   ///   and the temperature is the initial temperature of the annealing process.
-  /// * gammaEnd: Probability of solution acceptance if `dE == dEnergyEnd`
+  /// * [gammaEnd]: Probability of solution acceptance if `dE == dEnergyEnd`
   ///   and the temperature is the final temperatures of the annealing process.
-  /// * outerIterations: Number of iterations when cooling.
-  ///  * innerIterationsStart: Number of iterations at constant temperature
+  /// * [outerIterations]: Number of iterations when cooling.
+  ///  * [innerIterationsStart]: Number of iterations at constant temperature
   ///   at the start of the annealing process.
-  /// * innerIterationsEnd: Number of iterations at constant temperature
+  /// * [innerIterationsEnd]: Number of iterations at constant temperature
   ///   at the end of the annealing process.
-  /// * sampleSize: Size of sample used to estimate the start temperature
+  /// * [sampleSize]: Size of sample used to estimate the start temperature
   ///   and the final temperature of the annealing process.
-  LoggingSimulator(
+  new(
     super.field, {
     super.gammaStart = 0.8,
     super.gammaEnd = 0.1,
@@ -35,8 +35,7 @@ class LoggingSimulator extends Simulator {
     super.sampleSize,
   });
 
-  /// Stored the simulator data log. Works with the extensions `DataLog` and
-  /// `Export`.
+  /// Stores the simulator data log.
   final _dataLog = DataLog<num>();
 
   /// Exports all records.
@@ -77,12 +76,12 @@ class LoggingSimulator extends Simulator {
 
   /// Returns a list of valid keys that can be used to store
   /// `field.dimensions` coordinates.
-  /// The keys are the names of the [Interval]s used to define
-  /// the [SearchSpace], see [EnergyField].
+  /// The keys are the names of the intervals used to define
+  /// the `SearchSpace`, see [EnergyField].
   late final positionKeys = _validpositionKeys();
 
   /// Returns a valid list of keys that can be used to store
-  /// `field.dimensions` coordinates.
+  /// the coordinates of the [field].
   late final deltaPositionKeys = List<String>.generate(positionKeys.length, (
     i,
   ) {
