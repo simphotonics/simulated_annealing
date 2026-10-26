@@ -137,7 +137,8 @@ There is an aggreggation of points towards the left side of the search space bou
 ![Inverse CDF of a uniform PDF](https://raw.githubusercontent.com/simphotonics/simulated_annealing/main/images/inverseCdfUniform.png)
 
 The non-uniform distribution of points along the search space is related to the
-uniform distribution of the interval `x`. For a sufficiently large sample, the number of points with x-coordinate between 0 and 1 is approximately equal to the number of points with x-coordinate between 9 and 10.
+uniform distribution of the interval `x`. For a sufficiently large sample, the number of points
+with x-coordinate between 0 and 1 is approximately equal to the number of points with x-coordinate between 9 and 10.
 However, the size along the vertical dimension of the triangular space decreases linearly from the right to
 the left leading to an clustering of points as x approaches 0.
 

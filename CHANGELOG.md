@@ -1,4 +1,9 @@
 
+## 1.0.0
+- Updated dependencies.
+- Converted some functions from async -> sync.
+- Added methods related to coordinate transformations.
+
 ## 0.4.1
 - Updated dependencies.
 
