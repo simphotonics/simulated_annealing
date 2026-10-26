@@ -14,21 +14,21 @@ typedef Energy = num Function(List<num> x);
 ///   to the search space.
 class EnergyField {
   /// Constructs an object of type `EnergyField`.
-  /// * `energy`: Function representing the system energy (or cost function).
-  /// * `searchSpace`: The function domain.
-  EnergyField(this.energy, this.space) : _minValue = double.infinity {
+  /// * [energy]: Function representing the system energy (or cost function).
+  /// * [space]: The function domain.
+  new(this.energy, this.space) : _minValue = double.infinity {
     // Populate field _minPosition with a random point in the search space.
     next();
   }
 
   /// Copy constructor.
-  factory EnergyField.of(EnergyField energyField) =>
+  factory of(EnergyField energyField) =>
       EnergyField(energyField.energy, energyField.space);
 
   /// Function representing the system energy.
   final Energy energy;
 
-  /// The domain over which the `energy` function is defined.
+  /// The domain over which the [energy] function is defined.
   /// The simulated annealing algorithm will search this region for
   /// optimal solutions.
   final SearchSpace space;
@@ -59,11 +59,13 @@ class EnergyField {
 
   /// Returns the energy at a point selected randomly
   /// from the region (`position - deltaPosition, position + deltaPosition`).
-  /// * The quantity `deltaPosition` represents a vector. Each component specifies the
+  ///
+  /// * The quantity [deltaPosition] represents a vector.
+  /// Each component specifies the
   /// max. perturbation magnitude along the corrsponding dimension.
   /// * The new position can be accessed via the getter
-  /// `this.position`. The return value of `perturb()` can
-  /// also be accessed via `this.value`.
+  /// [position]. The return value of [perturb] can
+  /// also be accessed via the getter [value].
   num perturb(List<num> position, List<num> deltaPosition) {
     _position = space.perturb(position, deltaPosition);
     _value = energy(_position);
@@ -78,8 +80,8 @@ class EnergyField {
   /// selected point in the search space.
   ///
   /// Note: The new position can be accessed via the getter
-  /// `this.position`. The return value of `next()` can
-  /// also be accessed via `this.value`.
+  /// [position]. The return value of [next] can
+  /// also be accessed via [value].
   num next() {
     _position = space.next();
     _value = energy(_position);
@@ -91,22 +93,24 @@ class EnergyField {
   }
 
   /// Returns a list of energy values sampled from the entire search space.
-  Future<List<num>> sampleEnergy({int sampleSize = 100}) async =>
+  List<num> sampleEnergy({int sampleSize = 100}) =>
       List<num>.generate(sampleSize, (_) => next());
 
-  /// Returns an object of type [List<List<num>>] with length [sampleSize].
-  /// Each entry is obtained by listing the current position and energy.
-  Future<List<List<num>>> sample({int sampleSize = 100}) async =>
+  /// Returns a list with length [sampleSize]. Each list entry represents a
+  /// [position, energy] pair.
+  List<List<num>> sample({int sampleSize = 100}) =>
       List<List<num>>.generate(sampleSize, (_) {
         next();
         return [..._position, _value];
       });
 
   /// Returns a list containing the energy values at two
-  /// positions separated at most by `deltaPosition`.
+  /// positions separated at most by [deltaPosition].
+  ///
   /// * The lower energy state is listed first.
-  /// * Throws an exception of type `ExceptionOf<EnergyField>` if
-  /// no transition could be generated in `maxTrials` trials.
+  /// * Throws an exception of type [ExceptionOf] with type argument
+  /// [EnergyField] if
+  /// no transition could be generated in [maxTrials] trials.
   List<List<num>> transitions(
     List<num> deltaPosition, {
     int sampleSize = 100,
@@ -150,15 +154,17 @@ class EnergyField {
   /// Returns a list of energy values sampled from a neighbourhood
   /// around [position] using perturbation
   /// magnitudes [deltaPosition].
-  /// * `sampleSize`: The length of the returned list containing the sample.
-  /// * `selectUphillMoves`: Set to `true` to filter out down-hill transitions (
-  /// where the new energy value is lower than the energy at `position`).
-  Future<List<num>> sampleEnergyCloseTo(
+  ///
+  /// * [sampleSize]: The length of the returned list containing the sample.
+  /// * [selectUphillMoves]: Set this to `true` to filter out
+  /// down-hill transitions (where the new energy value is
+  /// lower than the energy at [position]).
+  List<num> sampleEnergyCloseTo(
     List<num> position,
     List<num> deltaPosition, {
     int sampleSize = 100,
     bool selectUphillMoves = false,
-  }) async {
+  }) {
     if (selectUphillMoves) {
       var i = 0;
       var counter = 0;
@@ -191,8 +197,8 @@ class EnergyField {
 
   /// Returns the expected value of gamma, the acceptance probability
   /// of a transition from a state with energy `e0[i]` to a state `e1[i]`
-  /// at a given `temperature`.
-  /// Note:
+  /// at a given [temperature].
+  ///
   /// * The transitions must be selected such that `e0[i] < e1[i]`.
   /// * To avoid a zero denominator it is advisable to rescale all
   //    energies by subtracting `e0.min()`.
@@ -207,8 +213,8 @@ class EnergyField {
   /// Returns the expected value of gamma, the acceptance probability
   /// of a transition from a state with energy `e0`
   /// to a state `e1[i]`
-  /// at a given `temperature`.
-  /// Note:
+  /// at a given [temperature].
+
   /// * The transitions must be selected such that `e0[i] < e1[i]`.
   /// * The energies `e1[i]` have been rescaled such that `e0 = 0`.
   num _gammaEnd(List<num> e1, num temperature) =>
@@ -216,15 +222,15 @@ class EnergyField {
 
   /// Returns the temperature at which the expectation value
   /// of the acceptance probability of up-hill transitions
-  /// approaches `gamma`.
+  /// approaches [gamma].
   ///
-  /// Note: The algorithm converges only for `gamma` in
-  /// the range: `0 < gamma < 1`.
-  Future<num> tStart(
+  /// Note: The algorithm converges only for [gamma] in
+  /// the range: 0 < [gamma] < 1.
+  num tStart(
     num gamma, {
     List<num> deltaPosition = const <num>[],
     int sampleSize = 200,
-  }) async {
+  }) {
     if (gamma <= 0 || gamma >= 1) {
       throw ErrorOf<EnergyField>(
         message: 'Error in function optimalTemperature',
@@ -263,15 +269,11 @@ class EnergyField {
 
   /// Returns the temperature at which the expectation value
   /// of the acceptance probability of up-hill transitions
-  /// approaches `gamma`.
+  /// approaches [gamma].
   ///
-  /// Note: The algorithm converges only for `gamma` in
-  /// the range: `0 < gamma < 1`.
-  Future<num> tEnd(
-    num gamma, {
-    deltaPosition = const <num>[],
-    int sampleSize = 200,
-  }) async {
+  /// Note: The algorithm converges only for [gamma] in
+  /// the range: 0 < [gamma] < 1.
+  num tEnd(num gamma, {deltaPosition = const <num>[], int sampleSize = 200}) {
     if (gamma <= 0 || gamma >= 1) {
       throw ErrorOf<EnergyField>(
         message: 'Error in function tEnd()',
@@ -286,7 +288,7 @@ class EnergyField {
     }
 
     // Final transition values.
-    final e1 = await sampleEnergyCloseTo(
+    final e1 = sampleEnergyCloseTo(
       _minPosition,
       deltaPosition,
       sampleSize: sampleSize,
