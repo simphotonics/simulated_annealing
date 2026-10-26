@@ -1,4 +1,7 @@
-export 'src/extensions/random_in_range.dart';
+export 'src/extension/cylindrical_coordinates.dart';
+export 'src/extension/euclidean_metric.dart';
+export 'src/extension/random_in_range.dart';
+export 'src/extension/spherical_coordinates.dart';
 export 'src/framework/annealing_schedule.dart';
 export 'src/framework/data_log.dart';
 export 'src/framework/energy_field.dart';
