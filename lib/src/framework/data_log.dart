@@ -1,7 +1,7 @@
 import 'package:exception_templates/exception_templates.dart';
 import 'package:list_operators/list_operators.dart';
 
-/// A storage that can be used to log data of type `T`.
+/// A storage that can be used to log data of type [T]
 /// Each log record is accessed using a unique [String] key.
 ///
 /// Usage:
