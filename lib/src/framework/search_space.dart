@@ -50,7 +50,8 @@ class SearchSpace {
 
   /// Set the levels (number of grid points) for each interval.
   ///
-  /// Throws an error of type [ErrorOf<SearchSpace] if the length
+  /// Throws an error of type [ErrorOf] with type argument [SearchSpace]
+  /// if the length
   /// of [value] is not [dimensions].
   set levels(List<int> value) {
     if (value.length != dimensions) {

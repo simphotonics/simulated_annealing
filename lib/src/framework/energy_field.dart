@@ -98,7 +98,7 @@ class EnergyField {
       List<num>.generate(sampleSize, (_) => next());
 
   /// Returns a list with length [sampleSize]. Each list entry represents a
-  /// [position], [energy]-value pair.
+  /// [position], [energyValue] pair.
   List<List<num>> sample({int sampleSize = 100}) =>
       List<List<num>>.generate(sampleSize, (_) {
         next();
