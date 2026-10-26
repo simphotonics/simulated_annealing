@@ -1,7 +1,10 @@
 import 'dart:math';
 
-typedef TemperatureSequence =
-    List<num> Function(num tStart, num tEnd, {int iterations});
+typedef TemperatureSequence = List<num> Function(
+  num tStart,
+  num tEnd, {
+  int iterations,
+});
 
 /// Linear temperature sequence with entries:
 ///
@@ -15,10 +18,10 @@ List<num> linearSequence(num tStart, num tEnd, {int iterations = 1000}) {
 /// Returns a geometric sequence with
 /// entries:
 ///
-/// `tStart, tStart * beta, ..., tStart * pow(beta, n-1)`.
+/// [tStart], [tStart] * beta, ..., [tStart] * pow(beta, n-1).
 ///
 /// The factor `beta` is calculated such that the last
-/// entry of the sequence is equal to `tEnd`.
+/// entry of the sequence is equal to [tEnd].
 List<num> geometricSequence(num tStart, num tEnd, {int iterations = 1000}) {
   final beta = exp(log(tEnd / tStart) / (iterations - 1));
   var current = tStart.abs();
@@ -29,11 +32,8 @@ List<num> geometricSequence(num tStart, num tEnd, {int iterations = 1000}) {
   return result..insert(0, tStart.abs());
 }
 
-/// Returns a monotonically decreasing sequence with
-/// entries: `tStart, ..., tEnd`.
-///
-/// `t(k) = tStart * exp(-pow(k / (2 * sigma), 2)` where
-/// `sigma = n/sqrt(2 * log(tStart / tEnd))`.
+/// Returns a monotonically decreasing sequence following a normal distribution
+/// with start value: [tStart] and end value [tEnd].
 List<num> normalSequence(num tStart, num tEnd, {int iterations = 1000}) {
   final invTwoSigmaSq = log(tStart / tEnd) / pow(iterations - 1, 2);
   return List<num>.generate(
@@ -42,8 +42,8 @@ List<num> normalSequence(num tStart, num tEnd, {int iterations = 1000}) {
   );
 }
 
-/// Exponentially decreasing sequence with start value `tStart` and
-/// end value `tEnd`.
+/// Exponentially decreasing sequence with start value [tStart] and
+/// end value [tEnd]`.
 ///
 /// The general form of the sequence members is:
 ///
@@ -56,8 +56,8 @@ List<num> exponentialSequence(num tStart, num tEnd, {int iterations = 1000}) {
   return List<num>.generate(iterations, (i) => prev = prev * beta);
 }
 
-/// Returns the sequence: `tStart, tStart / (1 + beta * tStart),`
-/// `..., tStart / (1 * (n-1) * beta * tStart)`
+/// Returns the sequence: [tStart], [tStart] / (1 + beta * tStart),
+/// ..., [tStart] / (1 * (n-1) * beta * [tStart])
 /// where `beta = (1 / tEnd - 1 / tStart) / (n - 1)`.
 List<num> lundySequence(num tStart, num tEnd, {int iterations = 1000}) {
   final beta = (1 / tEnd - 1 / tStart) / (iterations - 1);
