@@ -18,7 +18,7 @@ void main() {
       expect(interval.size, right - left);
     });
     test('next() limits', () {
-      interval.updateCache();
+      interval.invalidateCache();
       expect(interval.next() < right, true);
       expect(left < interval.next(), true);
     });
@@ -64,7 +64,7 @@ void main() {
     test('caching', () {
       expect(interval.next(), interval.next());
       final prev = interval.next();
-      interval.updateCache();
+      interval.invalidateCache();
       expect(interval.next() != prev, true);
     });
   });
@@ -92,12 +92,12 @@ void main() {
       );
     });
     test('next()', () {
-      discreteInterval.updateCache();
+      discreteInterval.invalidateCache();
       final next = discreteInterval.next();
       expect(discreteInterval.gridPoints.contains(next), isTrue);
     });
     test('perturb()', () {
-      discreteInterval.updateCache();
+      discreteInterval.invalidateCache();
       // Note: The point 7 wraps around and is equal to 2.
       //       The perturbation magnitude is 2. => perturbation interval 0...4.
       final p = discreteInterval.perturb(7, 2);

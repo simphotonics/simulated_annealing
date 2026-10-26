@@ -19,13 +19,13 @@ void main() {
     test('caching', () {
       expect(y.next(), y.next());
       final prev = y.next();
-      y.updateCache();
+      y.invalidateCache();
       expect(y.next() != prev, true);
     });
     test('perturb', () {
       final position = x.next();
       final deltaPosition = 0.4;
-      y.updateCache();
+      y.invalidateCache();
       final p = y.perturb(position, deltaPosition);
       expect(p < position + deltaPosition, true);
       expect(position - deltaPosition < p, true);
@@ -40,8 +40,8 @@ void main() {
       expect(y.overlaps(4, 6), false);
     });
     test('size', () {
-      x.updateCache();
-      y.updateCache();
+      x.invalidateCache();
+      y.invalidateCache();
       expect(y.size, x.next() - left);
     });
   });

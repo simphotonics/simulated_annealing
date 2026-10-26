@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_async
+
 import 'package:list_operators/list_operators.dart';
 import 'package:simulated_annealing/simulated_annealing.dart';
 import 'package:test/test.dart';
@@ -18,11 +20,11 @@ final simulatorWithPresets = LoggingSimulator(
   gammaEnd: 0.05,
 )..startPosition = [0, 0, 0];
 
-void main() async {
-  final tStart = await simulator.tStart;
-  final tEnd = await simulator.tEnd;
+void main() {
+  final tStart = simulator.tStart;
+  final tEnd = simulator.tEnd;
 
-  final result = await simulator.anneal();
+  final result = simulator.anneal();
   final temperatures = exponentialSequence(tStart, tEnd);
   final perturbationMagnitudes = defaultPerturbationSequence(
     temperatures,
@@ -40,11 +42,11 @@ void main() async {
     test('startPosition', () {
       expect(simulatorWithPresets.startPosition, [0, 0, 0]);
     });
-    test('tStart', () async {
-      expect(await simulator.tStart, isNotNaN);
+    test('tStart', () {
+      expect(simulator.tStart, isNotNaN);
     });
-    test('tEnd', () async {
-      expect(await simulator.tEnd, isNotNaN);
+    test('tEnd', () {
+      expect(simulator.tEnd, isNotNaN);
     });
   });
 

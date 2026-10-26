@@ -2,7 +2,6 @@
 // using parametric intervals.
 import 'dart:math';
 
-import 'package:list_operators/list_operators.dart';
 import 'package:simulated_annealing/simulated_annealing.dart';
 
 final radius = 2;
