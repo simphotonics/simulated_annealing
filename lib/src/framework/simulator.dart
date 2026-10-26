@@ -15,10 +15,9 @@ import 'interval.dart';
 typedef MarkovChainLength = int Function(num temperature);
 
 /// Returns an integer linearly interpolated
-/// between `chainLengthStart` and `chainLengthEnd`.
-/// * `markovChainlength(tStart) = mStart`,
-/// * `markovChainlength(tEnd) = mEnd`.
-/// *  The following must hold: `tStart <= temperature <= tEnd`.
+/// between [chainLengthStart] and [chainLengthEnd].
+///
+/// The following must hold: [tStart] <= [temperature] <= [tEnd].
 int markovChainLength(
   num temperature, {
   required num tStart,
@@ -41,7 +40,7 @@ typedef PerturbationSequence = List<List<num>> Function(
 
 /// Returns a sequence of vectors
 /// by interpolating between
-/// `start` and `end`.
+/// [start] and [end].
 ///
 /// The resulting sequence is linearly related to `temperatures`.
 List<List<T>> interpolate<T extends num>(
@@ -63,9 +62,9 @@ List<List<T>> interpolate<T extends num>(
 }
 
 /// Returns a sequence of perturbation magnitude vectors by
-/// interpolating between `deltPositionMax` and  `deltaPositionMin`.
+/// interpolating between [deltPositionMax] and  [deltaPositionMin].
 ///
-/// The resulting sequence is linearly related to `temperatures`.
+/// The resulting sequence is linearly related to [temperatures].
 List<List<num>> defaultPerturbationSequence(
   List<num> temperatures,
   List<num> deltaPositionMax,
@@ -98,13 +97,10 @@ abstract class Simulator {
     this.innerIterationsStart = 5,
     this.innerIterationsEnd = 20,
     this.sampleSize = 500,
-  }) {
-    /// Initial values:
-    _currentMinEnergy = field.energyValue;
-    _currentMinPosition = field.position;
-    _acceptanceProbability = 1.0;
-    _startPosition = field.position;
-  }
+  }) : _currentMinEnergy = field.energyValue,
+       _currentMinPosition = List.of(field.position),
+       _acceptanceProbability = 1.0,
+       _startPosition = List.of(field.position);
 
   /// Energy field.
   final EnergyField field;
