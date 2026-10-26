@@ -18,7 +18,7 @@ void main() {
       expect(interval.size, right - left);
     });
     test('next() limits', () {
-      interval.updateCache();
+      interval.invalidateCache();
       expect(interval.next() < right, true);
       expect(left < interval.next(), true);
     });
@@ -63,7 +63,7 @@ void main() {
     test('caching', () {
       expect(interval.next(), interval.next());
       final prev = interval.next();
-      interval.updateCache();
+      interval.invalidateCache();
       expect(interval.next() != prev, true);
     });
   });

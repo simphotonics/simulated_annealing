@@ -33,12 +33,11 @@ int markovChainLength(
 
 /// Function returning a sequence of pertubation
 /// magnitude vectors.
-typedef PerturbationSequence =
-    List<List<num>> Function(
-      List<num> temperatures,
-      List<num> deltaPositionMax,
-      List<num> deltaPositionMin,
-    );
+typedef PerturbationSequence = List<List<num>> Function(
+  List<num> temperatures,
+  List<num> deltaPositionMax,
+  List<num> deltaPositionMin,
+);
 
 /// Returns a sequence of vectors
 /// by interpolating between
@@ -76,22 +75,22 @@ List<List<num>> defaultPerturbationSequence(
 /// Annealing simulator
 abstract class Simulator {
   /// Simulator constructor.
-  /// * `field`: An object of type `EnergyField` encapsulating the
-  ///   energy function (cost function)  and search space.
+  /// * [field]: An object of type [EnergyField] encapsulating the
+  ///   energy function (cost function)  and a geometric search space.
   /// ----
   /// Optional parameters:
-  /// * gammaStart: Expectation value of the solution acceptance at the
+  /// * [gammaStart]: Expectation value of the solution acceptance at the
   //    initial temperature of the annealing process.
-  /// * gammaEnd: Expectation value of the solution acceptance at the
+  /// * [gammaEnd]: Expectation value of the solution acceptance at the
   //    final temperatures of the annealing process.
-  /// * outerIterations: Number of iterations when cooling.
-  /// * innerIterationsStart: Number of iterations at constant temperature
+  /// * [outerIterations]: Number of iterations when cooling.
+  /// * [innerIterationsStart]: Number of iterations at constant temperature
   ///   at the start of the annealing process.
-  /// * innerIterationsEnd: Number of iterations at constant temperature
+  /// * [innerIterationsEnd]: Number of iterations at constant temperature
   ///   at the end of the annealing process.
-  /// * sampleSize: Size of sample used to estimate the start temperature
+  /// * [sampleSize]: Size of sample used to estimate the start temperature
   ///   and the final temperature of the annealing process.
-  Simulator(
+  new(
     this.field, {
     this.gammaStart = 0.7,
     this.gammaEnd = 0.2,
@@ -132,7 +131,7 @@ abstract class Simulator {
   final int sampleSize;
 
   /// Initial annealing temperature.
-  late final Lazy<Future<num>> _tStart = Lazy<Future<num>>(
+  late final Lazy<num> _tStart = Lazy<num>(
     () => field.tStart(
       gammaStart,
       deltaPosition: deltaPositionStart,
@@ -141,10 +140,10 @@ abstract class Simulator {
   );
 
   /// Initial annealing temperature.
-  Future<num> get tStart => _tStart();
+  num get tStart => _tStart();
 
   /// Final annealing temperature.
-  late final Lazy<Future<num>> _tEnd = Lazy<Future<num>>(
+  late final Lazy<num> _tEnd = Lazy<num>(
     () => field.tEnd(
       gammaEnd,
       deltaPosition: deltaPositionEnd,
@@ -153,16 +152,14 @@ abstract class Simulator {
   );
 
   /// Final annealing temperature.
-  Future<num> get tEnd => _tEnd();
+  num get tEnd => _tEnd();
 
-  /// Triggers an update of the lazy variables
-  /// `_tStart`,`_tEnd`,`_temperatures`, and `_perturbationMagnitudes`.
-  void _updateLazyVariables() {
-    _tStart.updateCache();
-    _tEnd.updateCache();
-    _temperatures.updateCache();
-    _perturbationMagnitudes.updateCache();
-  }
+  late final lazyPool = LazyPool<Object>([
+    _tStart,
+    _tEnd,
+    temperatures,
+    perturbationMagnitudes,
+  ]);
 
   /// Function used to calculate the temperature sequence.
   TemperatureSequence _temperatureSequence = exponentialSequence;
@@ -178,8 +175,8 @@ abstract class Simulator {
   ///   and [geometricSequence].
   set temperatureSequence(TemperatureSequence value) {
     _temperatureSequence = value;
-    _temperatures.updateCache();
-    _perturbationMagnitudes.updateCache();
+    temperatures.invalidateCache();
+    perturbationMagnitudes.invalidateCache();
   }
 
   /// The function used to calculate the sequence of perturbation
@@ -194,21 +191,21 @@ abstract class Simulator {
   /// magnitudes.
   set perturbationSequence(PerturbationSequence value) {
     _perturbationSequence = value;
-    _perturbationMagnitudes.updateCache();
+    perturbationMagnitudes.invalidateCache();
   }
 
   /// The initial perturbation magnitudes.
   late final List<num> _deltaPositionStart = field.size;
 
   /// Returns the initial perturbation magnitudes.
-  List<num> get deltaPositionStart => List.of(_deltaPositionStart);
+  List<num> get deltaPositionStart => UnmodifiableListView(_deltaPositionStart);
 
   /// Sets the initial perturbation magnitudes.
   set deltaPositionStart(List<num> value) {
     _deltaPositionStart
       ..clear()
       ..addAll(value);
-    _updateLazyVariables();
+    lazyPool.invalidateCache();
   }
 
   /// The perturbation magnitudes at the end of the annealing cycle.
@@ -226,14 +223,14 @@ abstract class Simulator {
     _deltaPositionEnd
       ..clear()
       ..addAll(value);
-    _updateLazyVariables();
+    lazyPool.invalidateCache();
   }
 
   /// The starting position.
   late final List<num> _startPosition;
 
   /// Returns the starting position of the annealing process.
-  List<num> get startPosition => List.of(_startPosition);
+  List<num> get startPosition => UnmodifiableListView(_startPosition);
 
   /// Sets the starting position of the annealing process.
   set startPosition(List<num> value) {
@@ -243,35 +240,16 @@ abstract class Simulator {
     field.perturb(_startPosition, deltaPositionStart * 0.0);
   }
 
-  /// Annealing temperatures.
-  late final Lazy<Future<List<num>>> _temperatures = Lazy<Future<List<num>>>(
-    () => Future.wait(
-      [tStart, tEnd],
-    ).then((t) => temperatureSequence(t[0], t[1], iterations: outerIterations)),
+  /// The annealing temperatures
+  /// determining the annealing schedule.
+  late final LazyList<num> temperatures = LazyList<num>(
+    () => temperatureSequence(tStart, tEnd, iterations: outerIterations),
   );
 
-  /// Returns an [UnmodifiableListView] of the annealing temperatures
-  /// determining the annealing schedule.
-  Future<List<num>> get temperatures =>
-      _temperatures().then((temperatures) => temperatures.unmodifiable);
-
-  /// Perturbation magnitudes.
-  late final Lazy<Future<List<List<num>>>> _perturbationMagnitudes =
-      Lazy<Future<List<List<num>>>>(
-        () => _temperatures().then<List<List<num>>>(
-          (temperatures) =>
-              interpolate(temperatures, deltaPositionStart, deltaPositionEnd),
-        ),
-      );
-
-  /// Returns the sequence of perturbation magnitudes.
-  Future<List<List<num>>> get perturbationMagnitudes =>
-      _perturbationMagnitudes().then<List<List<num>>>(
-        (pertubationMagnitudes) => List<List<num>>.generate(
-          pertubationMagnitudes.length,
-          (i) => List<num>.of(pertubationMagnitudes[i]),
-        ),
-      );
+  /// The sequence of perturbation magnitudes.
+  late final perturbationMagnitudes = LazyList<List<num>>(
+    () => interpolate(temperatures, deltaPositionStart, deltaPositionEnd),
+  );
 
   /// Current field position.
   List<num> get currentPosition => field.position;
@@ -321,7 +299,7 @@ abstract class Simulator {
   /// Method called once from within `anneal` before any
   /// simulated annealing iterations.
   ///
-  /// Can be used to setup a log.
+  /// Can be used to setup a log object.
   void prepareLog();
 
   /// Method called during each (inner) iteration.
@@ -335,9 +313,6 @@ abstract class Simulator {
     bool isRecursive = false,
     num ratio = 0.5,
   }) async {
-    /// Initialize parameters:
-    final temperatures = await this.temperatures;
-
     final result = <int, int>{};
 
     int nInner(num t) => markovChainLength(
@@ -377,15 +352,12 @@ abstract class Simulator {
   /// temperature sequence during recursive calls. The parameter is used
   /// to model repeated annealing cycles with decreasing initial temperature.
   /// * Note: `0.0 < ratio < 1.0`.
-  Future<List<num>> anneal({
+  List<num> anneal({
     bool isRecursive = false,
     num ratio = 0.5,
     bool isVerbose = false,
-  }) async {
+  }) {
     /// Initialize parameters:
-    final temperatures = await this.temperatures;
-    final perturbationMagnitudes = await this.perturbationMagnitudes;
-
     int nInner(num t) => markovChainLength(
       t,
       tStart: temperatures.first,
@@ -462,35 +434,23 @@ abstract class Simulator {
       _currentMinPosition = globalMinPosition;
       _currentMinEnergy = globalMinEnergy;
       if (isRecursive) {
-        _currentMinPosition = await anneal(
-          isRecursive: isRecursive,
-          ratio: ratio,
-        );
+        _currentMinPosition = anneal(isRecursive: isRecursive, ratio: ratio);
       }
     }
     return _currentMinPosition;
   }
 
+  /// Returns a `String` containing object info.
+  ///
+  /// Note: The method calls asynchronous methods.
   @override
   String toString() {
     final b = StringBuffer();
     b.writeln('Simulator: ');
     b.writeln('  outerIterations: $outerIterations');
     b.writeln('  startPosition: $_startPosition');
-    b.writeln('  Field: $field'.replaceAll('\n', '\n  '));
-    return b.toString();
-  }
-
-  /// Returns a `String` containing object info.
-  ///
-  /// Note: The method calls asynchronous methods.
-  Future<String> get info async {
-    final b = StringBuffer();
-    b.writeln('Simulator: ');
-    b.writeln('  outerIterations: $outerIterations');
-    b.writeln('  startPosition: $_startPosition');
-    b.writeln('  tStart: ${await tStart}');
-    b.writeln('  tEnd: ${await tEnd}');
+    b.writeln('  tStart: $tStart');
+    b.writeln('  tEnd: $tEnd');
     b.writeln('  Field: $field'.replaceAll('\n', '\n  '));
     return b.toString();
   }

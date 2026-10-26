@@ -3,15 +3,15 @@ import 'package:test/test.dart';
 
 import 'src/energy_field_instance.dart';
 
-void main() async {
+void main() {
   // Testing class: Interval.
   group('Sampling:', () {
-    test('sampleField', () async {
-      final sample = await field.sampleEnergy();
+    test('sampleField', () {
+      final sample = field.sampleEnergy();
       expect(sample.length, 100);
     });
-    test('sampleEnergyCloseTo', () async {
-      final sample = await field.sampleEnergyCloseTo(
+    test('sampleEnergyCloseTo', () {
+      final sample = field.sampleEnergyCloseTo(
         globalMin,
         deltaPositionMin,
         selectUphillMoves: true,
@@ -21,28 +21,24 @@ void main() async {
     });
   });
   group('tStart:', () {
-    test('gamma = 1.0', () async {
-      final t = await field.tStart(0.99, deltaPosition: field.size);
+    test('gamma = 1.0', () {
+      final t = field.tStart(0.99, deltaPosition: field.size);
       expect(t, isNonNegative);
       expect(t, isNotNaN);
     });
-    test('gamma = 0.8', () async {
-      final t = await field.tStart(0.8, deltaPosition: field.size);
+    test('gamma = 0.8', () {
+      final t = field.tStart(0.8, deltaPosition: field.size);
       expect(t, isNonNegative, reason: '$t');
       expect(t, isNotNaN);
     });
-    test('gamma = 0.1', () async {
-      final t = await field.tStart(0.1, deltaPosition: field.size);
+    test('gamma = 0.1', () {
+      final t = field.tStart(0.1, deltaPosition: field.size);
       expect(t, isNonNegative, reason: '$t');
       expect(t, isNotNaN);
     });
-    test('t(gamma = 0.1) < t(gamma = 0.99)', () async {
-      final t01 = await field.tStart(
-        0.1,
-        deltaPosition: field.size,
-        sampleSize: 600,
-      );
-      final t099 = await field.tStart(
+    test('t(gamma = 0.1) < t(gamma = 0.99)', () {
+      final t01 = field.tStart(0.1, deltaPosition: field.size, sampleSize: 600);
+      final t099 = field.tStart(
         0.99,
         deltaPosition: field.size,
         sampleSize: 600,
@@ -52,24 +48,24 @@ void main() async {
   });
   group('tEnd:', () {
     final deltaPosition = [1e-6, 1e-6, 1e-6];
-    test('gamma = 0.99', () async {
-      final t = await field.tEnd(0.99, deltaPosition: deltaPosition);
+    test('gamma = 0.99', () {
+      final t = field.tEnd(0.99, deltaPosition: deltaPosition);
       expect(t, isNonNegative);
       expect(t, isNotNaN);
     });
-    test('gamma = 0.8', () async {
-      final t = await field.tEnd(0.8, deltaPosition: deltaPosition);
+    test('gamma = 0.8', () {
+      final t = field.tEnd(0.8, deltaPosition: deltaPosition);
       expect(t, isNonNegative);
       expect(t, isNotNaN);
     });
-    test('gamma = 0.1', () async {
-      final t = await field.tEnd(0.1, deltaPosition: deltaPosition);
+    test('gamma = 0.1', () {
+      final t = field.tEnd(0.1, deltaPosition: deltaPosition);
       expect(t, isNonNegative);
       expect(t, isNotNaN);
     });
-    test('t(gamma = 0.1) < t(gamma = 0.8)', () async {
-      final t01 = await field.tEnd(0.1, deltaPosition: deltaPosition);
-      final t08 = await field.tEnd(0.8, deltaPosition: deltaPosition);
+    test('t(gamma = 0.1) < t(gamma = 0.8)', () {
+      final t01 = field.tEnd(0.1, deltaPosition: deltaPosition);
+      final t08 = field.tEnd(0.8, deltaPosition: deltaPosition);
       expect(t01, lessThan(t08));
     });
   });

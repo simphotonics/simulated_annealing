@@ -1,7 +1,8 @@
 import 'dart:math' show min, max, Random;
+
 import 'package:lazy_memo/lazy_memo.dart';
 
-import '../extensions/random_in_range.dart';
+import '../extension/random_in_range.dart';
 
 /// Function defining an interval start/end point.
 typedef ParametricPoint = num Function();
@@ -11,7 +12,7 @@ typedef Perturb = num Function(num position, num deltaPosition);
 
 /// Abstract class representing a numerical interval.
 abstract class Interval {
-  Interval({this.inverseCdf, this.name = ''});
+  new({this.inverseCdf, this.name = ''});
 
   /// Inverse cummulative distribution function.
   final InverseCdf? inverseCdf;
@@ -60,19 +61,19 @@ abstract class Interval {
       _next = _nextDiscrete;
       _perturb = _perturbDiscrete;
     }
-    dx.updateCache();
+    dx.invalidateCache();
   }
 
   num _nextContinuous() {
-    if (_isUpToDate) {
-      return _cache;
-    } else {
-      _isUpToDate = true;
+    if (_isStale) {
+      _isStale = false;
       return _cache = Interval.random.nextInRange(
         start,
         end,
         inverseCdf: inverseCdf,
       );
+    } else {
+      return _cache;
     }
   }
 
@@ -84,19 +85,19 @@ abstract class Interval {
   /// * Returns a cached value if the cache is up-to-date.
   /// * If the cache is stale an new random number is returned and cached.
   num _nextDiscrete() {
-    if (_isUpToDate) {
-      return _cache;
-    } else {
-      _isUpToDate = true;
+    if (_isStale) {
       final next = Interval.random.nextInRange(
         start,
         end,
         inverseCdf: inverseCdf,
       );
+      _isStale = false;
       // If dx == 0 => start == end.
       return _cache = (dx() == 0)
           ? start
           : start + dx() * ((next - start) / dx()).round();
+    } else {
+      return _cache;
     }
   }
 
@@ -114,10 +115,10 @@ abstract class Interval {
     final startOverlap = max(position - deltaPosition, start);
     final endOverlap = min(position + deltaPosition, end);
     if (startOverlap > end || endOverlap < start) {
-      _isUpToDate = false;
+      _isStale = true;
       return double.nan;
     } else {
-      _isUpToDate = true;
+      _isStale = false;
       return _cache = random.nextInRange(
         startOverlap,
         endOverlap,
@@ -131,10 +132,10 @@ abstract class Interval {
     final startOverlap = max(position - deltaPosition, start);
     final endOverlap = min(position + deltaPosition, end);
     if (startOverlap > end || endOverlap < start) {
-      _isUpToDate = false;
+      _isStale = true;
       return double.nan;
     } else {
-      _isUpToDate = true;
+      _isStale = false;
       final next = random.nextInRange(
         startOverlap,
         endOverlap,
@@ -152,18 +153,19 @@ abstract class Interval {
   /// Returns the next random number sampled from the interval
   /// obtained by intersecting:
   /// `(start, end)` and `(position - deltaPosition, position + deltaPosition)`.
+  ///
   /// * If the intersection is empty, `double.nan` is returned.
-  /// * Returns a cached value if the cache is up-to-date.
+  /// * Returns a cached value if the cache not stale.
   /// * If the cache is stale a new random number is returned and cached.
   num perturb(num position, num deltaPosition) =>
       _perturb(position, deltaPosition);
 
-  /// Returns true if position is safisfying
-  /// `(start <= position && position <= end)`.
+  /// Returns true if [position] is safisfying
+  /// [start] <= [position] && [position] <= [end].
   bool contains(num position) => start <= position && position <= end;
 
   /// Returns true if the interval defined by the points
-  /// `left` and `right` overlaps `this`.
+  /// [left] and [right] overlaps `this`.
   bool overlaps(num left, num right) {
     final start = min(left, right);
     final end = max(left, right);
@@ -179,17 +181,17 @@ abstract class Interval {
   /// @nodoc
   late num _cache;
 
-  /// Logical flag indicating if `_cache` is up to date.
-  bool _isUpToDate = false;
+  /// True if [_cache] is stale and `false` otherwise.
+  bool _isStale = true;
 
-  /// Returns `true` is the cached random numbers are up-to-date.
-  bool get isUpToDate => _isUpToDate;
+  /// Returns `true` if the cached random numbers are stale.
+  bool get isStale => _isStale;
 
   /// Marks the internal cache as stale. After calling this function
   /// the methods [next] and [perturb] will return a new random number sampled
   /// from the interval `start...end`.
-  void updateCache() {
-    _isUpToDate = false;
+  void invalidateCache() {
+    _isStale = true;
   }
 
   @override
@@ -213,10 +215,10 @@ abstract class Interval {
       b.write(' dx: ${dx().toStringAsPrecision(6)}\n');
     }
 
-    if (_isUpToDate) {
-      b.write('   cached next: $_cache');
-    } else {
+    if (_isStale) {
       b.write('   cached next: not set');
+    } else {
+      b.write('   cached next: $_cache');
     }
     return b.toString();
   }
@@ -235,10 +237,9 @@ abstract class Interval {
 /// of a surface of a sphere.
 class SingularInterval extends FixedInterval {
   /// Constructs a singular fixed interval.
-  SingularInterval(num value, {String name = ''})
-    : super._(value, value, name: name);
+  new(num value, {String name = ''}) : super._(value, value, name: name);
 
-  SingularInterval.of(SingularInterval interval)
+  new of(SingularInterval interval)
     : super._(interval.start, interval.end, name: interval.name);
 
   /// Returns the singular value `start.
@@ -272,32 +273,27 @@ class SingularInterval extends FixedInterval {
 }
 
 /// A fixed numerical interval defined by
-/// the start point `start` and the end point `end`.
+/// the start point [start] and the end point [end].
 class FixedInterval extends Interval {
-  /// Constructs a fixed interval (`start`, `end`).
-  FixedInterval._(num start, num end, {super.inverseCdf, super.name})
+  /// Constructs a fixed interval ([start], [end]).
+  new _(num start, num end, {super.inverseCdf, super.name})
     : start = min(start, end),
       end = max(start, end);
 
   /// Returns an instance of [FixedInterval].
   ///
-  /// If `start == end` an instance of [SingularInterval] is returned.
-  factory FixedInterval(
-    num start,
-    num end, {
-    InverseCdf? inverseCdf,
-    String name = '',
-  }) {
+  /// If [start] == [end] an instance of [SingularInterval] is returned.
+  factory(num start, num end, {InverseCdf? inverseCdf, String name = ''}) {
     return start == end
         ? SingularInterval(start, name: name)
         : FixedInterval._(start, end, inverseCdf: inverseCdf, name: name);
   }
 
-  /// Constructs a copy of `interval`.
+  /// Constructs a copy of [interval].
   ///
   /// Note: The cache is *not* copied. Each instance of [FixedInterval]
   /// manages its own cache.
-  factory FixedInterval.of(FixedInterval interval) {
+  factory of(FixedInterval interval) {
     if (interval is SingularInterval) {
       return SingularInterval.of(interval);
     } else if (interval is PeriodicInterval) {
@@ -331,10 +327,9 @@ class FixedInterval extends Interval {
 /// the longitudinal angle of spherical coordinates.
 /// Any angle may then be remapped to the interval 0...2pi.
 class PeriodicInterval extends FixedInterval {
-  PeriodicInterval(super.start, super.end, {super.inverseCdf, super.name})
-    : super._();
+  new(super.start, super.end, {super.inverseCdf, super.name}) : super._();
 
-  PeriodicInterval.of(FixedInterval interval)
+  new of(FixedInterval interval)
     : super._(
         interval.start,
         interval.end,
@@ -344,7 +339,7 @@ class PeriodicInterval extends FixedInterval {
 
   @override
   num _perturbContinuous(num position, num deltaPosition) {
-    _isUpToDate = true;
+    _isStale = false;
     deltaPosition = deltaPosition.abs();
     final next = Interval.random.nextInRange(
       position - deltaPosition,
@@ -364,7 +359,7 @@ class PeriodicInterval extends FixedInterval {
 
   @override
   num _perturbDiscrete(num position, num deltaPosition) {
-    _isUpToDate = true;
+    _isStale = false;
     deltaPosition = deltaPosition.abs();
     var next = Interval.random.nextInRange(
       position - deltaPosition,
@@ -396,17 +391,12 @@ class ParametricInterval extends Interval {
   /// Constructs a parametric interval defined by
   /// the parametric start point function `startFunc` and the end
   /// point function `endFunc`.
-  ParametricInterval(
-    this.startFunc,
-    this.endFunc, {
-    super.inverseCdf,
-    super.name,
-  });
+  new(this.startFunc, this.endFunc, {super.inverseCdf, super.name});
 
   /// Constructs a copy of [interval].
   ///
   /// Note: Cached variables are not copied.
-  ParametricInterval.of(ParametricInterval interval)
+  new of(ParametricInterval interval)
     : startFunc = interval.startFunc,
       endFunc = interval.endFunc,
       super(inverseCdf: interval.inverseCdf);
@@ -430,13 +420,13 @@ class ParametricInterval extends Interval {
   num get end => max(_start(), _end());
 
   @override
-  void updateCache() {
-    super.updateCache();
+  void invalidateCache() {
+    super.invalidateCache();
 
     /// Re-initialize lazy variables.
-    _start.updateCache();
-    _end.updateCache();
-    dx.updateCache();
+    _start.invalidateCache();
+    _end.invalidateCache();
+    dx.invalidateCache();
   }
 
   @override
@@ -460,10 +450,10 @@ class ParametricInterval extends Interval {
       }
       b.write(' dx: ${dx().toStringAsPrecision(6)}\n');
     }
-    if (_isUpToDate) {
-      b.write('   cached next: $_cache');
-    } else {
+    if (_isStale) {
       b.write('   cached next: not set');
+    } else {
+      b.write('   cached next: $_cache');
     }
     return b.toString();
   }
