@@ -1,3 +1,4 @@
+import 'dart:collection' show UnmodifiableListView;
 import 'dart:math';
 
 import 'package:exception_templates/exception_templates.dart';
@@ -37,13 +38,13 @@ class EnergyField {
   late List<num> _position;
 
   /// Returns the current field position.
-  List<num> get position => List<num>.from(_position);
+  List<num> get position => UnmodifiableListView(_position);
 
   /// Stores the current energy value.
-  late num _value;
+  late num _energyValue;
 
-  /// Returns the current value of the energy at location `position`.
-  num get value => _value;
+  /// Returns the current value of the energy at location [position].
+  num get energyValue => _energyValue;
 
   /// Stores the smallest energy value encountered.
   num _minValue;
@@ -65,15 +66,15 @@ class EnergyField {
   /// max. perturbation magnitude along the corrsponding dimension.
   /// * The new position can be accessed via the getter
   /// [position]. The return value of [perturb] can
-  /// also be accessed via the getter [value].
+  /// also be accessed via the getter [energyValue].
   num perturb(List<num> position, List<num> deltaPosition) {
     _position = space.perturb(position, deltaPosition);
-    _value = energy(_position);
-    if (_value < _minValue) {
-      _minValue = _value;
+    _energyValue = energy(_position);
+    if (_energyValue < _minValue) {
+      _minValue = _energyValue;
       _minPosition = _position;
     }
-    return _value;
+    return _energyValue;
   }
 
   /// Returns the energy at a randomly
@@ -81,15 +82,15 @@ class EnergyField {
   ///
   /// Note: The new position can be accessed via the getter
   /// [position]. The return value of [next] can
-  /// also be accessed via [value].
+  /// also be accessed via [energyValue].
   num next() {
     _position = space.next();
-    _value = energy(_position);
-    if (_value < _minValue) {
-      _minValue = _value;
+    _energyValue = energy(_position);
+    if (_energyValue < _minValue) {
+      _minValue = _energyValue;
       _minPosition = _position;
     }
-    return _value;
+    return _energyValue;
   }
 
   /// Returns a list of energy values sampled from the entire search space.
@@ -97,11 +98,11 @@ class EnergyField {
       List<num>.generate(sampleSize, (_) => next());
 
   /// Returns a list with length [sampleSize]. Each list entry represents a
-  /// [position, energy] pair.
+  /// [position], [energy]-value pair.
   List<List<num>> sample({int sampleSize = 100}) =>
       List<List<num>>.generate(sampleSize, (_) {
         next();
-        return [..._position, _value];
+        return [..._position, _energyValue];
       });
 
   /// Returns a list containing the energy values at two
@@ -172,7 +173,7 @@ class EnergyField {
       final result = <num>[];
       do {
         if (eMin < perturb(position, deltaPosition)) {
-          result.add(value);
+          result.add(energyValue);
           ++i;
         } else {
           ++counter;

@@ -100,7 +100,7 @@ abstract class Simulator {
     this.sampleSize = 500,
   }) {
     /// Initial values:
-    _currentMinEnergy = field.value;
+    _currentMinEnergy = field.energyValue;
     _currentMinPosition = field.position;
     _acceptanceProbability = 1.0;
     _startPosition = field.position;
@@ -255,7 +255,7 @@ abstract class Simulator {
   List<num> get currentPosition => field.position;
 
   /// Energy at current field position.
-  num get currentEnergy => field.value;
+  num get currentEnergy => field.energyValue;
 
   /// Current energy minimizing field position.
   late List<num> _currentMinPosition;
@@ -401,13 +401,13 @@ abstract class Simulator {
             _currentMinEnergy;
 
         if (dE < 0) {
-          _currentMinEnergy = field.value;
+          _currentMinEnergy = field.energyValue;
           _currentMinPosition = field.position;
           _acceptanceProbability = 1.0;
         } else {
           _acceptanceProbability = exp(-dE / _t);
           if (_acceptanceProbability > Interval.random.nextDouble()) {
-            _currentMinEnergy = field.value;
+            _currentMinEnergy = field.energyValue;
             _currentMinPosition = field.position;
           }
         }
