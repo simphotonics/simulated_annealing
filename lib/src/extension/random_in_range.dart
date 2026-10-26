@@ -111,8 +111,6 @@ abstract class InverseCdfRepository {
       rMin + (rMax - rMin) * pow(p, oneThird);
 }
 
-/// Extension on [Random] providing the methods
-/// [nextInRange] and [nextIntFromList].
 extension RandomInRange on Random {
   /// Generates a random floating point
   /// value in the range from [start],
