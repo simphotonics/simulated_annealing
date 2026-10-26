@@ -6,12 +6,12 @@ import 'package:simulated_annealing/simulated_annealing.dart';
 /// To run the program navigate to the main project folder
 /// and use the command:
 /// ```Term
-/// $ dart example/bin/cone_example.dart
+/// $ dart example/bin/conical_space_example.dart
 /// ```
 /// To visualize the search space navigate to `example/gnuplot_scripts`,
 /// start the program `gnuplot` and use the command:
 /// ```Term
-/// gnuplot> load 'cone.gp'
+/// gnuplot> load 'conical_space.gp'
 /// ```
 void main(List<String> args) async {
   /// Search space including all points on the surface of
@@ -35,9 +35,8 @@ void main(List<String> args) async {
   print('Writing data ...');
 
   /// Write to file:
-  await File(
-    'example/data/cone.dat',
-  ).writeAsString(sample.export(label: '#Conical Search Space: x, y, z'));
+  await File('example/data/cone.dat')
+      .writeAsString(sample.export(label: '#Conical Search Space: x, y, z'));
   await File('example/data/cone_perturbation.dat').writeAsString(
     perturbations.export(label: '#Conical Perturbations: x, y, z'),
   );
