@@ -1,4 +1,8 @@
 
+## 1.0.1
+- Fixed bug related to the initialization of the `Simulator` instance field
+  `_startPosition`. 
+
 ## 1.0.0
 - Updated dependencies.
 - Converted some functions from async -> sync.

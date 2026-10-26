@@ -3,7 +3,7 @@ name: simulated_annealing
 description: Simulated annealing framework for finding the global minimum of
   multi-variate functions.
 
-version: 1.0.0
+version: 1.0.1
 
 homepage: https://github.com/simphotonics/simulated_annealing
 
