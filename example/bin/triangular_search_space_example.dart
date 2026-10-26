@@ -27,16 +27,13 @@ void main() async {
     (_) => space.perturb(testPoint, magnitudes),
   );
 
-  await File(
-    'example/data/triangular_search_space.dat',
-  ).writeAsString(sample.export());
-  await File(
-    'example/data/triangular_search_space_perturbation.dat',
-  ).writeAsString(perturbation.export());
+  await File('example/data/triangular_search_space.dat')
+      .writeAsString(sample.export());
+  await File('example/data/triangular_search_space_perturbation.dat')
+      .writeAsString(perturbation.export());
 
-  await File(
-    'example/data/triangular_search_space_center_point.dat',
-  ).writeAsString('''
+  await File('example/data/triangular_search_space_center_point.dat')
+      .writeAsString('''
     # Perturbation Centerpoint
     ${[testPoint].export()}''');
 

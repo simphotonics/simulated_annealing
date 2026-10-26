@@ -1,6 +1,8 @@
 import 'dart:io';
+
 import 'package:list_operators/list_operators.dart';
 import 'package:simulated_annealing/simulated_annealing.dart';
+
 import '../../test/src/energy_field_instance.dart';
 
 /// To run this program navigate to the root folder in your local
@@ -19,10 +21,10 @@ void main() async {
 
   simulator.deltaPositionEnd = [1e-7, 1e-7, 1e-7];
 
-  print(await simulator.info);
+  print(simulator);
 
   print('Start annealing process ...');
-  final xSol = await simulator.anneal(isRecursive: true, isVerbose: true);
+  final xSol = simulator.anneal(isRecursive: true, isVerbose: true);
   print('Annealing ended.');
   print('Writing log to file: example/data/log.dat');
   await File('example/data/log.dat').writeAsString(simulator.export());

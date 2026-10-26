@@ -1,10 +1,13 @@
 import '../../test/src/energy_field_instance.dart';
 import '../../test/src/snapshot_logging_simulator.dart';
 
-/// To run this program please navigate to the package root folder
+/// To run this program navigate to the package root folder
 /// and use the command:
 /// $ dart example/bin/simulated_annealing_animation_example.dart
-void main() async {
+///
+/// Note: Create the output folder: example/data/animation/ if it does not
+/// exist.
+void main() {
   // Construct a simulator instance.
   final simulator = SnapshotLoggingSimulator(
     field,
@@ -15,10 +18,10 @@ void main() async {
     gammaEnd: 0.05,
   );
 
-  print(await simulator.info);
+  print(simulator);
   print('Start annealing process ...');
 
-  final xSol = await simulator.anneal(isRecursive: true, isVerbose: true);
+  final xSol = simulator.anneal(isRecursive: true, isVerbose: true);
   print('Annealing ended.');
   print('Solution: $xSol');
 }

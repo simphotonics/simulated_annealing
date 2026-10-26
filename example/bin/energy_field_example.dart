@@ -25,7 +25,7 @@ void main(List<String> args) async {
   print('');
   print('Writing data ...');
 
-  final sample = await field.sample(sampleSize: 2000);
+  final sample = field.sample(sampleSize: 2000);
 
   await File('example/data/energy.dat').writeAsString(
     sample.export(label: '#Energy Spherical Search Space: x, y, z, Energy'),

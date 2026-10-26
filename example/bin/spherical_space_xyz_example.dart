@@ -31,9 +31,8 @@ void main() async {
   print('');
   print('Writing data ...');
 
-  await File(
-    'example/data/spherical_space.dat',
-  ).writeAsString(sample.export(label: '#Spherical Search Space: x, y, z'));
+  await File('example/data/spherical_space.dat')
+      .writeAsString(sample.export(label: '#Spherical Search Space: x, y, z'));
 
   await File('example/data/spherical_space_perturbation.dat').writeAsString(
     perturbations.export(label: '#Spherical Perturbations: x, y, z'),

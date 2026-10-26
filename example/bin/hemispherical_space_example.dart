@@ -38,9 +38,8 @@ void main() async {
       .sphericalToCartesian;
 
   await File('example/data/hemisphere.dat').writeAsString(sample.export());
-  await File(
-    'example/data/hemisphere_perturbation.dat',
-  ).writeAsString(perturbation.export());
+  await File('example/data/hemisphere_perturbation.dat')
+      .writeAsString(perturbation.export());
 
   await File('example/data/hemisphere_test_point.dat').writeAsString('''
     # Test Point

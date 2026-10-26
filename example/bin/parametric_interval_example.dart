@@ -48,9 +48,8 @@ void main() async {
   );
 
   await File('../data/spherical_space.dat').writeAsString(sample.export());
-  await File(
-    '../data/spherical_space_perturbation.dat',
-  ).writeAsString(perturbation.export());
+  await File('../data/spherical_space_perturbation.dat')
+      .writeAsString(perturbation.export());
 
   await File('../data/spherical_space_center_point.dat').writeAsString('''
     # Perturbation Centerpoint
